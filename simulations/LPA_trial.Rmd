@@ -18,6 +18,7 @@ library(psych)
 library(naniar)
 library(tidyverse)
 library(tidyLPA)
+library(GGally)
 ```
 
 ```{r set-up}
@@ -172,10 +173,12 @@ sim_dat <-data.frame(nara_comp=numeric(), nara_acc=numeric(), word_acc=numeric()
 for(i in 1:n_ppts){
 sim_dat[i,]<-switch(k[i],mvrnorm(n = 1, mu = means1, Sigma = covar1), mvrnorm(n = 1, mu = means2, Sigma = covar2), mvrnorm(n = 1, mu = means3, Sigma = covar3))
 }
-sim_dat <- as.data.frame(sim_dat)
+sim_dat <- as.data.frame(cbind(sim_dat,as.factor(k)))
 
 #create a dummy id (change as needed)
 sim_dat$id<-paste0("ALSPAC",sprintf('%0.4d', 1:n_ppts))
+
+names(sim_dat)<-c("nara_comp", "nara_acc", "word_acc", "nonword_acc", "wold_comp","k","id")
 ```
 
 ### Missing data
@@ -203,11 +206,11 @@ sep_na_prop <- 0.05
 
 # Create dataframe with NAs
 sim_dat_NA <- sim_dat %>% 
-  pivot_longer(cols = -id,names_to = "var", values_to = "value") %>%    # pivot data to long format
+  pivot_longer(cols = -c(id,k),names_to = "var", values_to = "value") %>%    # pivot data to long format
   mutate(r = runif(nrow(.)),                                            # simulate a random number (r) from 0 to 1 for each row
          value = ifelse(var %in% same_na_cols & r <= same_na_prop, NA,  # for same session vars, update to NA if r < threshold
                         ifelse(var %in% sep_na_cols & r <= sep_na_prop, NA, value))) %>%  # for separate session vars, update to NA is r < threshold, else same value
-  select(-r) %>%                                                        # remove random number
+  dplyr::select(-r) %>%                                                        # remove random number
   pivot_wider(names_from = var, values_from = value)                    # pivot back to original format
 ```
 
@@ -226,6 +229,10 @@ describe(sim_dat_NA)
 
 # Check histograms/correlations
 pairs.panels(sim_dat_NA)
+
+
+
+sim_dat_NA %>% dplyr::select(-id) %>% ggpairs(mapping = aes(color = k))
 ```
 
 ### Missing data
