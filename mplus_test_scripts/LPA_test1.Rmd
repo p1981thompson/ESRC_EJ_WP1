@@ -19,7 +19,10 @@ library(naniar)
 library(tidyverse)
 library(tidyLPA)
 library(GGally)
+library(MplusAutomation)
+library(texreg)
 ```
+
 
 ```{r set-up}
 options(scipen = 999)
@@ -178,7 +181,7 @@ sim_dat <- as.data.frame(cbind(sim_dat,as.factor(k)))
 #create a dummy id (change as needed)
 sim_dat$id<-paste0("ALSPAC",sprintf('%0.4d', 1:n_ppts))
 
-names(sim_dat)<-c("nara_comp", "nara_acc", "word_acc", "nonword_acc", "wold_comp","k","id")
+names(sim_dat)<-c("naraComp", "naraAcc", "wordAcc", "nonwordAcc", "woldComp","k","id")
 ```
 
 ### Missing data
@@ -197,11 +200,11 @@ EJ: For this analysis, it doesn't seem as if there are specific contingencies in
 
 ```{r missing-data}
 # specify variables collected in same session, low proportion missingness
-same_na_cols <- c("nara_acc", "word_acc", "nonword_acc")
+same_na_cols <- c("naraAcc", "wordAcc", "nonwordAcc")
 same_na_prop <- 0.01
 
 # specify variables collected in separate session, higher proportion missingness
-sep_na_cols <- "wold_comp"
+sep_na_cols <- "woldComp"
 sep_na_prop <- 0.05
 
 # Create dataframe with NAs
@@ -246,159 +249,52 @@ vis_miss(sim_dat_NA)
 
 *...decide what to do with missing data for this analysis.* 
 
-# Fitting multiple models
-
-Fit multiple different models, each with different numbers of latent classes. 
 
 ```{r compare-mods}
 sim_dat %>% dplyr::select(-c(id,k)) %>%
-  estimate_profiles(1:9) %>% 
+  estimate_profiles(1:9, package = "MplusAutomation") %>% 
   compare_solutions(statistics = c("AIC", "BIC", "ICL","SABIC", "Entropy", "BLRT_val", "BLRT_p"))
 
 sim_dat %>% dplyr::select(-c(id,k)) %>%
-estimate_profiles(9) %>% plot_profiles() 
+estimate_profiles(9, package = "MplusAutomation") %>% plot_profiles() 
 
 ```
-* *Here I kept increasing the number of profiles until BLRT was no longer significant (?)*  
-* *Some disagreement over the best model >> come down to interpretability? Generally favour fewer?* 
 
-tidyLPA outputs a number of different fit indices (described further [here](https://data-edu.github.io/tidyLPA/articles/Introduction_to_tidyLPA.html#getting-fit-statistics)):
+# Fitting simple LPA model in Mplus (manually specifying the mplus model)
 
-* *Definitely want LL, AIC, BIC, bLRT ...select others to prioritise in output?*
-* *No Chi-Sqr, CFI, TLI, RMSEA, SRMR - actually not seen reported for latent profile models?* 
+```{r mplus-prep}
 
-### Scree plot
 
-Create plot for visualising fit of different models - just selected AIC and BIC for now, but can incorporate others.
+#prepare data, converting R data.frame to Mplus readable file.
+sim_dat_NA2<-sim_dat_NA
 
-```{r scree-plot}
-# Extract fit statistics from multiple models 
-n_mods <- sim_dat %>%  dplyr::select(-c(id,k)) %>%                                                 
-  estimate_profiles(1:9) %>% 
-  get_fit() %>% 
-  select(Classes, AIC, BIC) %>% 
-  pivot_longer(AIC:BIC, names_to = "statistic", values_to = "value")
+names(sim_dat_NA2)<-c("k", "id", "NAC", "NAA", "WOA", "NWOA", "WC")
 
-# Plot
-ggplot(n_mods, aes(x = factor(Classes), y = value)) + 
-  geom_point() +
-  geom_line(group = 1) + 
-  xlab("n classes") + 
-  theme_bw() + 
-  theme(panel.grid.major.x = element_blank(),
-        panel.grid.minor.y = element_blank()) +
-  facet_grid(statistic ~., scales = "free")
-```
+#prepare the model script file. This can be done using a .txt file then using 
 
-### Model specification 
 
-Additional options for whether/how variances and covariances are estimated. Six different models can be fitted (if have Mplus, only four options without). Information [here](https://data-edu.github.io/tidyLPA/articles/Introduction_to_tidyLPA.html#model-specification). 
+pathmodel <- mplusObject(
+TITLE= "LCA with continuous latent class indicators;",
+VARIABLE = "CLASSES = c (2);",
+ANALYSIS =  "
+TYPE = MIXTURE; 
+STARTS = 0;",
+MODEL = "
+%OVERALL% 
+%c#1% 
+[NAC-WC*1]; 
+NAC-WC; 
+%c#2% 
+[NAC-WC*-1];
+NAC-WC;",
+OUTPUT = "TECH1 TECH8;",
+usevariables = c("NAC", "NAA", "WOA", "NWOA", "WC"),
+rdata = sim_dat_NA2[,!names(sim_dat_NA2) %in% c("id","k")])
 
-*Not sure I understand this too well yet, and whether it's a case of trying all the options for the best fit or theoretically guided?
-Can produce very different results... for example, for fitting all combinations for up to 6 classes... *
+fit <- mplusModeler(pathmodel, modelout = "model_LPA1.inp", run = 1L,check=TRUE,varwarnings=TRUE)
 
-```{r compare-mod-specs}
-sim_dat %>%
-  estimate_profiles(1:6,
-                    variances = c("equal", "varying", "equal", "varying"),
-                    covariances = c("zero", "zero", "equal", "varying")) %>%
-  compare_solutions(statistics = c("AIC", "BIC", "BLRT_val", "BLRT_p"))
-```
 
-# Model profiles
+screenreg(fit, single.row=TRUE)
 
-Once have final model (or exploring individual solution for interpetability), explore resultant profiles. 
-
-First fit selected model separately - e.g., for 8-class model (with covariances constrained to 0).
-
-```{r fit-selected}
-selected_mod <- sim_dat %>% 
-  estimate_profiles(8)
-```
-
-Plot profiles - package option quite hard to interpret, so also plotted own version...
-
-```{r plot-profiles}
-# tidyLPA option
-plot_profiles(selected_mod, rawdata = FALSE)
-
-# Extract estimates, reorder tasks for interpretability 
-estimates <- get_estimates(selected_mod) %>% 
-  filter(Category == "Means") %>% 
-  mutate(Class = factor(Class),
-         Parameter = factor(Parameter, levels = c("nonword_acc", "word_acc", "nara_acc", "nara_comp", "wold_comp")))
-
-# Plot mean test scores for each class
-ggplot(estimates, aes(x = Parameter, y = Estimate, colour = Class)) + 
-  geom_point() + 
-  geom_line(aes(group = Class)) +
-  xlab("Measure") +
-  #geom_errorbar(aes(ymin = Estimate - se, ymax = Estimate + se), width = .1) +
-  theme_bw()
-```
-
-A poor comprehender profile would have higher scores on the left 3 measures, low scores on the last 2 (e.g., here classes 4, 8?). 
-
-Should think about extent to which want to differentiate levels of performance - e.g., a 4-class model might produce classes aligned with the Simple View, but probably do want to focus on children with *weaknesses* in comprehension? 
-
-# Extracting profile information
-
-Each participant is given a probability of membership to each class, based on their task scores. 
-
-```{r class-assign}
-class_dat <- get_data(selected_mod)
-```
-
-Inspect classification utility - look at how well classes are distinguished from each other
-
-```{r classification-table}
-class_dat %>% 
-  group_by(Class) %>% 
-  summarise(across(CPROB1:CPROB8, mean)) %>% 
-  round(2)
-```
-
-Summarise class assignments, and check that sample statistics per class conform to parameters estimated by model. 
-
-```{r class-summary}
-# Probability of being assigned to each class
-colMeans(class_dat[8:15])
-
-# Number and proportion of individuals assigned to each class
-class_dat %>% 
-  group_by(Class) %>% 
-  summarise(group_n = n()) %>% 
-  mutate(percent_sample = (group_n / sum(group_n))*100)
-
-# Class descriptives
-class_dat %>% 
-  select(Class, nonword_acc, word_acc, nara_acc, nara_comp, wold_comp) %>% 
-  group_by(Class) %>% 
-  summarise(across(nonword_acc:wold_comp, list(mean = mean, sd = sd)))
-```
-
-*Consider threshold for class assignment?* - e.g., Foorman et al (2017) paper only included participants who had >.70 probability for their final class. Can explore range of final assignment...?
-
-```{r class-prob}
-# Create column with probability of selected class
-class_dat <- class_dat %>%
-  mutate(class_prob = ifelse(Class == 1, CPROB1,
-                             ifelse(Class == 2, CPROB2,
-                                    ifelse(Class == 3, CPROB3,
-                                           ifelse(Class == 4, CPROB4,
-                                                  ifelse(Class == 5, CPROB5,
-                                                         ifelse(Class == 6, CPROB6,
-                                                                ifelse(Class == 7, CPROB7,
-                                                                       CPROB8))))))))
-# Summarise probabilities
-class_dat %>%
-  group_by(Class) %>%
-  summarise(min_prob = min(class_prob), max = max(class_prob), mean = mean(class_prob), median = median(class_prob))
-
-# Visualise probabilities??? 
-class_dat %>%
-  ggplot(aes(class_prob, group = Class)) +
-  geom_density(aes(colour = factor(Class))) +
-  theme_bw()
 ```
 

@@ -1,0 +1,24 @@
+TITLE:
+LCA with continuous latent class indicators;
+DATA:
+FILE = "model_LPA1_3413d41957cb32a7603bc10969a7a73f.dat";
+ 
+VARIABLE:
+NAMES = NAC NAA WOA NWOA WC; 
+ MISSING=.;
+ CLASSES = c (2);
+ANALYSIS:
+
+TYPE = MIXTURE; 
+STARTS = 0;
+MODEL:
+
+%OVERALL% 
+%c#1% 
+[NAC-WC*1]; 
+NAC-WC; 
+%c#2% 
+[NAC-WC*-1];
+NAC-WC;
+OUTPUT:
+TECH1 TECH8;
