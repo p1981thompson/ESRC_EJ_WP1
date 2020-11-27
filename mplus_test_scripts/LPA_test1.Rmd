@@ -251,11 +251,11 @@ vis_miss(sim_dat_NA)
 
 
 ```{r compare-mods}
-sim_dat %>% dplyr::select(-c(id,k)) %>%
+sim_dat_NA %>% dplyr::select(-c(id,k)) %>%
   estimate_profiles(1:9, package = "MplusAutomation") %>% 
   compare_solutions(statistics = c("AIC", "BIC", "ICL","SABIC", "Entropy", "BLRT_val", "BLRT_p"))
 
-sim_dat %>% dplyr::select(-c(id,k)) %>%
+sim_dat_NA %>% dplyr::select(-c(id,k)) %>%
 estimate_profiles(9, package = "MplusAutomation") %>% plot_profiles() 
 
 ```
@@ -268,33 +268,80 @@ estimate_profiles(9, package = "MplusAutomation") %>% plot_profiles()
 #prepare data, converting R data.frame to Mplus readable file.
 sim_dat_NA2<-sim_dat_NA
 
-names(sim_dat_NA2)<-c("k", "id", "NAC", "NAA", "WOA", "NWOA", "WC")
+names(sim_dat_NA2)<-c("k", "id", "naraComp", "naraAcc", "wordAcc", "nonwordAcc", "woldComp")
 
 #prepare the model script file. This can be done using a .txt file then using 
 
 
-pathmodel <- mplusObject(
+pathmodel3 <- mplusObject(
 TITLE= "LCA with continuous latent class indicators;",
-VARIABLE = "CLASSES = c (2);",
-ANALYSIS =  "
+VARIABLE = "CLASSES = c (3);",
+ANALYSIS = "
 TYPE = MIXTURE; 
 STARTS = 0;",
 MODEL = "
 %OVERALL% 
 %c#1% 
-[NAC-WC*1]; 
-NAC-WC; 
+[naraComp-woldComp]; 
 %c#2% 
-[NAC-WC*-1];
-NAC-WC;",
+[naraComp-woldComp];
+%c#3% 
+[naraComp-woldComp];",
 OUTPUT = "TECH1 TECH8;",
-usevariables = c("NAC", "NAA", "WOA", "NWOA", "WC"),
+usevariables = c("naraComp", "naraAcc", "wordAcc", "nonwordAcc", "woldComp"),
 rdata = sim_dat_NA2[,!names(sim_dat_NA2) %in% c("id","k")])
 
-fit <- mplusModeler(pathmodel, modelout = "model_LPA1.inp", run = 1L,check=TRUE,varwarnings=TRUE)
+pathmodel2 <- mplusObject(
+TITLE= "LCA with continuous latent class indicators (2);",
+VARIABLE = "CLASSES = c (2);",
+ANALYSIS = "
+TYPE = MIXTURE; 
+STARTS = 0;",
+MODEL = "
+%OVERALL% 
+%c#1% 
+[naraComp-woldComp]; 
+%c#2% 
+[naraComp-woldComp];",
+OUTPUT = "TECH1 TECH8;",
+usevariables = c("naraComp", "naraAcc", "wordAcc", "nonwordAcc", "woldComp"),
+rdata = sim_dat_NA2[,!names(sim_dat_NA2) %in% c("id","k")])
+
+fit2 <- mplusModeler(pathmodel2, modelout = "model_LPA2.inp", run = 1L,check=TRUE,varwarnings=TRUE)
+fit3 <- mplusModeler(pathmodel3, modelout = "model_LPA3.inp", run = 1L,check=TRUE,varwarnings=TRUE)
 
 
-screenreg(fit, single.row=TRUE)
+screenreg(fit2, single.row=TRUE)
+screenreg(fit3, single.row=TRUE)
+
+```
+
+
+```{r multi_template}
+
+m.cfa <- mplusObject(
+    TITLE = "Confirmatory Factor Analysis",
+    ANALYSIS = "estimator = mlr;",
+    MODEL = "factor BY u1-u6;",
+    OUTPUT = "TECH1; TECH8;",
+    PLOT = "TYPE = PLOT3;",
+    usevariables = colnames(d),
+    rdata = d)
+
+m.cfa.fit <- mplusModeler(m.cfa, "cfa_example.dat", run = TRUE)
+
+m.lca <- lapply(2:5, function(k) {
+   body <- update(m.cfa,
+     TITLE = ~ "Latent Profile Analysis",
+     VARIABLE = as.formula(sprintf("~ . + 'classes = c(%d);'", k)),
+     ANALYSIS = ~ . + "type = mixture; starts = 250 25;",
+     MODEL = ~ "%OVERALL%",
+     OUTPUT = ~ . + "TECH14;")
+
+   mplusModeler(body, sprintf("lpa_%d_example.dat", k), run = TRUE)
+ })
+
+LPAModels <- readModels("/Volumes/PSYHOME/PSYRES/pthompson/DVMB/ESRC_EJ_WP1/mplus_test_scripts/template_multi_run")
 
 ```
 
