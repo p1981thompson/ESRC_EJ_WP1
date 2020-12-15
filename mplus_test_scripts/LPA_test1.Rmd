@@ -250,7 +250,7 @@ vis_miss(sim_dat_NA)
 *...decide what to do with missing data for this analysis.* 
 
 
-```{r compare-mods}
+```{r compare-mods, }
 sim_dat_NA %>% dplyr::select(-c(id,k)) %>%
   estimate_profiles(1:9, package = "MplusAutomation") %>% 
   compare_solutions(statistics = c("AIC", "BIC", "ICL","SABIC", "Entropy", "BLRT_val", "BLRT_p"))
@@ -322,17 +322,17 @@ screenreg(fit3, single.row=TRUE)
 m.cfa <- mplusObject(
     TITLE = "Confirmatory Factor Analysis",
     ANALYSIS = "estimator = mlr;",
-    MODEL = "factor BY u1-u6;",
+    MODEL = "factor BY naraComp-woldComp;",
     OUTPUT = "TECH1; TECH8;",
     PLOT = "TYPE = PLOT3;",
-    usevariables = colnames(d),
-    rdata = d)
+    usevariables = colnames(sim_dat_NA2[,!names(sim_dat_NA2) %in% c("id","k")]),
+    rdata = sim_dat_NA2[,!names(sim_dat_NA2) %in% c("id","k")])
 
 m.cfa.fit <- mplusModeler(m.cfa, "cfa_example.dat", run = TRUE)
 
 m.lca <- lapply(2:5, function(k) {
    body <- update(m.cfa,
-     TITLE = ~ "Latent Profile Analysis",
+     TITLE = as.formula(sprintf("~ 'class-%d;'", k)),
      VARIABLE = as.formula(sprintf("~ . + 'classes = c(%d);'", k)),
      ANALYSIS = ~ . + "type = mixture; starts = 250 25;",
      MODEL = ~ "%OVERALL%",
@@ -341,7 +341,7 @@ m.lca <- lapply(2:5, function(k) {
    mplusModeler(body, sprintf("lpa_%d_example.dat", k), run = TRUE)
  })
 
-LPAModels <- readModels("/Volumes/PSYHOME/PSYRES/pthompson/DVMB/ESRC_EJ_WP1/mplus_test_scripts/template_multi_run")
+LPAModels <- readModels("/Volumes/PSYHOME/PSYRES/pthompson/DVMB/ESRC_EJ_WP1/mplus_test_scripts")
 
 ```
 
