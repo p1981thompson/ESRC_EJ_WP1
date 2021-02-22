@@ -19,6 +19,8 @@ library(GGally)
 library(MplusAutomation)
 library(texreg)
 library(semPlot)
+library(DiagrammeR)
+library(kableExtra)
 ```
 
 ```{r set-up}
@@ -222,7 +224,6 @@ sim_dat_NA <- sim_dat %>%
 # Data check
 
 Inspect properties of the variables.
-**Q:** Why overall correlations so high?  Because current groups are ordered ability groups?
 
 ```{r summarise-vars}
 # Quick summary statistics
@@ -249,7 +250,6 @@ vis_miss(sim_dat_NA)
 (Other tools for visualising relationships in missingness: https://cran.r-project.org/web/packages/naniar/vignettes/getting-started-w-naniar.html)
 
 *Don't need to do anything in advance to deal with this?* 
-
 
 # Prepare data for Mplus
 
@@ -286,13 +286,13 @@ sim_dat_NA <- sim_dat_NA %>%
 ### Check that mplus reading data as expected
 
 Extract descriptive statistics as check.
-(Could check as step once modelling instead if preferred)
 
 ```{r mplus-desc}
-
-if(dir.exists("mod_scripts")==FALSE){dir.create("mod_scripts")} #PT - added this to create a folder in the directory, otherwise have to create manually and the script fails.
-#if(dir.exists("mod_scripts/cfa")==FALSE){dir.create("mod_scripts/cfa")} #PT - added this to create a folder in the directory, otherwise have to create manually and the script fails.
-#if(dir.exists("mod_scripts/lpa")==FALSE){dir.create("mod_scripts/lpa")} #PT - added this to create a folder in the directory, otherwise have to create manually and the script fails.
+# Create subdirectories for storing output, if do not already exist
+if(dir.exists("mod_scripts")==FALSE){dir.create("mod_scripts")} 
+if(dir.exists("mod_scripts/cfa")==FALSE){dir.create("mod_scripts/cfa")} 
+if(dir.exists("mod_scripts/lpa")==FALSE){dir.create("mod_scripts/lpa")}
+if(dir.exists("mod_scripts/fmm")==FALSE){dir.create("mod_scripts/fmm")}
 
 # Specify model
 m_desc <- mplusObject(
@@ -326,7 +326,7 @@ PT - The model can cope with some amount of departures from normality on individ
 # ONE-FACTOR MODEL
 m_cfa1 <- mplusObject(
   TITLE = "Confirmatory Factor Analysis - Single Factor;",
-  ANALYSIS = "estimator = mlr; type = general;",                  # check estimator with PT
+  ANALYSIS = "estimator = mlr; type = general;",                  
   MODEL = "read by naraComp naraAcc wordAcc nonwAcc woldComp;",   # single reading factor
   OUTPUT = "sampstat; TECH1; stdyx; modindices; ",
   PLOT = "TYPE = PLOT3;",
@@ -334,19 +334,19 @@ m_cfa1 <- mplusObject(
   rdata = sim_dat_NA)
 
 m_cfa1_fit <- mplusModeler(m_cfa1,
-                           modelout = "./mod_scripts/sv_cfa1.inp",
+                           modelout = "./mod_scripts/cfa/sv_cfa1.inp",
                            check = TRUE, run = TRUE)
 
 # TWO-FACTOR MODEL
 m_cfa2 <- update(m_cfa1,
                  TITLE = ~ "Confirmatory Factor Analysis - Two-Factor;",
-                 MODEL = ~ "acc by naraAcc wordAcc nonwAcc; comp by naraComp woldComp;")
+                 MODEL = ~ "acc by naraAcc wordAcc nonwAcc; comp by naraComp woldComp;") # two factors
 m_cfa2_fit <- mplusModeler(m_cfa2,
-                           modelout = "./mod_scripts/sv_cfa2.inp",
+                           modelout = "./mod_scripts/cfa/sv_cfa2.inp",
                            check = TRUE, run = TRUE)
 
 # COMPARE MODELS
-cfa_models <- readModels(target = "./mod_scripts", filefilter = "sv_cfa")
+cfa_models <- readModels(target = "./mod_scripts/cfa", filefilter = "sv_cfa")
 SummaryTable(cfa_models, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
 ```
 
@@ -382,11 +382,11 @@ m_cfa2b <- update(m_cfa2,
                  MODEL = ~. + "naraAcc with naraComp;")
 
 m_cfa2b_fit <- mplusModeler(m_cfa2b,
-                           modelout = "./mod_scripts/sv_cfa2b.inp",
+                           modelout = "./mod_scripts/cfa/sv_cfa2b.inp",
                            check = TRUE, run = TRUE)
 
 # COMPARE MODELS
-cfa_models <- readModels(target = "./mod_scripts", filefilter = "sv_cfa")
+cfa_models <- readModels(target = "./mod_scripts/cfa", filefilter = "sv_cfa")
 SummaryTable(cfa_models, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
 
 # Inspect model (by = loadings, with = covariances)
@@ -406,7 +406,507 @@ semPlotModel(cfa_models$sv_cfa2b.out)
 semPaths(semPlotModel(cfa_models$sv_cfa2b.out, mplusStd = "stdyx"), what = "paths", whatLabels = "std", rotation = 2, intercepts = FALSE)
 ```
 
-Looking at the output of these models, the likelihood ratio test is suggesting that the two factor model is better but the correlation between factors is quite high >0.9, so I'm considering whether they really are distinct factors. We have two ways to go: i) use the two factor model and feed into the latent profile model, but this would need to be converted to a factor mixture model so that we have two factors for comp and acc, but a higher class factor. See here:
+PT: Looking at the output of these models, the likelihood ratio test is suggesting that the two factor model is better but the correlation between factors is quite high >0.9, so I'm considering whether they really are distinct factors. We have two ways to go: i) use the two factor model and feed into the latent profile model, but this would need to be converted to a factor mixture model so that we have two factors for comp and acc, but a higher class factor. I think we should make this decision with the real data, so I have added the code for both scenarios.
+*EJ: Despite what I initially said on Slack, I ended up expanding the code for the LPA model too because I found it helpful for working through the Masyn example in a similar way. I don't think the two factors will be so highly correlated in the real dataset though - they're very highly correlated here because we have three subgroups largely dissociated by ability on both measures. But once we are happy with the procedures in this script, we can trial it with a) more realistically simulated data in line with what we expect; and b) some real reading data.*  
+
+
+# Step 2 - Mixture model to extract latent classes
+
+**Aim:** to fit models of different n classes, at range of different model specifications.
+
+Indicator variances can always differ from each other within a class, but different model specifications vary in whether they are separately estimated between classes. Labels for different specifications taken from Pastor (2007) and Masyn (2013).
+
+Code varies according to whether the CFA above favoured a one- or two-factor model. If the former, fit a standard latent profile measure with separate indicators [(Option A)](#LPA); if the latter, fit a factor mixture model using accuracy/comprehension factors [(Option B)](#FMM). 
+
+## Option A - Fitting latent profile model (no sub-factors) {#LPA}
+
+```{r lpa_diag}
+grViz("
+digraph SEM {
+
+graph [layout = neato,
+       overlap = false,
+       outputorder = edgesfirst]
+
+node [shape = rectangle,fontsize=20]
+
+
+a [pos = '-5,5!', label = 'woldcomp']
+b [pos = '-3,5!', label = 'naracomp']
+c [pos = '0,5!', label = 'naraAcc']
+d [pos = '2,5!', label = 'wordAcc']
+e [pos = '4,5!', label = 'nonwAcc']
+
+f [pos = '-1,7!', label = 'C', shape = ellipse,fontsize=20]
+
+
+f->a
+f->b 
+f->c
+f->d
+f->e
+
+b->c [dir = both]
+c->d [dir = both]
+d->e [dir = both]
+}
+")
+
+
+#d->c [dir = both]
+```
+*Q) If we did it this way, isn't it typical to model all/none covariances for each specification? i.e., rather than allowing the NARA measures to covary specifically as determined by the modification in the CFA, all possible covariances would be modelled?*
+
+### LPA Base model
+
+Set up initial model, based on CFA above. 
+
+Options reduced to save time for now, but possibly change for actual modelling:
+starts - 500 50
+lrtbootstrap 50
+lrtstarts 50 20 50 20
+(taken from Geiser book)
+
+```{r lpa-base}
+# Create base model
+m_lpa_base <- mplusObject(
+  TITLE = "Latent Profile Analysis;",
+  ANALYSIS = "estimator = mlr; type = mixture; starts = 100 10;",
+  VARIABLE = "classes = c(1);",
+  OUTPUT = "sampstat; stdyx; TECH1; TECH8; TECH11; TECH14;",
+  PLOT = "TYPE = PLOT3;",
+  usevariables = colnames(sim_dat_NA[,!names(sim_dat_NA) %in% c("id","k")]),
+  rdata = sim_dat_NA)
+
+# Specify all variances
+lpa_vars <- "naraComp; naraAcc; wordAcc; nonwAcc; woldComp;"
+
+# Specify all covariances 
+lpa_covars <- "
+  naraComp with naraAcc;
+  naraComp with wordAcc; 
+  naraComp with nonwAcc; 
+  naraComp with woldComp; 
+  naraAcc with wordAcc; 
+  naraAcc with nonwAcc; 
+  naraAcc with woldComp; 
+  wordAcc with nonWacc; 
+  wordAcc with woldComp; 
+  nonwAcc with woldComp; "
+```
+
+Follow class-enumeration process set out by Masyn (2013). Use a one-class LPA (incorporating sample means and covariances) as an absolute fit benchmark. 
+
+```{r lpa-benchmark}
+m_lpa_benchmark <- update(m_lpa_base,
+     TITLE = ~ "LPA Benchmark",
+     VARIABLE = ~ "classes = c(1);",
+     MODEL = as.formula(sprintf("~ '%%OVERALL%% \n %s \n %s'", lpa_vars, lpa_covars)))
+
+mplusModeler(m_lpa_benchmark, "mod_scripts/lpa/sv_lpa_benchmark.dat", run = TRUE)
+
+# Extract parameters for the benchmark model
+m_lpa_benchmark <- readModels(target = "./mod_scripts/lpa", filefilter = "benchmark") %>% 
+  mixtureSummaryTable(keepCols = c("LL", "AIC", "BIC", "aBIC")) %>% 
+  select(AIC, BIC, aBIC, LL) %>%
+  pivot_longer(AIC:LL, names_to = "statistic", values_to = "benchmark") %>% 
+  mutate(statistic_relevel = factor(m_lpa_benchmark$statistic, levels = c("LL", "AIC", "BIC", "aBIC")))
+
+```
+
+### LPA Model A: Class-invariant, diagonal
+
+Indicator variances differ from each other within a class, but are constrained to be equal across classes. No covariances are estimated. 
+
+Steps 1-3) Fit series of increasing *k*-class models.
+
+```{r lpa-a-fit}
+m_lpa_a <- lapply(1:6, function(k) {
+   body <- update(m_lpa_base,
+     TITLE = as.formula(sprintf("~ 'LPA Model A: %d classes;'", k)),
+     VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)))
+   
+   mplusModeler(body, sprintf("mod_scripts/lpa/sv_lpa_a_%dclass.dat", k), run = TRUE)
+ })
+```
+
+Steps 4-5) Extract fit indices, and use to select smaller subset of candidate models.
+
+```{r output-function}
+
+#### MOVE THIS FUNCTION SOMEWHERE ELSE EVENTUALLY TO KEEP TIDY, BUT KEPT HERE FOR TWEAKING ####
+
+output_initial_fit <- function(model_name = NULL){
+  
+  # Read in files, extract all summary info
+  filefilter <- paste0("sv_", model_name, "|benchmark")
+  lpa_out <- readModels(target = "./mod_scripts/lpa", filefilter = filefilter)
+  
+  lpa_summaries <- mixtureSummaryTable(lpa_out, keepCols = c("Title", "Classes", "Parameters", "LL", "AIC", "BIC", "aBIC", "T11_VLMR_PValue", "T11_LMR_PValue", "BLRT_PValue"))
+
+  # Print indices used for model selection
+  print(lpa_summaries %>% 
+    select(Title, Classes, Parameters, LL, T11_VLMR_PValue, T11_LMR_PValue, BLRT_PValue) %>% 
+    arrange(Title) %>% 
+    distinct(Title, .keep_all = TRUE))
+
+  # Elbow plots
+  print(lpa_summaries %>%
+    filter(!grepl("Benchmark", Title)) %>% 
+    distinct(Title, .keep_all = TRUE) %>% 
+    select(Classes, AIC, BIC, aBIC, LL) %>%
+    pivot_longer(AIC:LL, names_to = "statistic", values_to = "value") %>%
+    mutate(statistic_relevel = factor(statistic, levels = c("LL", "AIC", "BIC", "aBIC"))) %>% 
+    ggplot(aes(x = as.factor(Classes), y = value)) +
+    geom_point() +
+    geom_line(group = 1) +
+    xlab("n classes") +
+    theme_bw() +
+    theme(panel.grid.major.x = element_blank(),
+          panel.grid.minor.y = element_blank()) +
+    geom_hline(data = m_lpa_benchmark, aes(yintercept = benchmark), linetype = "dashed", colour = "red") +
+    facet_wrap(statistic_relevel ~., scales = "free")) 
+  
+  # Return output
+  output_name <- paste0(model_name, "_out")
+  assign(output_name, lpa_out, env = .GlobalEnv)
+  summarise_name <- paste0(model_name, "_summaries")
+  assign(summarise_name, lpa_summaries, env = .GlobalEnv)
+}
+
+
+```
+
+```{r lpa-a-output}
+output_initial_fit("lpa_a")
+```
+
+Best model for:
+**a) Absolute fit (fewest classes with better LL than benchmark):** 6-class
+**b) Information heuristics (diminishing gains from elbow plots):** 2-class (but none better than benchmark)
+**c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 4- or 5-class
+
+*Don't have Bayes factor or approximate correct model probability? Unless can calculate?*
+
+Step 6) View classification diagnostics for candidate models.
+
+```{r candidate_function}
+
+#### MOVE THIS FUNCTION SOMEWHERE ELSE EVENTUALLY TO KEEP TIDY, BUT KEPT HERE FOR TWEAKING ####
+
+inspect_candidates <- function(model_name = NULL, lpa_mods = NULL, lpa_out = NULL, candidate_models = NULL){
+  model_type = substr(model_name, start = nchar(model_name), stop = nchar(model_name))
+
+  # Classification diagnostics (> 0.70; Nagin, 2005)
+  print("Classification diagnostics:")
+  for (model in candidate_models) {
+    #print(diag(lpa_out[[model]][["class_counts"]][["classificationProbs.mostLikely"]]))
+    }
+  
+  # Refit models to extract data
+  for (model in candidate_models){
+    body <- update(lpa_mods[[model]],
+                   SAVEDATA = as.formula(sprintf(" ~ 'FILE IS sv_%s_%dclass.dat; SAVE = cprobabilities;'", model_name, model)))
+    
+    mplusModeler(body, sprintf("mod_scripts/lpa/sv_%s_%dclass_rerun_%s.dat", model_name, model, model_type), run = TRUE)
+  }
+
+  filefilter = paste0("rerun_", model_type)
+  
+  lpa_classification <- readModels(target = "./mod_scripts/lpa", filefilter = filefilter)
+  
+  # Inspect resultant classes (small SDs, sufficiently separated, theoretically meaningful) 
+  for (model in 1:length(lpa_classification)) {
+    # Inspect classes
+    print(plotMixtures(lpa_classification[[model]], rawdata = TRUE))
+  }
+  
+  # Return output
+  classification_name <- paste0(model_name, "_classification")
+  assign(classification_name, lpa_classification, env = .GlobalEnv)
+}
+```
+
+
+```{r lpa-a-candidates}
+inspect_candidates(model_name = "lpa_a", lpa_mods = m_lpa_a, lpa_out = lpa_a_out, candidate_models = 4:6)
+```
+
+*Masyn chapter also suggests inspect observed/estimated/residual values, but couldn't find all relevant info in output?*
+
+Step 7) Select final model in class enumeration process, for model specification A. 
+```{r lpa-a-selected}
+lpa_a_final_nclass <- 4  # most interpretable, but poorer than benchmark so perhaps wouldn't realistically consider?
+lpa_a_final_m <- lpa_a_classification[[1]]  
+```
+
+### LPA Model B: Class-invariant, unrestricted
+
+Indicator variances differ from each other within a class and can covary, but variances and covariances constrained to be equal across classes.
+
+Steps 1-3) Fit series of increasing *k*-class models.
+
+```{r lpa-b}
+m_lpa_b <- lapply(1:6, function(k) {
+   body <- update(m_lpa_base,
+     TITLE = as.formula(sprintf("~ 'LPA Model B: %d classes;'", k)),
+     VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
+     MODEL = as.formula(sprintf("~ '%%OVERALL%% \n %s \n %s'", lpa_vars, lpa_covars)))
+
+   mplusModeler(body, sprintf("mod_scripts/lpa/sv_lpa_b_%dclass.dat", k), run = TRUE)
+ })
+```
+
+Steps 4-5) Extract fit indices, and use to select smaller subset of candidate models.
+
+```{r lpa-b-output}
+output_initial_fit("lpa_b")
+```
+
+Best model for:
+**a) Absolute fit (fewest classes with better LL than benchmark):** 2-class
+**b) Information heuristics (diminishing gains from elbow plots):** 2-class 
+**c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 2-class
+
+Step 6) View classification diagnostics for candidate models.
+
+```{r lpa-b-candidates}
+inspect_candidates(model_name = "lpa_b", lpa_mods = m_lpa_b, lpa_out = lpa_b_out, candidate_models = 2:3) # including 3-class model for comparison
+```
+```{r lpa-b-selected}
+lpa_b_final_nclass <- 2
+lpa_b_final_m <- lpa_b_classification[[1]]
+```
+
+### LPA Model C: Class-varying, diagonal 
+
+Indicator variances are estimated separately for each class. No covariances are estimated.
+
+Steps 1-3) Fit series of increasing *k*-class models.
+
+```{r lpa-c}
+m_lpa_c <- lapply(1:6, function(k) {
+  
+  # Create class-level specifications
+  class_spec <- paste0("%c#1% \n ", lpa_vars)
+  if (k > 1){
+    for (i in 2:k){
+      class_spec <- paste0(class_spec, "\n %c#", i, "% \n ", lpa_vars)
+    }
+  }
+  
+  # Update model
+  body <- update(m_lpa_base,
+              MODEL = as.formula(sprintf("~ '%%OVERALL%% \n %s'", lpa_vars)))
+  
+  body <- update(body,
+     TITLE = as.formula(sprintf("~ 'LPA Model C: %d classes;'", k)),
+     VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
+     MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
+
+   mplusModeler(body, sprintf("mod_scripts/lpa/sv_lpa_c_%dclass.dat", k), run = TRUE)
+ })
+
+```
+
+Steps 4-5) Extract fit indices, and use to select smaller subset of candidate models.
+
+```{r lpa-c-output}
+output_initial_fit("lpa_c")
+```
+
+Best model for:
+**a) Absolute fit (fewest classes with better LL than benchmark):** 4-class
+**b) Information heuristics (diminishing gains from elbow plots):** 2-class 
+**c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 2-class
+
+Step 6) View classification diagnostics for candidate models.
+
+```{r lpa-c-candidates}
+inspect_candidates(model_name = "lpa_c", lpa_mods = m_lpa_c, lpa_out = lpa_c_out, candidate_models = c(2:4))
+```
+
+```{r lpa-c-selected}
+lpa_c_final_nclass <- 4
+lpa_c_final_m <- lpa_c_classification[[3]]
+```
+
+### LPA Model D 
+
+Indicator variances are estimated separately for each class, but covariances are constrained to be equal across classes.
+
+Steps 1-3) Fit series of increasing *k*-class models.
+
+```{r lpa-d}
+m_lpa_d <- lapply(1:6, function(k) {
+  
+  # Create class-level specifications
+  class_spec <- paste0("%c#1% \n ", lpa_vars)
+  if (k > 1){
+    for (i in 2:k){
+      class_spec <- paste0(class_spec, "\n %c#", i, "% \n ", lpa_vars)
+    }
+  }
+  
+  # Update model
+  body <- update(m_lpa_base,
+              MODEL = as.formula(sprintf("~ '%%OVERALL%% \n %s \n %s '", lpa_vars, lpa_covars)))   
+  
+  body <- update(body,
+     TITLE = as.formula(sprintf("~ 'LPA Model D: %d classes;'", k)),
+     VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
+     MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
+
+   mplusModeler(body, sprintf("mod_scripts/lpa/sv_lpa_d_%dclass.dat", k), run = TRUE)
+ })
+```
+
+Steps 4-5) Extract fit indices, and use to select smaller subset of candidate models.
+
+```{r lpa-d-output}
+output_initial_fit("lpa_d")
+```
+
+Best model for:
+**a) Absolute fit (fewest classes with better LL than benchmark):** 2-class
+**b) Information heuristics (diminishing gains from elbow plots):** 2-class (or possibly 3)
+**c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 3-class
+
+Step 6) View classification diagnostics for candidate models.
+
+```{r lpa-d-candidates}
+inspect_candidates(model_name = "lpa_d", lpa_mods = m_lpa_d, lpa_out = lpa_d_out, candidate_models = c(2:3)) 
+```
+
+```{r lpa-d-selected}
+lpa_d_final_nclass <-  3
+lpa_d_final_m <- lpa_d_classification[[2]]
+```
+
+### LPA Model E: Class-varying, unrestricted
+
+All variances and covariances can vary between clusters. 
+
+Steps 1-3) Fit series of increasing *k*-class models.
+
+```{r lpa-e}
+m_lpa_e <- lapply(1:6, function(k) {
+  
+  # Create class-level specifications
+  class_spec <- paste0("%c#1% \n ", lpa_vars,  lpa_covars)
+  if (k > 1){
+    for (i in 2:k){
+      class_spec <- paste0(class_spec, "\n %c#", i, "% \n ", lpa_vars)
+    }
+  }
+  
+  # Update model
+  body <- update(m_lpa_base,
+              MODEL = as.formula(sprintf("~ '%%OVERALL%% \n %s \n %s '", lpa_vars, lpa_covars)))   
+  
+   body <- update(body,
+     TITLE = as.formula(sprintf("~ 'LPA Model E: %d classes;'", k)),
+     VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
+     MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
+
+   mplusModeler(body, sprintf("mod_scripts/lpa/sv_lpa_e_%dclass.dat", k), run = TRUE)
+ })
+```
+
+Steps 4-5) Extract fit indices, and use to select smaller subset of candidate models.
+
+```{r lpa-e-output}
+output_initial_fit("lpa_e")
+```
+
+Best model for:
+**a) Absolute fit (fewest classes with better LL than benchmark):** 2-class
+**b) Information heuristics (diminishing gains from elbow plots):** 2-class
+**c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 2-class
+
+Step 6) View classification diagnostics for candidate models.
+
+```{r lpa-e-candidates}
+inspect_candidates(model_name = "lpa_e", lpa_mods = m_lpa_e, lpa_out = lpa_e_out, candidate_models = c(2:3)) 
+```
+
+```{r lpa-e-selected}
+lpa_e_final_nclass <-  2
+lpa_e_final_m <- lpa_e_classification[[1]]
+```
+
+### All LPA models: Summary output & final selection
+
+```{r lpa-all-mods}
+# Read in model output files
+lpa_all_out <- readModels(target = "./mod_scripts/lpa", filefilter = "sv_lpa_")
+lpa_all_summaries <- mixtureSummaryTable(lpa_all_out, keepCols = c("Title", "Classes", "LL", "Parameters", "Entropy", "AIC", "BIC", "aBIC", "T11_VLMR_PValue", "T11_LMR_PValue", "BLRT_PValue")) %>%
+  arrange(Title) %>% 
+  distinct(Title, .keep_all = TRUE) %>% 
+  filter(Title != " LPA Benchmark") %>% 
+  mutate(model_spec = substr(Title, 12, 12))
+
+k_classes_modelled <- max(lpa_all_summaries$Classes)
+
+# Selected models for each spec
+a_row <- lpa_a_final_nclass
+b_row <- (1*k_classes_modelled) + lpa_b_final_nclass
+c_row <- (2*k_classes_modelled) + lpa_c_final_nclass
+d_row <- (3*k_classes_modelled) + lpa_d_final_nclass
+e_row <- (4*k_classes_modelled) + lpa_e_final_nclass
+
+# Format table, highlight class model of best fit in each specification
+lpa_all_summaries %>% 
+  select(-model_spec) %>% 
+  mutate(Title = " ") %>%  
+  rename(Specification = Title) %>% 
+  mutate(across(where(is.numeric), round, 2)) %>% 
+  kbl() %>% 
+  kable_classic(html_font = "Cambria") %>% 
+  pack_rows(index = c("Model A" = 6, "Model B" = 6, "Model C" = 6, "Model D" = 6, "Model E" = 6)) %>%  # edit if add n-class models
+  row_spec(7, background = "#F0F0F0") %>% 
+  row_spec(c(a_row, b_row, c_row, d_row, e_row), bold = T)  # edit for row numbers of selected models within each model spec 
+
+```
+
+```{r lpa-all-elbow}
+# Grouped elbow plots
+lpa_all_summaries %>%
+    select(model_spec, Classes, LL, AIC, BIC, aBIC) %>%
+    pivot_longer(LL:aBIC, names_to = "statistic", values_to = "value") %>%
+    mutate(statistic_relevel = factor(statistic, levels = c("LL", "AIC", "BIC", "aBIC"))) %>% 
+    ggplot(aes(x = as.factor(Classes), y = value)) +
+    geom_point(aes(shape = model_spec)) +
+    geom_line(aes(group = model_spec, linetype = model_spec)) +
+    xlab("n classes") +
+    theme_bw() +
+    theme(panel.grid.major.x = element_blank(),
+          panel.grid.minor.y = element_blank()) +
+    geom_hline(data = m_lpa_benchmark, aes(yintercept = benchmark), linetype = "dashed", colour = "red") +
+    facet_wrap(statistic_relevel ~., scales = "free")
+
+# save out for easier viewing
+ggsave("lpa_all_statistics.tiff", dpi = 600, width = 7, height = 4, units = "in")
+```
+
+Models D and E are generally best fits. 
+
+```{r final-candidates}
+best_fits <- list(lpa_a_final_m, lpa_b_final_m, lpa_c_final_m, lpa_d_final_m, lpa_e_final_m)
+
+for (model in best_fits) {
+    print(model$input$title)
+    print(diag(model[["class_counts"]][["classificationProbs.mostLikely"]]))
+    print(plotMixtures(model, rawdata = TRUE))
+    }
+```
+
+
+
+############################ have not edited output processing beyond here #####################################################
+
+
+## Step 2 Option B - Fitting Factor mixture model (sub-factors for comprehension and accuracy) {#FMM}
 
 ```{r path_diag}
 library(DiagrammeR)
@@ -455,109 +955,7 @@ d->e [dir = both]
 #d->c [dir = both]
 ```
 
-I think we should make this decision with the real data, so I have added the code for both scenarios. I tweaked your code as it produces the standard latent profile model like this:
-
-```{r path_diag2}
-library(DiagrammeR)
-
-grViz("
-digraph SEM {
-
-graph [layout = neato,
-       overlap = false,
-       outputorder = edgesfirst]
-
-node [shape = rectangle,fontsize=20]
-
-
-a [pos = '-5,5!', label = 'woldcomp']
-b [pos = '-3,5!', label = 'naracomp']
-c [pos = '0,5!', label = 'naraAcc']
-d [pos = '2,5!', label = 'wordAcc']
-e [pos = '4,5!', label = 'nonwAcc']
-
-f [pos = '-1,7!', label = 'C', shape = ellipse,fontsize=20]
-
-
-f->a
-f->b 
-f->c
-f->d
-f->e
-
-b->c [dir = both]
-c->d [dir = both]
-d->e [dir = both]
-}
-")
-
-
-#d->c [dir = both]
-```
-# Step 2A - Fitting latent profile model (no sub-factors)
-
-### Examining models of different n classes
-
-Using best fitting CFA model, fit LPAs of different number of classes. 
-
-Options reduced to save time for now, but possibly change for actual modelling:
-starts - 500 50
-lrtbootstrap 50
-lrtstarts 50 20 50 20
-(taken from Geiser book, could also remove these arguments from below script testing)
-
-
-```{r lpa-nclass}
-# LPA models of different n classes
-m_lpa <- lapply(2:6, function(k) {
-   body <- update(m_cfa2,
-     TITLE = as.formula(sprintf("~ 'Latent profile analysis - %d classes;'", k)),
-     VARIABLE = as.formula(sprintf("~ . + 'classes = c(%d);'", k)),
-     ANALYSIS = ~ "estimator = mlr; type = mixture; stiterations = 50; starts = 250 25;    
-                   lrtbootstrap = 200; lrtstarts = 25 5 10 25;",                           
-     MODEL = ~ "%OVERALL% 
-     naraAcc with naraComp; 
-     nonwAcc with	wordAcc;
-     nonwAcc with naraAcc;
-     wordAcc with naraAcc;",
-     OUTPUT = ~ . + "TECH10; TECH11; TECH14;")
-
-   mplusModeler(body, sprintf("mod_scripts/lpa/sv_lpa_%dclass.dat", k), run = TRUE)
- })
-
-# Read in all LPA models
-lpa_models_out <- readModels(target = "./mod_scripts/lpa", filefilter = "sv_lpa")
-(lpa_mod_summaries <- mixtureSummaryTable(lpa_models_out))
-```
-
-```{r lpa-scree}
-lpa_mod_summaries %>%  
-  select(Classes, AIC, BIC, aBIC) %>% 
-  pivot_longer(AIC:aBIC, names_to = "statistic", values_to = "value") %>% 
-  ggplot(aes(x = as.factor(Classes), y = value)) + 
-  geom_point() + 
-  geom_line(group = 1) + 
-  xlab("n classes") + 
-  theme_bw() + 
-  theme(panel.grid.major.x = element_blank(),
-        panel.grid.minor.y = element_blank()) +
-  facet_grid(statistic ~., scales = "free")
-```
-
-4 classes best here? PT - I don't think this shows good distinction between models, so we might have to adjust the model further.
-
-Why BLRT all 0? PT - "I would go by BIC in these cases. The problem of BIC not showing a minimum can be solved by allowing within-class covariance between some pairs of variables. Sometimes adding a single factor to soak up some such covariance can give an indication of which pairs of items are the culprits." http://www.statmodel.com/discussion/messages/13/4529.html?1249068377.
-
-Other considerations - entropy to approach 1 (<= 0.6 considered poor; Asparouhov & Muthen, 2014); classes meaningful and not too small.
-
-
-# Step 2B - Fitting Factor mixture model (sub-factors for comprehension and accuracy)
-
-*Aim:* to fit models of different n classes, at range of different model specifications.
-
-Indicator variances can always differ from each other within a class, but different model specifications vary in whether they are separately estimated between classes. Labels for different specifications taken from Pastor (2007) and Masyn (2013).
-
-### Base model
+### FMM Base model
 
 Set up initial model, based on CFA above. 
 
@@ -573,7 +971,6 @@ select_cfa_spec <- m_cfa2b$MODEL
 
 # Create mixture model specification
 model_spec <- paste0("%OVERALL% \n", select_cfa_spec)
-#model_spec <- "%OVERALL% \n acc by naraAcc wordAcc nonwAcc; \n comp by naraComp woldComp;"  # tried to make sure NARA covariance wasn't problem for A/C
 
 # Create base model
 m_fmm_base <- mplusObject(
@@ -588,7 +985,7 @@ m_fmm_base <- mplusObject(
 ```
 
 
-### Model A: Class-invariant, diagonal
+### FMM Model A: Class-invariant, diagonal
 
 Indicator variances differ from each other within a class, but are constrained to be equal across classes. No covariances are estimated. 
 
@@ -599,43 +996,44 @@ m_fmm_a <- lapply(2:5, function(k) {
      VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
      MODEL = ~ . + "acc with comp@0;")
 
-   mplusModeler(body, sprintf("mod_scripts/sv_fmm_a_%dclass.dat", k), run = TRUE)
+   mplusModeler(body, sprintf("mod_scripts/fmm/sv_fmm_a_%dclass.dat", k), run = TRUE)
  })
 
 
 # CHECK WORKING
-fmm_a_out <- readModels(target = "./mod_scripts", filefilter = "sv_fmm_a")
+fmm_a_out <- readModels(target = "./mod_scripts/fmm", filefilter = "sv_fmm_a")
 (fmm_a_summaries <- mixtureSummaryTable(fmm_a_out))
 ```
 
-**I THINK THIS IS WRONG - STILL SEEMS TO BE ESTIMATING COVARIANCES?** (i.e., same as Model B below)
-** Now correct as the covariance between factors needs to be set specifically to zero. Model removes this constraint.
-### Model B: Class-invariant, unrestricted
+
+### FMM Model B: Class-invariant, unrestricted
 
 Indicator variances differ from each other within a class and can covary, but variances and covariances constrained to be equal across classes.
 
+The one class model is also fitted here, as the minimum-goodness-of-fit benchmark model. 
+
 ```{r fmm-b}
-m_fmm_b <- lapply(2:5, function(k) {
+m_fmm_b <- lapply(1:5, function(k) {
    body <- update(m_fmm_base,
      TITLE = as.formula(sprintf("~ 'FMM Model B: %d classes;'", k)),
      VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
      MODEL = ~ . + "acc with comp;")
 
-   mplusModeler(body, sprintf("mod_scripts/sv_fmm_b_%dclass.dat", k), run = TRUE)
+   mplusModeler(body, sprintf("mod_scripts/fmm/sv_fmm_b_%dclass.dat", k), run = TRUE)
  })
 
 
 # CHECK WORKING
-fmm_b_out <- readModels(target = "./mod_scripts", filefilter = "sv_fmm_b")
+fmm_b_out <- readModels(target = "./mod_scripts/fmm", filefilter = "sv_fmm_b")
 (fmm_b_summaries <- mixtureSummaryTable(fmm_b_out))
 ```
 
-### Model C: Class-varying, diagonal 
+### FMM Model C: Class-varying, diagonal 
 
 Indicator variances are estimated separately for each class. No covariances are estimated.
 
 ```{r fmm-c}
-m_fmm_c <- lapply(3, function(k) {
+m_fmm_c <- lapply(2:5, function(k) {
   
   # Create class-level specifications
   class_spec <- "%c#1% \n acc; \n comp;"
@@ -652,19 +1050,16 @@ m_fmm_c <- lapply(3, function(k) {
      VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
      MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
 
-   mplusModeler(body, sprintf("mod_scripts/sv_fmm_c_%dclass.dat", k), run = TRUE)
+   mplusModeler(body, sprintf("mod_scripts/fmm/sv_fmm_c_%dclass.dat", k), run = TRUE)
  })
 
 
 # CHECK WORKING
-lpa_c_out <- readModels(target = "./mod_scripts", filefilter = "sv_lpa_c")
-(lpa_c_summaries <- mixtureSummaryTable(lpa_c_out))
+fmm_c_out <- readModels(target = "./mod_scripts/fmm", filefilter = "sv_fmm_c")
+(fmm_c_summaries <- mixtureSummaryTable(fmm_c_out))
 ```
 
-**I THINK THIS IS WRONG - STILL SEEMS TO BE ESTIMATING COVARIANCES?** (i.e., same as Model D below)
-** now corrected as the covariance in C is set to zero. The variances are allowed to differ between classes. I had to implement this using a double update as I could figure out how to add in top level constraint without affecting the class looped bit.
-
-### Model D 
+### FMM Model D 
 
 Indicator variances are estimated separately for each class, but covariances are constrained to be equal across classes.
 
@@ -679,20 +1074,20 @@ m_fmm_d <- lapply(2:5, function(k) {
   
   # Update model
    body <- update(m_fmm_b[[1]],
-     TITLE = as.formula(sprintf("~ 'fmm Model D: %d classes;'", k)),
+     TITLE = as.formula(sprintf("~ 'FMM Model D: %d classes;'", k)),
      VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
      MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
 
-   mplusModeler(body, sprintf("mod_scripts/sv_fmm_d_%dclass.dat", k), run = TRUE)
+   mplusModeler(body, sprintf("mod_scripts/fmm/sv_fmm_d_%dclass.dat", k), run = TRUE)
  })
 
 
 # CHECK WORKING
-fmm_d_out <- readModels(target = "./mod_scripts", filefilter = "sv_fmm_d")
+fmm_d_out <- readModels(target = "./mod_scripts/fmm", filefilter = "sv_fmm_d")
 (fmm_d_summaries <- mixtureSummaryTable(fmm_d_out))
 ```
 
-### Model E: Class-varying, unrestricted
+### FMM Model E: Class-varying, unrestricted
 
 All variances and covariances can vary between clusters. 
 
@@ -711,31 +1106,53 @@ m_fmm_e <- lapply(2:5, function(k) {
      VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
      MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
 
-   mplusModeler(body, sprintf("mod_scripts/sv_fmm_e_%dclass.dat", k), run = TRUE)
+   mplusModeler(body, sprintf("mod_scripts/fmm/sv_fmm_e_%dclass.dat", k), run = TRUE)
  })
 
 
 # CHECK WORKING
-fmm_e_out <- readModels(target = "./mod_scripts", filefilter = "sv_fmm_e")
+fmm_e_out <- readModels(target = "./mod_scripts/fmm", filefilter = "sv_fmm_e")
 (fmm_e_summaries <- mixtureSummaryTable(fmm_e_out))
 ```
 
 
-# Inspect all models
+# FMM Inspect all models
 
 ```{r fmm-all-mods}
-fmm_all_out <- readModels(target = "./mod_scripts", filefilter = "sv_fmm_")
-(fmm_all_summaries <- mixtureSummaryTable(fmm_all_out))
+# Read in model output files
+fmm_all_out <- readModels(target = "./mod_scripts/fmm", filefilter = "sv_fmm_")
+fmm_all_summaries <- arrange(mixtureSummaryTable(fmm_all_out, keepCols = c("Title", "Classes", "LL", "Parameters", "AIC", "BIC", "aBIC", "T11_VLMR_PValue", "T11_LMR_PValue", "BLRT_PValue")), Title) %>%
+  mutate(model_spec = substr(Title, 12, 12))
+
+# Format table, highlight class model of best fit in each specification
+fmm_all_summaries %>% 
+  filter(Classes != 1) %>% 
+  select(-model_spec) %>% 
+  mutate(Title = " ") %>%  
+  rename(Specification = Title) %>% 
+  mutate(across(where(is.numeric), round, 2)) %>% 
+  kbl() %>% 
+  kable_classic(html_font = "Cambria") %>% 
+  pack_rows(index = c("Model A" = 4, "Model B" = 4, "Model C" = 4, "Model D" = 4, "Model E" = 4)) %>%  # edit if add n-class models
+  row_spec(c(2,5, 12, 14, 18), bold = T)  # edit for row numbers of selected models within each model spec
 
 ```
 
-```{r lpa-scree}
+```{r fmm-scree}
+# Extract benchmark minimum-goodness-of-fit
+min_gof <- filter(fmm_all_summaries, Classes == 1 & model_spec == "B") %>% 
+  select(model_spec, Classes, LL, AIC, BIC, aBIC) %>% 
+  mutate(model_spec = "min_gof") %>% 
+  pivot_longer(LL:aBIC, names_to = "statistic", values_to = "value") 
+
+# Elbow plots
 fmm_all_summaries %>%  
-  select(Classes, AIC, BIC, aBIC) %>% 
-  pivot_longer(AIC:aBIC, names_to = "statistic", values_to = "value") %>% 
-  ggplot(aes(x = as.factor(Classes), y = value)) + 
-  geom_point() + 
-  geom_line(group = 1) + 
+  filter(Classes != 1) %>% 
+  select(model_spec, Classes, LL, AIC, BIC, aBIC) %>% 
+  pivot_longer(LL:aBIC, names_to = "statistic", values_to = "value") %>% 
+  ggplot(aes(x = as.factor(Classes), y = value, group = model_spec)) + 
+  geom_point(aes(shape = model_spec)) + 
+  geom_line(aes(group = model_spec, linetype = model_spec)) + 
   xlab("n classes") + 
   theme_bw() + 
   theme(panel.grid.major.x = element_blank(),
@@ -751,134 +1168,6 @@ fmm_all_summaries %>%
 
 
 
-
-
-```{r lpa-nclass}
-# Basic LPA
-base_lpa <- lapply(1, function(k) {
-   body <- update(select_cfa,
-     TITLE = as.formula(sprintf("~ 'class-%d;'", k)),
-     VARIABLE = as.formula(sprintf("~ . + 'classes = c(%d);'", k)),
-     ANALYSIS = ~ "estimator = mlr; type = mixture; stiterations = 50; starts = 100 10;    
-                   lrtbootstrap = 50; lrtstarts = 25 5 10 25;",
-     MODEL = ~ "%OVERALL%",
-     OUTPUT = ~ . + "TECH10; TECH11; TECH14;")
-
-   mplusModeler(body, "mod_scripts/lpa_base.dat", run = TRUE)
- })
-
-
-# LPA models of different n classes
-m_lpa_a <- lapply(2:3, function(k) {
-   body <- update(select_cfa,
-     TITLE = as.formula(sprintf("~ 'Latent profile analysis: Model A - %d classes;'", k)),
-     VARIABLE = as.formula(sprintf("~ . + 'classes = c(%d);'", k)),
-     MODEL = ~ . + eval(mget(select_cfa_spec)),
-     OUTPUT = ~ . + "TECH10; TECH11; TECH14;")
-
-   mplusModeler(body, sprintf("mod_scripts/sv_lpa_a_%dclass.dat", k), run = TRUE)
- })
-
-# Read in all LPA models
-lpa_a_out <- readModels(target = "./mod_scripts", filefilter = "sv_lpa_a")
-(lpa_a_summaries <- mixtureSummaryTable(lpa_a_out))
-```
-
-
-p200 Mplus manual (example 7.17 mixture CFA modelling)
-not sure on the acc*1 versus just acc part - makes a difference, still to look into
-
-```{r}
-m_trial <- mplusObject(
-  TITLE = "Factor mixture model;",
-  ANALYSIS = "estimator = mlr; type = mixture;",
-  VARIABLE = "classes = c(3);",
-  MODEL = "
-  %OVERALL% 
-  acc by naraAcc wordAcc nonwAcc;  !factor for reading accuracy
-  comp by naraComp woldComp;       !factor for comprehension
-  naraAcc with naraComp;           !example modification guided by initial CFA
-  acc with comp;                   !allows covariances to be estimated within clusters
-  
-  %c#1%                            
-  acc;                             !allows for variances to differ between clusters
-  comp;
-  acc with comp;                   !allows covariances to differ across clusters
-  
-  %c#2% 
-  acc;
-  comp;
-  acc with comp;                   
-  
-  %c#3% 
-  acc;
-  comp;
-  acc with comp;",                  
-  OUTPUT = "sampstat; TECH1; TECH8; stdyx;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(sim_dat_NA[,!names(sim_dat_NA) %in% c("id","k")]),
-  rdata = sim_dat_NA,
-  SAVEDATA = "FILE IS class_assignment_trial.dat; SAVE = cprobabilities;")
-
-trial_fit <- mplusModeler(m_trial,
-                           modelout = "./mod_scripts/testing_mixturecfa.inp",
-                           check = TRUE, run = TRUE)
-
-
-
-# COMPARE MODELS
-trial_fitted <- readModels(target = "./mod_scripts", filefilter = "testing_mixture")
-SummaryTable(trial_fitted)
-
-plotMixtureDensities(lp, variables = c("Acc", "Comp"))
-plotMixtures(trial_fitted, variables = c("Acc", "Comp"))
-
-semPaths(semPlotModel(trial_fitted, mplusStd = "stdyx"), what = "paths", whatLabels = "std", rotation = 2, intercepts = FALSE)
-semPaths(trial_fitted, what = "paths", whatLabels = "std", intercepts = FALSE)
-```
-
-
-```{r lpa-nclass2}
-# LPA models of different n classes
-m_lpa_e <- lapply(2:6, function(k) {
-   body <- update(m_lpa_a,
-     TITLE = as.formula(sprintf("~ 'Latent profile analysis: Model E - %d classes;'", k)),
-     VARIABLE = as.formula(sprintf("~ . + 'classes = c(%d);'", k)),
-     ANALYSIS = ~ "estimator = mlr; type = mixture; stiterations = 50; starts = 100 10;    
-                   lrtbootstrap = 50; lrtstarts = 25 5 10 25;",                           
-     MODEL = ~ "%OVERALL%",
-     OUTPUT = ~ . + "TECH10; TECH11; TECH14;")
-
-   mplusModeler(body, sprintf("mod_scripts/sv_lpa_a_%dclass.dat", k), run = TRUE)
- })
-
-# Read in all LPA models
-#lpa_a_out <- readModels(target = "./mod_scripts", filefilter = "sv_lpa_a")
-#(lpa_a_summaries <- mixtureSummaryTable(lpa_a_out))
-```
-
-
-
-```{r lpa-scree}
-lpa_mod_summaries %>%  
-  select(Classes, AIC, BIC, aBIC) %>% 
-  pivot_longer(AIC:aBIC, names_to = "statistic", values_to = "value") %>% 
-  ggplot(aes(x = as.factor(Classes), y = value)) + 
-  geom_point() + 
-  geom_line(group = 1) + 
-  xlab("n classes") + 
-  theme_bw() + 
-  theme(panel.grid.major.x = element_blank(),
-        panel.grid.minor.y = element_blank()) +
-  facet_grid(statistic ~., scales = "free")
-```
-
-4 classes best here?
-Why BLRT all 0? 
-
-Other considerations - entropy to approach 1 (<= 0.6 considered poor; Asparouhov & Muthen, 2014); classes meaningful and not too small.
-
-**TO-DO: What about different variance/covariance structures??**
 
 ### Inspecting resultant model
 
@@ -997,35 +1286,6 @@ fit3 <- mplusModeler(pathmodel3, modelout = "model_LPA3.inp", run = 1L,check=TRU
 
 screenreg(fit2, single.row=TRUE)
 screenreg(fit3, single.row=TRUE)
-
-```
-
-
-```{r multi_template}
-
-m.cfa <- mplusObject(
-    TITLE = "Confirmatory Factor Analysis",
-    ANALYSIS = "estimator = mlr;",
-    MODEL = "factor BY naraComp-woldComp;",
-    OUTPUT = "TECH1; TECH8;",
-    PLOT = "TYPE = PLOT3;",
-    usevariables = colnames(sim_dat_NA2[,!names(sim_dat_NA2) %in% c("id","k")]),
-    rdata = sim_dat_NA2[,!names(sim_dat_NA2) %in% c("id","k")])
-
-m.cfa.fit <- mplusModeler(m.cfa, "cfa_example.dat", run = TRUE)
-
-m.lca <- lapply(2:5, function(k) {
-   body <- update(m.cfa,
-     TITLE = as.formula(sprintf("~ 'class-%d;'", k)),
-     VARIABLE = as.formula(sprintf("~ . + 'classes = c(%d);'", k)),
-     ANALYSIS = ~ . + "type = mixture; starts = 250 25;",
-     MODEL = ~ "%OVERALL%",
-     OUTPUT = ~ . + "TECH14;")
-
-   mplusModeler(body, sprintf("lpa_%d_example.dat", k), run = TRUE)
- })
-
-LPAModels <- readModels("/Volumes/PSYHOME/PSYRES/pthompson/DVMB/ESRC_EJ_WP1/mplus_test_scripts")
 
 ```
 
