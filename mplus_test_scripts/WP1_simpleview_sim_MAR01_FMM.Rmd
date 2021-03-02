@@ -918,6 +918,40 @@ for (model in best_fits) {
 
 ## Step 2 Option B - Fitting Factor mixture model (sub-factors for comprehension and accuracy) {#FMM}
 
+
+
+### FMM Base model
+
+Set up initial model, based on CFA above. 
+
+Options reduced to save time for now, but possibly change for actual modelling:
+starts - 500 50
+lrtbootstrap 50
+lrtstarts 50 20 50 20
+(taken from Geiser book)
+
+```{r fmm-base}
+# Specify final selected model
+select_cfa_spec <- " acc by naraAcc wordAcc nonwAcc; \n comp by naraComp woldComp; \n [comp@0];\n [acc@0];"
+
+# Create mixture model specification
+model_spec <- paste0("%OVERALL% \n ", select_cfa_spec)
+
+# Create base model
+m_fmm_base <- mplusObject(
+  TITLE = "Factor mixture model;",
+  ANALYSIS = "estimator = mlr; type = mixture; starts = 100 20; algorithm = integration;",
+  VARIABLE = "classes = c(1);",
+  MODEL = model_spec,
+  OUTPUT = "sampstat; TECH1; TECH8; TECH11; TECH14;",
+  PLOT = "TYPE = PLOT3;",
+  usevariables = colnames(sim_dat_NA[,!names(sim_dat_NA) %in% c("id","k")]),
+  rdata = sim_dat_NA)
+```
+
+
+### FMM Model A: tests different N-Class, 2 factor FMM models. Class varying item means, class invariant factor loadings, class varying factor covariance matrix, factor means fixed at zero (for identifiability)
+
 ```{r path_diag}
 library(DiagrammeR)
 
@@ -965,53 +999,20 @@ h->e
 #d->c [dir = both]
 ```
 
-### FMM Base model
-
-Set up initial model, based on CFA above. 
-
-Options reduced to save time for now, but possibly change for actual modelling:
-starts - 500 50
-lrtbootstrap 50
-lrtstarts 50 20 50 20
-(taken from Geiser book)
-
-```{r fmm-base}
-# Specify final selected model
-select_cfa_spec <- " acc by naraAcc wordAcc nonwAcc; \n comp by naraComp woldComp; \n [comp@0];\n [acc@0];"
-
-# Create mixture model specification
-model_spec <- paste0("%OVERALL% \n ", select_cfa_spec)
-
-# Create base model
-m_fmm_base <- mplusObject(
-  TITLE = "Factor mixture model;",
-  ANALYSIS = "estimator = mlr; type = mixture; starts = 100 20; algorithm = integration;",
-  VARIABLE = "classes = c(1);",
-  MODEL = model_spec,
-  OUTPUT = "sampstat; TECH1; TECH8; TECH11; TECH14;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(sim_dat_NA[,!names(sim_dat_NA) %in% c("id","k")]),
-  rdata = sim_dat_NA)
-```
-
-
-### FMM Model A: Class-invariant, diagonal
-
-Indicator variances differ from each other within a class, but are constrained to be equal across classes. No covariances are estimated. 
 
 ```{r fmm-a}
 
 m_fmm_a <- lapply(2:5, function(k) {
   
   # Create class-level specifications
-  class_spec <- "%c#1% \n acc by naraAcc@1 wordAcc nonwAcc; \n comp by naraComp@1 woldComp; \n comp; \n acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp];"
+  class_spec <- "%c#1% \n comp; \n acc; \n comp with acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp];"
   for (i in 2:k){
-    class_spec <- paste0(class_spec, "\n %c#", i, "% \n acc by naraAcc@1 wordAcc nonwAcc; comp by naraComp@1 woldComp; \n comp; \n acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp];")
+    class_spec <- paste0(class_spec, "\n %c#", i, "% \n comp; \n acc; \n comp with acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp];")
   }
   
   # Update model
-  #body<-update(m_fmm_base,
-   #           MODEL = ~ . + "acc with comp@0;" )
+  body<-update(m_fmm_base,
+              MODEL = ~ . + "acc - comp; \n acc with comp;" )
   
   body <- update(m_fmm_base,
      TITLE = as.formula(sprintf("~ 'FMM Model A: %d classes;'", k)),
@@ -1027,28 +1028,87 @@ fmm_a_out <- readModels(target = "./mod_scripts/fmm", filefilter = "sv_fmm_a")
 (fmm_a_summaries <- mixtureSummaryTable(fmm_a_out))
 ```
 
+### FMM Model B: tests different N-Class, 2 factor FMM models. Class varying item means, class varying factor loadings, class varying factor covariance matrix, factor means fixed at zero (for identifiability)
 
-### FMM Model B: Class-invariant, unrestricted
+```{r path_diag}
+library(DiagrammeR)
 
-Indicator variances differ from each other within a class and can covary, but variances and covariances constrained to be equal across classes.
 
-The one class model is also fitted here, as the minimum-goodness-of-fit benchmark model. 
+grViz("
+digraph SEM {
+
+graph [layout = neato,
+       overlap = false,
+       outputorder = edgesfirst]
+
+node [shape = rectangle,fontsize=20]
+
+
+a [pos = '-5,7!', label = 'woldcomp']
+b [pos = '-3,7!', label = 'naracomp']
+c [pos = '0,7!', label = 'naraAcc']
+d [pos = '2,7!', label = 'wordAcc']
+e [pos = '4,7!', label = 'nonwAcc']
+
+f [pos = '-4,5!', label = 'comp', shape = ellipse,fontsize=20]
+
+g [pos = '2,5!', label = 'acc', shape = ellipse,fontsize=20]
+
+
+h [pos = '-1,5!', label = 'C', shape = ellipse,fontsize=20]
+
+
+f->a
+f->b 
+
+g->c
+g->d
+g->e
+
+h->a 
+h->b
+h->c
+h->d
+h->e
+
+node [shape = circle,
+        fixedsize = true,
+        width = 0.1,
+        color = white,
+        fontcolor = white]
+
+wc [pos = '-4.5,6!']
+nc [pos = '-3.5,6!']
+na [pos = '1,6!']
+wa [pos = '2,6!']
+nwa [pos = '3,6!']
+
+h -> wc [style = dashed]
+h -> nc [style = dashed]
+h -> na [style = dashed]
+h -> wa [style = dashed]
+h -> nwa [style = dashed]
+}
+")
+
+
+#d->c [dir = both]
+```
+
+
 
 ```{r fmm-b}
 
 m_fmm_b <- lapply(1:5, function(k) {
   
   # Create class-level specifications
-  class_spec <- "%c#1% \n acc by naraAcc@1 wordAcc nonwAcc; \n comp by naraComp@1 woldComp; \n comp; \n acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp];"
+  class_spec <- "%c#1% \n acc by naraAcc wordAcc nonwAcc; \n comp by naraComp woldComp; \n comp; \n acc; \n comp with acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp];"
   for (i in 2:k){
-    class_spec <- paste0(class_spec, "\n %c#", i, "% \n acc by naraAcc@1 wordAcc nonwAcc; \n comp by naraComp@1 woldComp; \n comp; \n acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp]; ")
+    class_spec <- paste0(class_spec, "\n %c#", i, "% \n acc by naraAcc wordAcc nonwAcc; \n comp by naraComp woldComp; \n comp; \n acc;\n comp with acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp]; ")
   }
   
   # Update model
-  body<-update(m_fmm_base,
-              MODEL = as.formula(sprintf("~ . + '%s \n %s'", lpa_vars, lpa_covars)))
-  
-  body <- update(body,
+  body <- update(m_fmm_base,
      TITLE = as.formula(sprintf("~ 'FMM Model B: %d classes;'", k)),
      VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
      MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
@@ -1062,122 +1122,6 @@ fmm_b_out <- readModels(target = "./mod_scripts/fmm", filefilter = "sv_fmm_b")
 (fmm_b_summaries <- mixtureSummaryTable(fmm_b_out))
 ```
 
-
-### FMM Model C: Class-varying, diagonal 
-
-Indicator variances are estimated separately for each class. No covariances are estimated.
-
-```{r fmm-c}
-
-m_fmm_c <- lapply(2:5, function(k) {
-  
-  # Create class-level specifications
-  class_spec <- "%c#1% \n acc by naraAcc@1 wordAcc nonwAcc; \n comp by naraComp@1 woldComp; \n comp; \n acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp];\n naraComp; naraAcc; wordAcc; nonwAcc; woldComp;"
-  for (i in 2:k){
-    class_spec <- paste0(class_spec, "\n %c#", i, "% \n acc by naraAcc@1 wordAcc nonwAcc; \n comp by naraComp@1 woldComp; \n comp; \n acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp]; naraComp; naraAcc; wordAcc; nonwAcc; woldComp;")
-  }
-  
-  # Update model
-  body<-update(m_fmm_base,
-              MODEL = ~ . + "acc with comp@0;" )
-  
-  body <- update(body,
-     TITLE = as.formula(sprintf("~ 'FMM Model C: %d classes;'", k)),
-     VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
-     MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
-
-   mplusModeler(body, sprintf("mod_scripts/fmm/sv_fmm_c_%dclass.dat", k), run = TRUE)
- })
-
-
-# CHECK WORKING
-fmm_c_out <- readModels(target = "./mod_scripts/fmm", filefilter = "sv_fmm_c")
-(fmm_c_summaries <- mixtureSummaryTable(fmm_c_out))
-```
-
-### FMM Model D 
-
-Indicator variances are estimated separately for each class, but covariances are constrained to be equal across classes.
-
-```{r fmm-d}
-
-m_fmm_d <- lapply(2:5, function(k) {
-  
-  # Create class-level specifications
-  class_spec <- "%c#1% \n acc by naraAcc@1 wordAcc nonwAcc; \n comp by naraComp@1 woldComp; \n comp; \n acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp];\n naraComp; naraAcc; wordAcc; nonwAcc; woldComp;"
-  for (i in 2:k){
-    class_spec <- paste0(class_spec, "\n %c#", i, "% \n acc by naraAcc@1 wordAcc nonwAcc; \n comp by naraComp@1 woldComp; \n comp; \n acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp]; naraComp; naraAcc; wordAcc; nonwAcc; woldComp;")
-  }
-  
-  # Update model
-  body<-update(m_fmm_base,
-              MODEL = as.formula(sprintf("~ . + 'acc with comp@0; %s \n %s'", lpa_covars)))
-  
-  body <- update(body,
-     TITLE = as.formula(sprintf("~ 'FMM Model D: %d classes;'", k)),
-     VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
-     MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
-
-   mplusModeler(body, sprintf("mod_scripts/fmm/sv_fmm_d_%dclass.dat", k), run = TRUE)
- })
-
-
-# CHECK WORKING
-fmm_d_out <- readModels(target = "./mod_scripts/fmm", filefilter = "sv_fmm_d")
-(fmm_d_summaries <- mixtureSummaryTable(fmm_d_out))
-```
-
-
-### FMM Model E: Class-varying, unrestricted
-
-All variances and covariances can vary between clusters. 
-
-```{r fmm-e}
-
-m_fmm_e <- lapply(2:5, function(k) {
-  
-  # Create class-level specifications
-  class_spec <- "%c#1% \n acc by naraAcc@1 wordAcc nonwAcc; \n comp by naraComp@1 woldComp; \n comp; \n acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp];\n naraComp; naraAcc; wordAcc; nonwAcc; woldComp;\n 
-  naraComp with naraAcc;
-  \n naraComp with wordAcc; 
-  \n naraComp with nonwAcc; 
-  \n naraComp with woldComp; 
-  \n naraAcc with wordAcc; 
-  \n naraAcc with nonwAcc; 
-  \n naraAcc with woldComp; 
-  \n wordAcc with nonWacc; 
-  \n wordAcc with woldComp; 
-  \n nonwAcc with woldComp; "
-  for (i in 2:k){
-    class_spec <- paste0(class_spec, "\n %c#", i, "% \n acc by naraAcc@1 wordAcc nonwAcc; \n comp by naraComp@1 woldComp; \n comp; \n acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp]; naraComp; naraAcc; wordAcc; nonwAcc; woldComp;naraComp with naraAcc;
-  naraComp with wordAcc; 
-  naraComp with nonwAcc; 
-  naraComp with woldComp; 
-  naraAcc with wordAcc; 
-  naraAcc with nonwAcc; 
-  naraAcc with woldComp; 
-  wordAcc with nonWacc; 
-  wordAcc with woldComp; 
-  nonwAcc with woldComp; ")
-  }
-  
-  # Update model
-  body<-update(m_fmm_base,
-              MODEL = ~ . + "acc with comp@0;" )
-  
-  body <- update(body,
-     TITLE = as.formula(sprintf("~ 'FMM Model E: %d classes;'", k)),
-     VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
-     MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
-
-   mplusModeler(body, sprintf("mod_scripts/fmm/sv_fmm_e_%dclass.dat", k), run = TRUE)
- })
-
-
-# CHECK WORKING
-fmm_e_out <- readModels(target = "./mod_scripts/fmm", filefilter = "sv_fmm_e")
-(fmm_e_summaries <- mixtureSummaryTable(fmm_e_out))
-```
 
 
 # FMM Inspect all models
@@ -1197,8 +1141,8 @@ fmm_all_summaries %>%
   mutate(across(where(is.numeric), round, 2)) %>% 
   kbl() %>% 
   kable_classic(html_font = "Cambria") %>% 
-  pack_rows(index = c("Model A" = 4, "Model B" = 4, "Model C" = 4, "Model D" = 4, "Model E" = 4)) %>%  # edit if add n-class models
-  row_spec(c(2,5, 12, 14, 18), bold = T)  # edit for row numbers of selected models within each model spec
+  pack_rows(index = c("Model A" = 4, "Model B" = 4)) %>%  # edit if add n-class models
+  row_spec(c(2,5), bold = T)  # edit for row numbers of selected models within each model spec
 
 ```
 
@@ -1292,64 +1236,4 @@ mean(sim_mod$class_check)
 
 
 
-
-######################################## Paul's code ####################################
-
-
-
-# Fitting simple LPA model in Mplus (manually specifying the mplus model)
-
-```{r mplus-prep}
-
-
-#prepare data, converting R data.frame to Mplus readable file.
-sim_dat_NA2<-sim_dat_NA
-
-names(sim_dat_NA2)<-c("k", "id", "naraComp", "naraAcc", "wordAcc", "nonwordAcc", "woldComp")
-
-#prepare the model script file. This can be done using a .txt file then using 
-
-
-pathmodel3 <- mplusObject(
-TITLE= "LCA with continuous latent class indicators;",
-VARIABLE = "CLASSES = c (3);",
-ANALYSIS = "
-TYPE = MIXTURE; 
-STARTS = 0;",
-MODEL = "
-%OVERALL% 
-%c#1% 
-[naraComp-woldComp]; 
-%c#2% 
-[naraComp-woldComp];
-%c#3% 
-[naraComp-woldComp];",
-OUTPUT = "TECH1 TECH8;",
-usevariables = c("naraComp", "naraAcc", "wordAcc", "nonwordAcc", "woldComp"),
-rdata = sim_dat_NA2[,!names(sim_dat_NA2) %in% c("id","k")])
-
-pathmodel2 <- mplusObject(
-TITLE= "LCA with continuous latent class indicators (2);",
-VARIABLE = "CLASSES = c (2);",
-ANALYSIS = "
-TYPE = MIXTURE; 
-STARTS = 0;",
-MODEL = "
-%OVERALL% 
-%c#1% 
-[naraComp-woldComp]; 
-%c#2% 
-[naraComp-woldComp];",
-OUTPUT = "TECH1 TECH8;",
-usevariables = c("naraComp", "naraAcc", "wordAcc", "nonwordAcc", "woldComp"),
-rdata = sim_dat_NA2[,!names(sim_dat_NA2) %in% c("id","k")])
-
-fit2 <- mplusModeler(pathmodel2, modelout = "model_LPA2.inp", run = 1L,check=TRUE,varwarnings=TRUE)
-fit3 <- mplusModeler(pathmodel3, modelout = "model_LPA3.inp", run = 1L,check=TRUE,varwarnings=TRUE)
-
-
-screenreg(fit2, single.row=TRUE)
-screenreg(fit3, single.row=TRUE)
-
-```
 
