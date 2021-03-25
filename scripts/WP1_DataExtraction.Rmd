@@ -1,0 +1,204 @@
+---
+title: 'WP1: Data extraction'
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r libraries}
+# Note - no up-to-date version of packages with MCAR tests, install prev versions
+#devtools::install_version("MissMech", version="1.0.2", repos=getOption("repos")["CRAN"])
+#devtools::install_version("BaylorEdPsych", version="0.5", repos=getOption("repos")["CRAN"])
+#devtools::install_version("mvnmle", version="0.1-11.1", repos=getOption("repos")["CRAN"])
+
+library(tidyverse)
+library(readxl)
+library(naniar)
+library(finalfit)
+library(MissMech)
+library(BaylorEdPsych)
+library(broom)
+
+options(scipen = 999)
+```
+
+This script incorporates the selection of relevant variables and cases for the research questions included in Work Package 1: *Identifying heterogeneity in reading comprehension difficulties using data collected from ALSPAC*. It also includes preliminary exploration and documentation of patterns of missingness in the key variables of interest.
+
+# Access statement
+
+Under ALSPAC's Data Access arrangements, we will receive all data associated with the grant at the beginning of the project. However, the grant incorporates a number of sub-projects (or work packages) that build on each other, making it challenging to specify later all hypotheses and analysis plans in advance.
+
+We will pre-register each set of hypotheses and analyses prior to working with the data for each sub-project, and make clear in the pre-registration where analyses include variables that we have already interacted with. We will extract the relevant data for each sub-project only after it has been pre-registered, and work only with the relevant data for that sub-project.
+
+# Extracting data
+
+### Rename variables 
+
+Read in and rename variables (might need some tweaking depending on format data arrives in)
+
+```{r rename-data}
+# Read in data
+data_orig <- read.csv("../data/simulated/dummy_alspac.csv")
+#data_orig <- read.csv("../data/raw/XXXXXX.csv")
+
+# Read in codebook 
+codebook <- read_excel("../data/codebook.xlsx", sheet = "codebook") %>% 
+  select(`Var name`, R_var_name)
+
+# Rename
+data_named <- data_orig 
+names(data_named) <- codebook$R_var_name[match(names(data_named), codebook$`Var name`)]
+```
+
+### WP1 Dataset 
+
+Rename variables received from ALSPAC according to the codebook; select relevant variables; select participants to be included (i.e., those who completed the Neale Analysis of Reading Ability at age 9); create sum scores to be used.
+
+```{r wp1-vars}
+# Variables for pre-registered analyses
+RQ1 <- c("age_m_f8", "age_m_f9",                                      # age
+         "read_word_raw_f9", "read_nonw_raw_f9", "nara_acc_raw_f9",    # accuracy
+         "nara_comp_raw_f9", "wold_comp_raw_f8")                       # comprehension
+
+RQ2 <- c("age_m_f10",                                                # age
+         "nara_rate_raw_f9",                                         # fluency
+         "wold_vcb_strt_f8", "wold_vcb_i1_f8", "wold_vcb_i2_f8", "wold_vcb_i3_f8", "wold_vcb_i4_f8", "wold_vcb_i5_f8", 
+         "wold_vcb_i6_f8", "wold_vcb_i7_f8", "wold_vcb_i8_f8", "wold_vcb_i9_f8", "wold_vcb_i10_f8",  "wisc_vcb_raw_f8",     # vocabulary
+         "wisc_pcmp_raw_f8", "wisc_code_raw_f8", "wisc_parr_raw_f8", "wisc_bloc_raw_f8", "wisc_obja_raw_f8",  # nonverbal ability 
+         "wisc_bwsp_raw_f8", "cntsp_span_raw_f10",                     # working memory
+         "teach_slct_raw_f8", "teach_divd_raw_f8", "teach_ctrs_raw_f8", "teach_ctro_raw_f8", "sdq_hyp_prnt_ku", "sst_250a_raw_f10", "sst_150a_raw_f10") #attention  
+
+# Variables for descriptives, exploratory analyses (subject to change)
+other <- c("nara_acc_std_f9", "nara_comp_std_f9", "nara_rate_std_f9", "nara_npass_f9",
+           "wisc_vcb_std_f8",
+           "wisc_pcmp_std_f8", "wisc_code_std_f8", "wisc_parr_std_f8", "wisc_bloc_std_f8", "wisc_obja_std_f8", "wisc_perf_std_f8") 
+  
+# Additional variables for exploring missingness
+missingness <-  c("sex", "m_cigs_n_a", "m_marry_a", "m_socc_c", "m_fdif_tot_c", "m_home_a")
+
+# All variables for extraction
+wp1_vars <- c("yp_id", RQ1, RQ2, other, missingness)  
+```
+
+Extract and process
+```{r wp1-data}
+wp1_data <- data_named %>% 
+  
+  # Select relevant variables
+  select(all_of(wp1_vars)) %>% 
+  
+  # Filter for participants with NARA
+  filter(!is.na(nara_comp_raw_f9)) %>% 
+  
+  # Create processed vars 
+  mutate(wold_vcb_raw_f8 = ifelse(wold_vcb_strt_f8 == 1,                      # wold vocab sum score
+                                  rowSums(select(., contains("wold_vcb_i"))), # TO-DO check missing item-level data
+                                  NA),
+         teach_ctr_diff_f8 = teach_ctro_raw_f8 - teach_ctrs_raw_f8) %>%      # difference score for teach attentional control
+
+  # Remove unnecessary variables
+  select(-c(wold_vcb_strt_f8:wold_vcb_i10_f8), -c(teach_ctro_raw_f8:teach_ctrs_raw_f8))
+ 
+# Test whether meets expected  number of participants
+length(unique(wp1_data$yp_id)) == 6943
+
+# Save data
+# write.csv(wp1_data, "../data/processed/WP1_data.csv", row.names = FALSE)
+```
+
+**TO-DO** Process missing data labels? 
+
+# Missingness
+
+### Description
+
+Document prevalence and patterns of missingness for variables to be included in the pre-registered analyses.
+
+```{r missing-descr}
+# Prevalence
+wp1_data %>% 
+  select(-all_of(c(other, missingness))) %>% 
+  vis_miss()
+
+# Pattern
+wp1_data %>% 
+  select(-all_of(c(other, missingness))) %>% 
+  missing_pattern()
+```
+
+### Structure
+
+Use two types of test to examine whether data is likely MCAR. Little's (1988) MCAR test examines whether variable means differ between missing data patterns. Jamshidian & Jalal's (2010) test examines whether the variances and covariances differ betwen missing data patterns. 
+
+```{r missing-tests}
+# Little's MCAR test 
+missingness_little <- wp1_data %>% 
+  select(-all_of(c(other))) %>% 
+  select(where(is.numeric)) %>% 
+  LittleMCAR()
+
+missingness_little$chi.square
+missingness_little$df
+missingness_little$p.value
+
+# Jamshidian & Jalal (2010) MCAR test
+wp1_data %>% 
+  select(-all_of(c(other))) %>% 
+  select(where(is.numeric)) %>% 
+  TestMCARNormality()
+```
+
+### Predictors of missingness 
+
+Given the assessments are all taken from assessments close in time, we do not anticipate structured missingness in these data. 
+
+```{r missing-predict}
+# Create updated list of pre-registered variables (incorporating new vars created above)
+prereg_vars <- names(wp1_data) %>% 
+  setdiff(c(missingness, other))
+
+# Create data frame for storing significant predictors
+miss_pred <- data.frame(missing_val = as.character(), predictor = as.character(), estimate = as.numeric(), std.error = as.numeric(), statistic = as.numeric(), p.value = as.numeric(), p.holm = as.numeric())
+
+for (var in prereg_vars){
+  
+# for (var in names(sim_data)) { (used for testing)
+  
+  # Create data frame with selected variable marked for missingness, remove irrelevant columns 
+  data <- wp1_data %>% 
+    select(-all_of(c(other))) %>% 
+    mutate(is_missing = ifelse(is.na(get(var)) == TRUE, 1, 0)) %>% 
+    select(-c(yp_id, var))
+  
+  # If no missing data, print statement
+  if (sum(data$is_missing) == 0) {
+      print(paste0("No missing values for variable ", var))
+    
+  # Else if missing data present...
+  } else {
+      
+      # Test every other variable as a predictor
+      missing_model <- glm(is_missing ~ ., family = binomial("logit"), data = data)
+      tidy_model <- tidy(missing_model) %>%  # format output
+        mutate(missing_val = var, p.adjust = p.adjust(p.value, "holm")) %>% 
+        rename(predictor = term) %>% 
+        select(missing_val, predictor, estimate, std.error, statistic, p.value, p.adjust)
+      
+      # If any of the values are significant, print output labelled with predictor and variable
+      if(any(tidy_model$p.value < .05)) {
+        print(paste0("Potential predictors (non-corrected) of missing values for variable  ", var))
+        
+        # Append significant predictors to missing data table
+        sig_vals <- tidy_model %>% 
+          filter(p.value < .05)
+        miss_pred <- rbind(miss_pred, sig_vals)
+
+      # Otherwise print that no significant predictors were found
+      } else {
+        print(paste0("No significant predictors of missing values found for variable ", var))
+      }
+  }
+}
+print(miss_pred)
+```
