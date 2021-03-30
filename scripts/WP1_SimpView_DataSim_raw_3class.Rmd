@@ -1,0 +1,280 @@
+---
+title: "WP1: Simple View - Data Simulation"
+output: html_document
+---
+
+This script simulates data designed around the variables available in ALSPAC for the first analysis (extracting sub-populations of readers in line with the Simple View of reading).
+
+```{r libraries}
+# List packages
+pkgs <- c("SIN", "MASS", "psych", "tidyverse", "naniar", "GGally")
+
+# Use groundhog package to load correct package versions
+# if (!require("groundhog")) install.packages("groundhog")
+# groundhog.day <- "2021-03-01"
+# groundhog::groundhog.library(pkgs, groundhog.day)
+
+# Or if not using groundhog package - load currently installed package versions separately (reproducibility not guaranteed)
+invisible(lapply(pkgs, library, character.only = TRUE))
+
+# Set random seed
+set.seed(4926)
+```
+
+
+### Specify variables and relationships
+
+Create dataset similar to one that we will use - three reading accuracy measures, a reading comprehension measure and listening comprehension.  
+
+* NARA comp - range 0-45, M = 25
+* NARA acc (errors) - range 0-100, M = 66  (note that a lower score is better)
+* Word and nonword acc - range 0-10 
+* WOLD comp - range 2-14
+
+```{r measures}
+
+################# CLASS 1 MEASURES ###################
+
+# NARA - comprehension
+nara_comp_m1 <- 35
+nara_comp_sd1 <- 10
+  
+# NARA - accuracy
+nara_acc_m1 <- 30
+nara_acc_sd1 <- 6
+
+# Word/nonword reading
+word_acc_m1 <- 9
+word_acc_sd1 <- 1
+nonword_acc_m1 <- 8
+nonword_acc_sd1 <- 1
+
+# WOLD listening
+wold_comp_m1 <- 10
+wold_comp_sd1 <- 3
+
+
+################# CLASS 2 MEASURES ###################
+
+# NARA - comprehension
+nara_comp_m2 <- 10
+nara_comp_sd2 <- 5
+  
+# NARA - accuracy
+nara_acc_m2 <- 60
+nara_acc_sd2 <- 10
+
+# Word/nonword reading
+word_acc_m2 <- 4
+word_acc_sd2 <- 2
+nonword_acc_m2 <- 3
+nonword_acc_sd2 <- 2
+
+# WOLD listening
+wold_comp_m2 <- 5
+wold_comp_sd2 <- 3
+
+
+
+################# CLASS 3 MEASURES ###################
+
+# NARA - comprehension
+nara_comp_m3 <- 20
+nara_comp_sd3 <- 6
+  
+# NARA - accuracy
+nara_acc_m3 <- 50
+nara_acc_sd3 <- 10
+
+# Word/nonword reading
+word_acc_m3 <- 7
+word_acc_sd3 <- 2
+nonword_acc_m3 <- 5
+nonword_acc_sd3 <- 2
+
+# WOLD listening
+wold_comp_m3 <- 7
+wold_comp_sd3 <- 3
+
+
+################# CORRELATIONS ###################
+
+# Assumption is that we have same correlation among measures for each class (note NARA acc measures neg correlated; lower score = better)
+
+nara_comp_acc <- -0.5
+nara_comp_word <- 0.4
+nara_comp_nonword <- 0.3
+nara_comp_wold <- 0.6
+nara_acc_word <- -0.6
+nara_acc_nonword <- -0.5
+nara_acc_wold <- -0.2
+word_acc_nonword <- 0.7
+word_acc_wold <- 0.2
+nonword_acc_wold <- 0.2
+```
+
+Dataset will need to take age into account. Do not expect large age differences between groups, so specify same means and correlations for each. 
+*Note - originally used same means/SDs for all 3 groups, tried separating in case source of the problem* 
+
+```{r ages}
+# Set age means - roughly guided by those that attended clinic
+age_months_f8_m <- 103
+age_months_f8_sd <- 4
+age_months_f9_m <- 119
+age_months_f9_sd <- 4
+
+# age_months_f8_m1 <- 104
+# age_months_f8_sd1 <- 4
+# age_months_f9_m1 <- 121
+# age_months_f9_sd1 <- 4
+# 
+# age_months_f8_m2 <- 101
+# age_months_f8_sd2 <- 3
+# age_months_f9_m2 <- 117
+# age_months_f9_sd2 <- 4
+# 
+# age_months_f8_m3 <- 103
+# age_months_f8_sd3 <- 4
+# age_months_f9_m3 <- 119
+# age_months_f9_sd3 <- 4
+
+
+# F8 age should only correlate with measures taken at F8 
+nara_comp_f8age <- 0
+nara_acc_f8age <- 0
+word_acc_f8age <- 0
+nonword_acc_f8age <- 0
+wold_f8age <- 0.1
+
+# F9 age should only correlate with measures taken at F9
+nara_comp_f9age <- 0.1
+nara_acc_f9age <- -0.1
+word_acc_f9age <- 0.1
+nonword_acc_f9age <- 0.1
+wold_f9age <- 0
+
+# Age measures should not correlate with each other
+f8age_f9age <- 0
+```
+
+### Simulate dataset
+
+Compute covariance matrix based on the above estimates, and use to simulate specified number of observations.
+
+```{r simulate-data}
+################# COVARIANCES ###################
+
+# List names in order
+test_names <- c("nara_comp", "nara_acc", "word_acc", "nonword_acc", "wold_comp", "age_f8", "age_f9")
+
+# List SDs in order above, for each group
+stddev1 <- c(nara_comp_sd1, nara_acc_sd1, word_acc_sd1, nonword_acc_sd1, wold_comp_sd1, age_months_f8_sd, age_months_f9_sd)
+stddev2 <- c(nara_comp_sd2, nara_acc_sd2, word_acc_sd2, nonword_acc_sd2, wold_comp_sd2, age_months_f8_sd, age_months_f9_sd)
+stddev3 <- c(nara_comp_sd3, nara_acc_sd3, word_acc_sd3, nonword_acc_sd3, wold_comp_sd3, age_months_f8_sd, age_months_f9_sd)
+
+# Create correlation matrix using above estimates
+corr <- matrix(c(1, nara_comp_acc, nara_comp_word, nara_comp_nonword, nara_comp_wold, nara_comp_f8age, nara_comp_f9age,
+                 nara_comp_acc, 1, nara_acc_word, nara_acc_nonword, nara_acc_wold, nara_acc_f8age, nara_acc_f9age,
+                 nara_comp_word, nara_acc_word, 1, word_acc_nonword, word_acc_wold, word_acc_f8age, word_acc_f9age,
+                 nara_comp_nonword, nara_acc_nonword, word_acc_nonword, 1, nonword_acc_wold, nonword_acc_f8age, nonword_acc_f9age,
+                 nara_comp_wold, nara_acc_wold, word_acc_wold, nonword_acc_wold, 1, wold_f8age, wold_f9age,
+                 nara_comp_f8age, nara_acc_f8age, word_acc_f8age, nonword_acc_f8age, wold_f8age, 1, f8age_f9age,
+                 nara_comp_f9age, nara_acc_f9age, word_acc_f9age, nonword_acc_f9age, wold_f9age, f8age_f9age, 1),
+               byrow = TRUE, nrow = 7, 
+               dimnames = list(test_names, test_names))
+
+# Compute covariance matrix, for each group
+covar1 <- sdcor2cov(stddev1, corr)
+covar2 <- sdcor2cov(stddev2, corr)
+covar3 <- sdcor2cov(stddev3, corr)
+
+################# SIMULATE DATA ###################
+
+# List means in order above, for each group
+means1 <- c(nara_comp_m1, nara_acc_m1, word_acc_m1, nonword_acc_m1, wold_comp_m1, age_months_f8_m, age_months_f9_m)
+means2 <- c(nara_comp_m2, nara_acc_m2, word_acc_m2, nonword_acc_m2, wold_comp_m2, age_months_f8_m, age_months_f9_m)
+means3 <- c(nara_comp_m3, nara_acc_m3, word_acc_m3, nonword_acc_m3, wold_comp_m3, age_months_f8_m, age_months_f9_m)
+
+# Number of observations
+n_ppts <- 1000
+
+# Latent profile probabilities
+class_probs<-c(0.6,0.15,0.25)
+
+# Generate mixing profile indicator based on profile probabilities
+k<-sample(1:3,n_ppts,class_probs,replace=TRUE)
+
+# Set up empty holding dataframe
+sim_dat <-data.frame(nara_comp=numeric(), nara_acc=numeric(), word_acc=numeric(), nonword_acc=numeric(), wold_comp=numeric(), age_f8=numeric(), age_f9 = numeric())
+
+# Sample from the three multivariate normal distributions in the correct proportions according to profile probabilities
+for(i in 1:n_ppts){
+sim_dat[i,]<-switch(k[i],mvrnorm(n = 1, mu = means1, Sigma = covar1), mvrnorm(n = 1, mu = means2, Sigma = covar2), mvrnorm(n = 1, mu = means3, Sigma = covar3))
+}
+sim_dat <- as.data.frame(cbind(sim_dat,as.factor(k)))
+
+# Create a dummy ID
+sim_dat$id<-paste0("ALSPAC",sprintf('%0.4d', 1:n_ppts))
+
+# Set variable names
+names(sim_dat)<-c("naraComp", "naraAcc", "wordAcc", "nonwordAcc", "woldComp", "f8age", "f9age", "k","id")
+```
+
+### Missing data
+
+**Missing data expectations for this analysis:**
+* nara_comp and nara_acc should have no missing data, as inclusion in this/subsequent projects relies on having completed this assessment 
+* word_acc & nonword_acc will also have only a very small proportion - collected in same assessment session as nara. Possibly more likely that if word_acc missing then nonword_acc also missing (?), but numbers very small. 
+* wold_comp - more likely to have missing data; collected at different clinic session one year earlier 
+
+```{r missing-data}
+# specify variables collected in same session, low proportion missingness
+same_na_cols <- c("wordAcc", "nonwordAcc")
+same_na_prop <- 0.01
+
+# specify variables collected in separate session, higher proportion missingness
+sep_na_cols <- "woldComp"
+sep_na_prop <- 0.05
+
+# Create dataframe with NAs
+sim_dat_NA <- sim_dat %>% 
+  pivot_longer(cols = -c(id,k),names_to = "var", values_to = "value") %>%    # pivot data to long format
+  mutate(r = runif(nrow(.)),                                            # simulate a random number (r) from 0 to 1 for each row
+         value = ifelse(var %in% same_na_cols & r <= same_na_prop, NA,  # for same session vars, update to NA if r < threshold
+                        ifelse(var %in% sep_na_cols & r <= sep_na_prop, NA, value))) %>%  # for separate session vars, update to NA is r < threshold, else same value
+  dplyr::select(-r) %>%                                                        # remove random number
+  pivot_wider(names_from = var, values_from = value)                    # pivot back to original format
+```
+
+
+### Data check
+
+Inspect properties of the variables.
+
+```{r summarise-vars, message = FALSE, warning = FALSE}
+# Quick summary statistics
+describe(sim_dat_NA)
+
+# Overall histograms/correlations
+sim_dat_NA %>% 
+  dplyr::select(-k, -id) %>% 
+  pairs.panels()
+
+# Distributions/correlations by group
+sim_dat_NA %>% 
+  dplyr::select(-id) %>% 
+  ggpairs(mapping = aes(color = k))
+
+# Missing data
+vis_miss(sim_dat_NA)
+```
+
+### Save data for use
+
+```{r save-simdata}
+if(dir.exists("sim_data")==FALSE){dir.create("sim_data")} 
+
+filename <- paste0("sim_data/WP1_SimpView_sim_raw_n", n_ppts, "_k", length(class_probs), ".csv")
+
+write.csv(sim_dat_NA, filename, row.names = FALSE)
+```
