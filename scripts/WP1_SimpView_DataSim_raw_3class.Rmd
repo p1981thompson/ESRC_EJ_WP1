@@ -271,10 +271,19 @@ vis_miss(sim_dat_NA)
 
 ### Save data for use
 
-```{r save-simdata}
-if(dir.exists("sim_data")==FALSE){dir.create("sim_data")} 
+Rename variables to match ALSPAC dataset.
 
-filename <- paste0("sim_data/WP1_SimpView_sim_raw_n", n_ppts, "_k", length(class_probs), ".csv")
+```{r rename-round}
+sim_dat_NA <- sim_dat_NA %>% 
+  set_names(c("k", "yp_id", "nara_comp_raw_f9", "nara_acc_raw_f9", "read_word_raw_f9", "read_nonw_raw_f9", "wold_comp_raw_f8", "age_m_f8", "age_m_f9")) %>% 
+  mutate_if(is.numeric, round) %>% 
+  mutate(yp_no = as.numeric(as.factor(yp_id)))    # Create numeric version of ID for mplus
+```
+
+```{r save-simdata}
+if(dir.exists("../data/simulated")==FALSE){dir.create("../data/simulated")} 
+
+filename <- paste0("../data/simulated/WP1_SimpView_sim_raw_n", n_ppts, "_k", length(class_probs), ".csv")
 
 write.csv(sim_dat_NA, filename, row.names = FALSE)
 ```

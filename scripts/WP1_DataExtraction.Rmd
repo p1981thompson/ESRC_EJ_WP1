@@ -103,13 +103,24 @@ wp1_data <- data_named %>%
 # Test whether meets expected  number of participants
 length(unique(wp1_data$yp_id)) == 6943
 
+# Create numeric ID variable for working with mplus
+wp1_data <- wp1_data %>% 
+  mutate(yp_no = as.numeric(as.factor(yp_id)))
+
 # Save data
 # write.csv(wp1_data, "../data/processed/WP1_data.csv", row.names = FALSE)
 ```
 
-**TO-DO** Process missing data labels? 
-
 # Missingness
+
+### Process labels
+
+Missing data are coded as negative values in raw data; recode as NA to avoid incorporating into analyses. 
+
+```{r assign-na}
+wp1_data <- wp1_data %>% 
+  replace_with_na_all(condition = ~.x < 0)
+```
 
 ### Description
 
@@ -138,9 +149,7 @@ missingness_little <- wp1_data %>%
   select(where(is.numeric)) %>% 
   LittleMCAR()
 
-missingness_little$chi.square
-missingness_little$df
-missingness_little$p.value
+print(cat("\nLITTLE'S TEST \nchi.square:", missingness_little$chi.square, "\ndf:", missingness_little$df, "\np = ", missingness_little$p.value))
 
 # Jamshidian & Jalal (2010) MCAR test
 wp1_data %>% 

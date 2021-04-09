@@ -1,0 +1,51 @@
+TITLE:
+ FMM Model A: 6 classes;
+DATA:
+FILE = "./mplus_models/fmm/sv_fmm_mbenchmark_4cbfad64e896565fcee05dab5070f813.dat";
+ 
+VARIABLE:
+NAMES = yp_id naraComp naraAcc wordAcc nonwAcc woldComp f8age f9age; 
+ MISSING=.;
+  classes = c(6);
+ANALYSIS:
+estimator = mlr; type = mixture; starts = 100 20; algorithm = integration;
+MODEL:
+%OVERALL% 
+  acc by naraAcc wordAcc nonwAcc; 
+ comp by naraComp woldComp; 
+ [comp@0];
+ [acc@0];
+ %c#1% 
+ comp; 
+ acc; 
+ comp with acc; 
+ [naraAcc wordAcc nonwAcc naraComp woldComp];
+ %c#2% 
+ comp; 
+ acc; 
+ comp with acc; 
+ [naraAcc wordAcc nonwAcc naraComp woldComp];
+ %c#3% 
+ comp; 
+ acc; 
+ comp with acc; 
+ [naraAcc wordAcc nonwAcc naraComp woldComp];
+ %c#4% 
+ comp; 
+ acc; 
+ comp with acc; 
+ [naraAcc wordAcc nonwAcc naraComp woldComp];
+ %c#5% 
+ comp; 
+ acc; 
+ comp with acc; 
+ [naraAcc wordAcc nonwAcc naraComp woldComp];
+ %c#6% 
+ comp; 
+ acc; 
+ comp with acc; 
+ [naraAcc wordAcc nonwAcc naraComp woldComp];
+OUTPUT:
+sampstat; stdyx; CINTERVAL; TECH1; TECH8; TECH11; TECH14;
+PLOT:
+TYPE = PLOT3;

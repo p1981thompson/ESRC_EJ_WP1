@@ -40,7 +40,7 @@ sv_data <- read.csv("../data/simulated/WP1_SimpView_sim_raw_n1000_k3.csv")
 #sv_data <- read.csv("../data/processed/WP1_data.csv")
 ```
 
-Mplus has an 8-character limit, so may need to rename to avoid duplicates. 
+Mplus has an 8-character limit, so rename relevant variables with short names for modelling. 
 
 ```{r mplus-names}
 # Check names
@@ -48,12 +48,13 @@ str_sub(names(sv_data), 1, 8)
 
 # Rename any necessary, print new names
 sv_data <- sv_data %>% 
-  rename(nonwAcc = nonwordAcc) 
-  # mutate(naraComp = scale(naraComp)[,],
-  #        naraAcc = scale(naraAcc)[,],
-  #        wordAcc = scale(wordAcc)[,],
-  #        nonwAcc = scale(nonwAcc)[,],
-  #        woldComp = scale(woldComp)[,])
+  rename(naraComp = nara_comp_raw_f9,
+         naraAcc = nara_acc_raw_f9,
+         wordAcc = read_word_raw_f9,
+         nonwAcc = read_nonw_raw_f9,
+         woldComp = wold_comp_raw_f8,
+         f8age = age_m_f8,
+         f9age = age_m_f9) 
 
 names(sv_data)
 ```
@@ -133,11 +134,11 @@ m_cfa1 <- mplusObject(
   TITLE = "Confirmatory Factor Analysis - Single Factor;",
   ANALYSIS = "estimator = mlr; type = general;",                  
   MODEL = "read by naraComp naraAcc wordAcc nonwAcc woldComp;
-           wordAcc nonwAcc on f9age;
+           wordAcc nonwAcc naraAcc naraComp on f9age;
            woldcomp on f8age;",   # single reading factor, plus age covariates 
   OUTPUT = "sampstat; TECH1; TECH4; stdyx; modindices; ",
   PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(sv_data[,!names(sv_data) %in% c("id","k")]),
+  usevariables = colnames(sv_data[,!names(sv_data) %in% c("yp_id", "yp_no", "k")]),
   rdata = sv_data)
 
 m_cfa1_fit <- mplusModeler(m_cfa1,
@@ -148,9 +149,9 @@ m_cfa1_fit <- mplusModeler(m_cfa1,
 m_cfa2 <- update(m_cfa1,
                  TITLE = ~ "Confirmatory Factor Analysis - Two-Factor;",
                  MODEL = ~ "acc by nonwAcc wordAcc naraAcc; comp by woldComp naraComp;
-                            wordAcc nonwAcc on f9age;
+                            wordAcc nonwAcc naraAcc naraComp on f9age;
                             woldcomp on f8age;
-                            acc with comp;") # two factors, plus age covariates; fixed residual var to 0 as problematic???
+                            acc with comp;") # two factors, plus age covariates
 m_cfa2_fit <- mplusModeler(m_cfa2,
                            modelout = "./mplus_models/cfa/sv_cfa2.inp",
                            check = TRUE, run = TRUE)

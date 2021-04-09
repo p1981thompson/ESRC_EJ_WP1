@@ -170,6 +170,7 @@ mm_extract_data <- function(orig_mods = NA,        # list of original models (in
       n_classes <- ifelse(one_fit == TRUE, model, model+1) # adjust name to reflect class n
       
       body <- update(orig_mods[[model]],
+                     VARIABLE = ~ . + "IDVARIABLE IS yp_no;",
                      SAVEDATA = as.formula(sprintf(" ~ 'FILE IS sv_%s_%dclass.dat; SAVE = cprobabilities;'", model_name, n_classes)))
       
       mplusModeler(body, sprintf("%s/sv_%s_rerun_%dclass.dat", filepath, model_name, n_classes), run = TRUE)
