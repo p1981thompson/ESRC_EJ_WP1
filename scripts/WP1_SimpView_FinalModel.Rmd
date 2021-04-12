@@ -1,0 +1,163 @@
+---
+title: 'WP1: Simple View - Final Class Model'
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_dir = "../output/analysis/") })
+---
+
+This script is used for extracting descriptive statistics for the final class model (LPA or FMM).
+
+# Set-up
+
+```{r libraries}
+# Specify packages
+pkgs <- c("tidyverse", "MplusAutomation", "texreg", "kableExtra")
+
+# Use groundhog package to load correct package versions
+# if (!require("groundhog")) install.packages("groundhog")
+# groundhog.day <- "2021-03-01"
+# groundhog::groundhog.library(pkgs, groundhog.day)
+
+# Or if not using groundhog package - load currently installed package versions separately (reproducibility not guaranteed)
+invisible(lapply(pkgs, library, character.only = TRUE))
+```
+
+Read in selected model file that contains class assignment data, and data file of descriptive statistics. Merge and check. 
+
+```{r read-data}
+# Read in and extract class data
+final_mod <- readModels(target = "./mplus_models/fmm", filefilter = "a_rerun_3class")  # final model file
+class_data <- as.data.frame(final_mod$savedata) %>% 
+  rename_all(tolower) %>% 
+  select(yp_no, acc:c, f8age, f9age)  # keep age data for additional checking during merge
+
+# Read in and extract relevant variables from data file
+# ppt_data <- read.csv("../data/processed/WP1_data.csv") %>% 
+#   select(yp_id, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8,
+#          nara_comp_std_f9, nara_acc_std_f9)
+
+### ... simulated version for testing
+ppt_data <- read.csv("../data/simulated/WP1_SimpView_sim_raw_n1000_k3.csv") %>%
+  select(yp_id, yp_no, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8) %>% 
+  mutate(nara_comp_std_f9 = round(rnorm(n(), 100, 15)), # Create dummy variables for now
+         nara_acc_std_f9 = round(rnorm(n(), 100, 15)))  
+
+# Merge
+ppt_classes <- ppt_data %>% 
+  full_join(class_data, by = c("yp_no",
+                             "age_m_f8" = "f8age",
+                             "age_m_f9" = "f9age"))
+```
+
+
+# Whole sample descriptives
+
+```{r all-desc}
+ppt_classes %>% 
+  select(-yp_id, -yp_no, -c(acc:c)) %>% 
+  describe() %>% 
+  as.data.frame() %>% 
+  select(n, mean, sd, min, max) %>% 
+  round(., 2)
+```
+
+The NARA comes with test-normed standardised scores, but the others have raw score only (bespoke tests and/or only subset of items). Compute sample standardised scores, accounting for age variability.
+
+```{r standardise}
+sample_std <- function(test_scores = NA, age = NA, data = NA){
+  
+  # Create row references
+  data <- data %>% 
+    rownames_to_column("rowno_id")
+  
+  # For each variable in list
+  for (test in test_scores){
+    
+      # Create new variable name
+      var_name = str_replace(test, "raw", "bstd")   # for bespoke standard
+    
+      # Regress out age
+      lm_age <- lm(get(test) ~ get(age), data = data)
+      
+      # Use standardised residuals, and then convert to standardised score (M = 100, SD = 15)
+      ppt_resid <- rstandard(lm_age)
+      std_score <- round(ppt_resid*15 + 100)
+
+      # Convert new standardised score to data frame
+      append_score <- data.frame(std_score) %>%
+        set_names(var_name) %>%
+        rownames_to_column("rowno_id")
+
+      # Merge score by row reference
+      data <- data %>%
+        left_join(append_score, by = "rowno_id") 
+  }
+  
+  # Remove row reference from final output
+  data <- data %>% 
+    select(-rowno_id)
+}
+
+std_data <- sample_std(data = ppt_classes, test_scores = c("read_nonw_raw_f9", "read_word_raw_f9", "nara_acc_raw_f9", "nara_comp_raw_f9"), age = "age_m_f9")
+std_data <- sample_std(data = std_data, test_scores = c("wold_comp_raw_f8"), age = "age_m_f8")
+```
+
+
+Intend to report test-standardised scores for the NARA, but check how the two compare. 
+```{r std-compare}
+# Accuracy
+plot(std_data$nara_acc_std_f9, std_data$nara_acc_bstd_f9) +
+  abline(1, 1)
+
+# Comprehension
+plot(std_data$nara_comp_std_f9, std_data$nara_comp_bstd_f9) +
+  abline(1, 1)
+```
+
+# Class descriptives 
+
+```{r class-desc}
+class_averages_raw <- ppt_classes %>% 
+  group_by(c) %>% 
+  summarise_at(vars(read_nonw_raw_f9, read_word_raw_f9, nara_acc_raw_f9, nara_comp_raw_f9, wold_comp_raw_f8 ), 
+               list(mean = mean, sd = sd, min = min, max = max), na.rm = TRUE) %>% 
+  round(.,2)
+
+class_averages_raw
+
+class_averages_std <- std_data %>% 
+  group_by(c) %>% 
+  summarise_at(vars(read_nonw_bstd_f9, read_word_bstd_f9, nara_acc_std_f9, nara_comp_std_f9, wold_comp_bstd_f8), 
+               list(mean = mean, sd = sd, min = min, max = max), na.rm = TRUE) %>% 
+  round(.,2)
+
+class_averages_std
+```
+
+```{r class-plot}
+#### STILL TO-DO / TO MAKE NICE ####
+# would be nice to add distributions, but might end up looking messy
+
+# Summarise for plotting
+plot_data <- std_data %>% 
+  select(yp_id, c, read_nonw_bstd_f9, read_word_bstd_f9, nara_acc_std_f9, nara_comp_std_f9, wold_comp_bstd_f8) %>% 
+  pivot_longer(cols = c(read_nonw_bstd_f9, read_word_bstd_f9, nara_acc_std_f9, nara_comp_std_f9, wold_comp_bstd_f8),
+               names_to = "task",
+               values_to = "score") %>% 
+  group_by(c, task) %>% 
+  summarise(class_mean = mean(score, na.rm = TRUE), sd = sd(score, na.rm = TRUE), se = sd/sqrt(n())) %>% 
+  mutate(c = as.factor(c),
+         task = factor(task, levels = c("read_nonw_bstd_f9", "read_word_bstd_f9", "nara_acc_std_f9", "nara_comp_std_f9", "wold_comp_bstd_f8")))
+
+ggplot(plot_data, aes(x = task, y = class_mean, group = c, colour = c)) +
+  theme_bw() +
+  geom_point(aes(shape = c)) + 
+  geom_line(aes(linetype = c)) + 
+  geom_errorbar(aes(ymin = class_mean - (2*se), ymax = class_mean + (2*se)), width = 0.1)
+  scale_x_discrete()
+
+```
