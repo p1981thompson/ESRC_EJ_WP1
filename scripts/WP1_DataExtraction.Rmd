@@ -67,7 +67,7 @@ RQ2 <- c("age_m_f10",                                                # age
          "wold_vcb_i6_f8", "wold_vcb_i7_f8", "wold_vcb_i8_f8", "wold_vcb_i9_f8", "wold_vcb_i10_f8",  "wisc_vcb_raw_f8",     # vocabulary
          "wisc_pcmp_raw_f8", "wisc_code_raw_f8", "wisc_parr_raw_f8", "wisc_bloc_raw_f8", "wisc_obja_raw_f8",  # nonverbal ability 
          "wisc_bwsp_raw_f8", "cntsp_span_raw_f10",                     # working memory
-         "teach_slct_raw_f8", "teach_divd_raw_f8", "teach_ctrs_raw_f8", "teach_ctro_raw_f8", "sdq_hyp_prnt_ku", "sst_250a_raw_f10", "sst_150a_raw_f10") #attention  
+         "teach_slct_raw_f8", "teach_divd_raw_f8", "teach_ctrs_raw_f8", "teach_ctro_raw_f8", "sdq_hyp_prnt_ku") #attention  
 
 # Variables for descriptives, exploratory analyses (subject to change)
 other <- c("nara_acc_std_f9", "nara_comp_std_f9", "nara_rate_std_f9", "nara_npass_f9",
@@ -116,6 +116,8 @@ wp1_data <- wp1_data %>%
 ### Process labels
 
 Missing data are coded as negative values in raw data; recode as NA to avoid incorporating into analyses. 
+
+********* EDIT FOR TEACh SCORES (decrement score can be negative) ***********
 
 ```{r assign-na}
 wp1_data <- wp1_data %>% 

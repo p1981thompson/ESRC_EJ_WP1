@@ -152,6 +152,7 @@ fmm_enum_elbow <- function(mm_summaries = NA,
 mm_extract_data <- function(orig_mods = NA,        # list of original models (in environment)
                             candidate_mods = NA,   # candidate number of classes
                             filepath = NA,         # folder to save models to
+                            analysis_id = "sv",
                             rerun = TRUE,          # whether to re-run models to extract data, set to false if just loading 
                             one_fit = TRUE) {      # whether a one-class model was fitted (if not, adjusts selection from list)
   
@@ -173,7 +174,7 @@ mm_extract_data <- function(orig_mods = NA,        # list of original models (in
                      VARIABLE = ~ . + "IDVARIABLE IS yp_no;",
                      SAVEDATA = as.formula(sprintf(" ~ 'FILE IS sv_%s_%dclass.dat; SAVE = cprobabilities;'", model_name, n_classes)))
       
-      mplusModeler(body, sprintf("%s/sv_%s_rerun_%dclass.dat", filepath, model_name, n_classes), run = TRUE)
+      mplusModeler(body, sprintf("%s/%s_%s_rerun_%dclass.dat", filepath, analysis, model_name, n_classes), run = TRUE)
     }
   }
   filefilter = paste0(model_name, "_rerun")
@@ -192,8 +193,100 @@ plotMixtures_simpView <- function(output = NA){
     scale_x_discrete(limits = c("Nonwacc", "Wordacc","Naraacc", "Naracomp", "Woldcomp"))
 }
 
-
-
+# plotMixtures_compProf: plot standardised class means for task variables ----
+### currently makes use of standard plotMixtures function, but could be extract manually for more flexibility
+plotMixtures_compProf <- function(output = NA, select_model = NA){
+  
+  # Specify all models if no model selected
+  if (is.na(select_model)){
+    select_model <- 1:length(output)
+  }
+  
+  # For each model...
+  for (model in select_model){
+    
+    # Make separate plots of tasks for each factor
+    
+    acc <- plotMixtures(output[[model]], 
+                        variables = c("Nonwacc", "Wordacc","Naraacc"),
+                        coefficients = "stdyx.standardized") +
+      scale_shape_manual(values = c(18, 18, 18, 18)) + 
+      scale_size_manual(values = c(5, 5, 5, 5)) +
+      scale_linetype_manual(values = c("solid", "solid", "solid", "solid")) +
+      theme(axis.text.x = element_text(angle = 45, vjust = 0.9, hjust = 1),
+            axis.title.x = element_blank()) +
+      scale_x_discrete(limits = c("Nonwacc", "Wordacc","Naraacc")) + 
+      ggtitle("accuracy")
+    
+    comp <- plotMixtures(output[[model]], 
+                         variables = c("Naracomp", "Woldcomp"),
+                         coefficients = "stdyx.standardized") +
+      scale_shape_manual(values = c(18, 18, 18, 18)) + 
+      scale_size_manual(values = c(5, 5, 5, 5)) +
+      scale_linetype_manual(values = c("solid", "solid", "solid", "solid")) +
+      theme(axis.text.x = element_text(angle = 45, vjust = 0.9, hjust = 1),
+            axis.title.x = element_blank()) +
+      scale_x_discrete(limits = c("Naracomp", "Woldcomp")) + 
+      ggtitle("comprehension")
+    
+    rate <- plotMixtures(output[[model]], 
+                         variables = c("Nararate"),
+                         coefficients = "stdyx.standardized") +
+      scale_shape_manual(values = c(18, 18, 18, 18)) + 
+      scale_size_manual(values = c(5, 5, 5, 5)) +
+      scale_linetype_manual(values = c("solid", "solid", "solid", "solid")) +
+      theme(axis.text.x = element_text(angle = 45, vjust = 0.9, hjust = 1),
+            axis.title.x = element_blank()) +
+      scale_x_discrete(limits = c("Nararate")) + 
+      ggtitle("fluency")
+    
+    vocab <- plotMixtures(output[[model]], 
+                          variables = c("Wiscvcb", "Woldvcb"),
+                          coefficients = "stdyx.standardized") +
+      scale_shape_manual(values = c(18, 18, 18, 18)) + 
+      scale_size_manual(values = c(5, 5, 5, 5)) +
+      scale_linetype_manual(values = c("solid", "solid", "solid", "solid")) +
+      theme(axis.text.x = element_text(angle = 45, vjust = 0.9, hjust = 1),
+            axis.title.x = element_blank()) +
+      scale_x_discrete(limits = c("Wiscvcb", "Woldvcb")) + 
+      ggtitle("vocabulary")
+    
+    perfiq <- plotMixtures(output[[model]], 
+                           variables = c("Wiscpcmp", "Wisccode", "Wiscparr", "Wiscbloc", "Wiscobja"),
+                           coefficients = "stdyx.standardized") +
+      scale_shape_manual(values = c(18, 18, 18, 18)) + 
+      scale_size_manual(values = c(5, 5, 5, 5)) +
+      scale_linetype_manual(values = c("solid", "solid", "solid", "solid")) +
+      theme(axis.text.x = element_text(angle = 45, vjust = 0.9, hjust = 1),
+            axis.title.x = element_blank()) +
+      scale_x_discrete(limits = c("Wiscpcmp", "Wisccode", "Wiscparr", "Wiscbloc", "Wiscobja")) + 
+      ggtitle("performance IQ")
+    
+    execfun <- plotMixtures(output[[model]], 
+                            variables = c("Wiscbwsp", "Cntspan", "Attnsel", "Attndiv", "Attnopp", "Sdqhyp"),
+                            coefficients = "stdyx.standardized") +
+      scale_shape_manual(values = c(18, 18, 18, 18)) + 
+      scale_size_manual(values = c(5, 5, 5, 5)) +
+      scale_linetype_manual(values = c("solid", "solid", "solid", "solid")) +
+      theme(axis.text.x = element_text(angle = 45, vjust = 0.9, hjust = 1),
+            axis.title.x = element_blank()) +
+      scale_x_discrete(limits = c("Wiscbwsp", "Cntspan", "Attnsel", "Attndiv", "Attnopp", "Sdqhyp")) + 
+      ggtitle("executive functions")
+    
+    # Create title and arrange plots together
+    plot_title <- output[[model]][["input"]][["title"]] 
+    fig <- ggarrange(acc, comp, rate, vocab, perfiq, execfun, rows = 3, common.legend = TRUE)
+    fig <- annotate_figure(fig, top = text_grob(plot_title, color = "black", face = "bold", size = 14))
+    print(fig)
+    
+    # Save out for clearer inspection
+    plot_title <- str_replace_all(plot_title, "[^[:alnum:]]", "_")
+    filename <- paste0("../output/figures/", plot_title, ".tiff")
+    print(filename)
+    ggsave(filename, plot = fig, dpi = 600, height = 9, width = 10)
+  }
+  
+}
 
 # classification_diagnostics ---- 
 ### not formatted in easy-to-read way, could maybe be improved
@@ -252,23 +345,9 @@ class_diag <- function(output = NA){
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # extract_classes: 
 extract_classes <- function(output = NULL, type = NULL){
+  
   # for each model in the output
   for (model in 1:length(output)){
     
@@ -337,6 +416,11 @@ extract_classes <- function(output = NULL, type = NULL){
   
   print(plot)
 }
+
+
+
+
+
 
 
 

@@ -63,7 +63,7 @@ Variable format problematic for mplus data conversion, change ID to factor.
 
 ```{r mplus-formatting}
 sv_data <- sv_data %>% 
-  mutate(id = as.factor(id))
+  mutate(yp_id = as.factor(yp_id))
 ```
 
 
