@@ -1,5 +1,5 @@
 ---
-title: 'WP1: Simple View - Factor Mixture Model'
+title: 'WP1: Profiles of comprehension difficulty - Factor Mixture Model'
 output: 
   html_document:
     toc: true
@@ -9,13 +9,13 @@ knit: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding, output_dir = "../output/analysis/") })
 ---
 
-This script is used for running the factor mixture models. It will only be used *if* the CFA supports a two-factor structure, otherwise we will use a latent profile model (WP1_SimpView_LPA.Rmd).
+This script is used for running the factor mixture models.
 
 # Set-up
 
 ```{r libraries}
 # Specify packages
-pkgs <- c("tidyverse", "MplusAutomation", "texreg", "DiagrammeR", "kableExtra", "ggalluvial", "scales")
+pkgs <- c("tidyverse", "MplusAutomation", "texreg", "DiagrammeR", "kableExtra", "ggalluvial", "scales", "ggpubr")
 
 # Use groundhog package to load correct package versions
 # if (!require("groundhog")) install.packages("groundhog")
@@ -44,36 +44,47 @@ source("WP1_OutputFunctions.R")
 ###  Load and prepare data for Mplus
 
 ```{r load-data}
-sv_data <- read.csv("../data/simulated/WP1_SimpView_sim_raw_n1000_k3.csv")
-# sv_data <- read.csv("../data/processed/WP1_data.csv") %>% 
-#  select(yp_id, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8)
+cp_data <- read.csv("../data/simulated/WP1_CompProf_sim_raw_n694_k3.csv")
+#cp_data <- read.csv("../data/processed/WP1_data.csv")
 ```
 
 Mplus has an 8-character limit, so rename relevant variables with short names for modelling. 
 
 ```{r mplus-names}
-# Check names
-str_sub(names(sv_data), 1, 8)
-
 # Rename any necessary, print new names
-sv_data <- sv_data %>% 
+cp_data <- cp_data %>% 
   rename(naraComp = nara_comp_raw_f9,
          naraAcc = nara_acc_raw_f9,
          wordAcc = read_word_raw_f9,
          nonwAcc = read_nonw_raw_f9,
          woldComp = wold_comp_raw_f8,
          f8age = age_m_f8,
-         f9age = age_m_f9) 
+         f9age = age_m_f9,
+         f10age = age_m_f10,
+         naraRate = nara_rate_raw_f9,
+         woldVcb = wold_vcb_raw_f8,
+         wiscVcb = wisc_vcb_raw_f8,
+         wiscPcmp = wisc_pcmp_raw_f8,
+         wiscCode = wisc_code_raw_f8,
+         wiscParr = wisc_parr_raw_f8,
+         wiscBloc = wisc_bloc_raw_f8,
+         wiscObja = wisc_obja_raw_f8,
+         wiscBwsp = wisc_bwsp_raw_f8,
+         cntspan = cntsp_span_raw_f10,
+         attnSel = teach_slct_raw_f8,
+         attnDiv = teach_divd_raw_f8,
+         attnOpp = teach_ctr_diff_f8,
+         sdqHyp = sdq_hyp_prnt_ku) 
 
-names(sv_data)
+# Check compatibility with mplus
+str_sub(names(cp_data), 1, 8)
 ```
 
 Variable format problematic for mplus data conversion, change ID to factor.
 
 ```{r mplus-formatting}
-sv_data <- sv_data %>%
-  mutate(yp_id = as.factor(yp_id),
-         yp_no = as.numeric(yp_id))
+cp_data <- cp_data %>%
+  mutate(yp_id = as.factor(yp_id))
 ```
 
 # Factor Mixture Model to extract latent classes
@@ -90,14 +101,73 @@ lrtbootstrap 50
 lrtstarts 50 20 50 20
 (taken from Geiser book)
 
+```{r}
+# Age regressors
+age_spec <- " 
+             wordAcc nonwAcc naraAcc naraComp naraRate on f9age;
+             woldComp woldVcb wiscVcb wiscPcmp wiscCode wiscParr 
+             wiscBloc wiscObja wiscBwsp attnSel attnDiv attnOpp on f8age;
+             cntSpan on f10age;"
+
+# Factor specification (for overall statement)
+factor_spec <- " 
+                acc by nonwAcc wordAcc naraAcc; 
+                comp by naraComp; woldComp 
+                naraRate;
+                vocab by wiscVcb woldVcb ;
+                perfiq by wiscPcmp wiscCode wiscParr wiscBloc wiscObja;
+                execfun by wiscBwsp cntSpan attnSel attnDiv attnOpp sdqHyp;"
+
+# Factor specification (for class statements; remove first loading as already fixed to 1)
+factor_spec_class <- " 
+                acc by wordAcc naraAcc; 
+                comp by woldComp;
+                naraRate;
+                vocab by woldVcb ;
+                perfiq by wiscCode wiscParr wiscBloc wiscObja;
+                execfun by cntSpan attnSel attnDiv attnOpp sdqHyp;"
+
+# Set factor means to 0 for identifiability
+factor_means <- "
+                 [comp@0]; [acc@0]; [vocab@0]; [perfiq@0]; [execfun@0];"     # means at 0 ? what about naraRate? 
+
+# Factor variances
+factor_vars <- " 
+                acc; comp; naraRate; vocab; perfiq; execfun;" # Not sure about naraRate here as not latent variable? 
+
+# Factor covariances  
+factor_covars <- " 
+                  acc with comp; acc with naraRate; acc with vocab; 
+                  acc with perfiq; acc with execfun;
+                  comp with naraRate; comp with vocab; 
+                  comp with perfiq; comp with execfun;
+                  naraRate with vocab; naraRate with perfiq; 
+                  naraRate with execfun; 
+                  vocab with perfiq; vocab with execfun;
+                  perfiq with execfun;"
+
+# Means of indicator variables
+ind_means <- " 
+              [wordAcc nonwAcc naraAcc naraComp naraRate 
+              woldComp woldVcb wiscVcb wiscPcmp wiscCode 
+              wiscParr wiscBloc wiscObja wiscBwsp 
+              attnSel attnDiv attnOpp cntSpan];"
+
+# Additional covariances between indicator variables (determined by initial CFA model)
+ind_covars <- " 
+               cntSpan with wiscBwsp;
+               naraRate with naraAcc;"        # e.g., from MIs in CFA script
+```
+
+
 ```{r fmm-base}
-# Specify final selected model - TO BE EDITED
-select_cfa_spec <- "\n acc by naraAcc wordAcc nonwAcc; \n comp by naraComp woldComp; \n [comp@0];\n [acc@0];"
 
 # Create mixture model specification (including age regressors)
-model_spec <- paste0("%OVERALL%",
-                     "\n wordAcc nonwAcc naraAcc naraComp on f9age; \n woldcomp on f8age;",
-                      select_cfa_spec)
+model_spec <- paste0("%OVERALL% \n ",
+                     age_spec,
+                     factor_spec,
+                     factor_means,
+                     ind_covars)      ### not sure where these go - in all models in overall statement???
 
 # Create base model
 m_fmm_base <- mplusObject(
@@ -107,8 +177,8 @@ m_fmm_base <- mplusObject(
   MODEL = model_spec,
   OUTPUT = "sampstat; stdyx; CINTERVAL; TECH1; TECH8; TECH11; TECH14;",
   PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(sv_data[,!names(sv_data) %in% c("yp_id","k")]),
-  rdata = sv_data)
+  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "yp_no", "k")]),
+  rdata = cp_data)
 ```
 
 Follow same class-enumeration process as set out by Masyn (2013) for LCA and LPA models. Fit two  different models - corresponding to  FMM-3 and FMM-4 in Clark et al. (2013). Use one-class model as a benchmark for evaluating mixture models. 
@@ -117,7 +187,7 @@ Follow same class-enumeration process as set out by Masyn (2013) for LCA and LPA
 m_fmm_benchmark <- update(m_fmm_base,
      TITLE = ~ "FMM Benchmark")
 
-mplusModeler(m_fmm_benchmark, "./mplus_models/fmm/sv_fmm_mbenchmark.dat", run = TRUE)
+mplusModeler(m_fmm_benchmark, "./mplus_models/fmm/cp_fmm_mbenchmark.dat", run = TRUE)
 
 # Extract parameters for the benchmark model
 m_fmm_benchmark <- readModels(target = "./mplus_models/fmm", filefilter = "mbenchmark") %>% 
@@ -181,16 +251,16 @@ h->e
 Steps 1-3) Fit series of increasing *k*-class models.
 
 ```{r fmm-a-fit}
-m_fmm_a <- lapply(2:6, function(k) {
+m_fmm_a <- lapply(2:4, function(k) {
   
   # Update model spec 1: overall model estimates (variances and covariances)
   body<-update(m_fmm_base,
-              MODEL = ~ . + "acc - comp; \n acc with comp;" )
+              MODEL = as.formula(sprintf("~ . + '%s %s'", factor_vars, factor_covars)))
   
   # Create class-level specifications (factor variances and covariances)
-  class_spec <- "%c#1% \n comp; \n acc; \n comp with acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp];"
+  class_spec <- paste0("%c#1%", factor_vars, factor_covars, ind_means)
   for (i in 2:k){
-    class_spec <- paste0(class_spec, "\n %c#", i, "% \n comp; \n acc; \n comp with acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp];")
+    class_spec <- paste0(class_spec, "\n %c#", i, "%", factor_vars, factor_covars, ind_means)
   }
   
   # ...Update model spec 2: class estimates
@@ -200,7 +270,7 @@ m_fmm_a <- lapply(2:6, function(k) {
      MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
 
   # Run model
-  mplusModeler(body, sprintf("./mplus_models/fmm/sv_fmm_a_%dclass.dat", k), run = TRUE)
+  mplusModeler(body, sprintf("./mplus_models/fmm/cp_fmm_a_%dclass.dat", k), run = FALSE)
  })
 ```
 
@@ -208,7 +278,7 @@ Steps 4-5) Extract fit indices, and use to select smaller subset of candidate mo
 
 ```{r fmm-a-output}
 # Read in output
-fmm_a_out <- readModels(target = "./mplus_models/fmm", filefilter = "sv_fmm_a")
+fmm_a_out <- readModels(target = "./mplus_models/fmm", filefilter = "cp_fmm_a")
 
 # Check warnings
 # for (model in 1:length(fmm_a_out)){
@@ -234,17 +304,18 @@ Step 6) View classification diagnostics for candidate models. Can also inspect h
 ```{r fmm-a-candidates}
 # Extract participant level data
 fmm_a_rerun <- mm_extract_data(orig_mods = m_fmm_a, candidate_mods = 3:4, 
-                               filepath = "./mplus_models/fmm",
-                               rerun = TRUE, one_fit = FALSE)
+                               filepath = "./mplus_models/fmm", analysis_id = "cp",
+                               rerun = FALSE, one_fit = FALSE)
 
 # Compute classification diagnostics
 class_diag(fmm_a_rerun)
 
-# Plot class means
-plotMixtures_simpView(fmm_a_rerun)
+# Plot class means (use select_model if not all models ran correctly)
+### Note - plot saves to output/figures/ >> open and inspect separately for proper viewing
+plotMixtures_compProf(fmm_a_rerun, select_model = 2)
 
-# Inspect transitions 
-extract_classes(fmm_a_rerun, type = "fmm")
+# Inspect transitions - not yet edited/working
+# extract_classes(fmm_a_rerun, select_model = 3:4, type = "fmm")
 ```
 
 Comments:
@@ -327,12 +398,12 @@ h -> nwa [style = dashed]
 Steps 1-3) Fit series of increasing *k*-class models.
 
 ```{r fmm-b-fit}
-m_fmm_b <- lapply(2:6, function(k) {
+m_fmm_b <- lapply(2:3, function(k) {
   
   # Create class-level specifications (factor loadings, factor variance and covariance)
-  class_spec <- "%c#1% \n acc by naraAcc wordAcc nonwAcc; \n comp by naraComp woldComp; \n comp; \n acc; \n comp with acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp];"
+  class_spec <- paste0("%c#1%", factor_spec_class, factor_vars, factor_covars, ind_means)
   for (i in 2:k){
-    class_spec <- paste0(class_spec, "\n %c#", i, "% \n acc by naraAcc wordAcc nonwAcc; \n comp by naraComp woldComp; \n comp; \n acc;\n comp with acc; \n [naraAcc wordAcc nonwAcc naraComp woldComp]; ")
+    class_spec <- paste0(class_spec, "\n %c#", i, "%", factor_spec_class, factor_vars, factor_covars, ind_means)
   }
   
   # Update model
@@ -342,7 +413,7 @@ m_fmm_b <- lapply(2:6, function(k) {
      MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
  
   # Run model
-   mplusModeler(body, sprintf("./mplus_models/fmm/sv_fmm_b_%dclass.dat", k), run = TRUE)
+   mplusModeler(body, sprintf("./mplus_models/fmm/cp_fmm_b_%dclass.dat", k), run = TRUE)
  })
 ```
 
@@ -350,7 +421,7 @@ Steps 4-5) Extract fit indices, and use to select smaller subset of candidate mo
 
 ```{r fmm-b-output}
 # Read in output
-fmm_b_out <- readModels(target = "./mplus_models/fmm", filefilter = "sv_fmm_b")
+fmm_b_out <- readModels(target = "./mplus_models/fmm", filefilter = "cp_fmm_b")
 
 # Check warnings
 # for (model in 1:length(fmm_b_out)){
@@ -377,7 +448,7 @@ Step 6) View classification diagnostics for candidate models. Can also inspect h
 ```{r fmm-b-candidates}
 # Extract participant level data
 fmm_b_rerun <- mm_extract_data(orig_mods = m_fmm_b, candidate_mods = 3:4,
-                               filepath = "./mplus_models/fmm",
+                               filepath = "./mplus_models/fmm", analysis_id = "cp",
                                rerun = TRUE, one_fit = FALSE)
 
 # Compute classification diagnostics
