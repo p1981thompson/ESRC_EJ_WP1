@@ -4,12 +4,13 @@ output:
   html_document:
     toc: true
     toc_float: true
+date: '06/05/2021'
     
 knit: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding, output_dir = "../output/analysis/") })
 ---
 
-This script is used for running the latent profile models. It will only be used *if* the CFA indicates that a single factor is best, otherwise we will use a factor mixture model (WP1_SimpView_FMM.Rmd).
+This script is used for running the latent profile models. It will only be used *if* the CFA indicates that a single factor is best, otherwise we will use a factor mixture model (WP1_SimpView_FMM.Rmd). This analysis is conducted using the "exploratory" or "calibration" half of the dataset (subsample A).
 
 # Set-up
 
@@ -18,19 +19,19 @@ This script is used for running the latent profile models. It will only be used 
 pkgs <- c("tidyverse", "MplusAutomation", "texreg", "DiagrammeR", "kableExtra", "ggalluvial", "scales")
 
 # Use groundhog package to load correct package versions
-# if (!require("groundhog")) install.packages("groundhog")
-# groundhog.day <- "2021-03-01"
+if (!require("groundhog")) install.packages("groundhog")
+groundhog.day <- "2021-03-01"
+groundhog::groundhog.library(pkgs, groundhog.day)
 
-# groundhog::groundhog.library(pkgs, groundhog.day)
-
-# Or if not using groundhog package - load currently installed package versions separately (reproducibility not guaranteed)
-invisible(lapply(pkgs, library, character.only = TRUE))
+# Or if not using groundhog package - load currently installed package versions separately (faster, reproducibility not guaranteed)
+# invisible(lapply(pkgs, library, character.only = TRUE))
 ```
 
 ```{r create-dir}
 # Create subdirectories for storing mplus scripts, data files, and output, if do not already exist
 if(dir.exists("./mplus_models/")==FALSE){dir.create("./mplus_models/")}
-if(dir.exists("./mplus_models/lpa")==FALSE){dir.create("./mplus_models/lpa")} 
+if(dir.exists("./mplus_models/simpview/")==FALSE){dir.create("./mplus_models/simpview/")}
+if(dir.exists("./mplus_models/simpview/lpa")==FALSE){dir.create("./mplus_models/simpview/lpa")} 
 if(dir.exists("../output/")==FALSE){dir.create("../output/")}
 if(dir.exists("../output/figures")==FALSE){dir.create("../output/figures")}
 if(dir.exists("../output/tables")==FALSE){dir.create("../output/tables")}
@@ -45,9 +46,10 @@ source("WP1_OutputFunctions.R")
 ###  Load and prepare data for Mplus
 
 ```{r load-data}
-sv_data <- read.csv("../data/simulated/WP1_SimpView_sim_raw_n1000_k3.csv")
-# sv_data <- read.csv("../data/processed/WP1_data.csv") %>% 
-#  select(yp_id, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8)
+# sv_data <- read.csv("../data/simulated/WP1_SimpView_sim_raw_n1000_k3.csv")  # for script testing
+
+# sv_data <- read.csv("../data/processed/WP1_data_subA.csv") %>%              # ALSPAC data
+#  select(yp_id, yp_no, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8)
 ```
 
 Mplus has an 8-character limit, so rename relevant variables with short names for modelling. 
@@ -85,26 +87,21 @@ Indicator variances can always differ from each other within a class, but differ
 
 ### Base model
 
-Set up initial model, based on CFA above. 
-
-Options reduced to save time for now, but change for actual modelling:
-starts - 500 50
-lrtbootstrap 50
-lrtstarts 50 20 50 20
-(taken from Geiser book)
+*Note:* Increase starts to 2000 200 for a model if best log-likelihood value not replicated (Lubke & Luningham, 2017).
 
 ```{r lpa-base}
 # Create base model
 m_lpa_base <- mplusObject(
   TITLE = "Latent Profile Analysis;",
-  ANALYSIS = "estimator = mlr; type = mixture; starts = 100 10;",
+  ANALYSIS = "estimator = mlr; type = mixture; starts = 500 50; 
+              processors = 4(STARTS);",
   VARIABLE = "classes = c(1);",
   MODEL = "%OVERALL% 
            wordAcc nonwAcc naraAcc naraComp on f9age;
            woldcomp on f8age;", 
-  OUTPUT = "sampstat; stdyx; residual; TECH1; TECH7; TECH8; TECH11; TECH14;",
+  OUTPUT = "TECH1; TECH8; TECH11;",
   PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(sv_data[,!names(sv_data) %in% c("yp_id", "yp_no", "k")]),
+  usevariables = colnames(sv_data[,!names(sv_data) %in% c("yp_id", "yp_no")]),
   rdata = sv_data)
 
 # Specify all variances
@@ -132,10 +129,10 @@ m_lpa_benchmark <- update(m_lpa_base,
      VARIABLE = ~ "classes = c(1);",
      MODEL = as.formula(sprintf("~ . + '%%OVERALL%% \n %s \n %s'", lpa_vars, lpa_covars)))
 
-mplusModeler(m_lpa_benchmark, "./mplus_models/lpa/sv_lpa_mbenchmark.dat", run = TRUE)
+mplusModeler(m_lpa_benchmark, "./mplus_models/simpview/lpa/sv_lpa_mbenchmark.dat", run = TRUE)
 
 # Extract parameters for the benchmark model
-m_lpa_benchmark <- readModels(target = "./mplus_models/lpa", filefilter = "mbenchmark") %>% 
+m_lpa_benchmark <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "mbenchmark") %>% 
   mixtureSummaryTable(keepCols = c("Parameters", "Observations", "LL", "BIC")) %>% 
   mutate(CAIC = -2*LL + Parameters*(log(Observations) + 1),
            AWE = -2*LL + Parameters*(log(Observations) + 1.5)) %>% 
@@ -157,7 +154,7 @@ m_lpa_a <- lapply(1:6, function(k) {
      TITLE = as.formula(sprintf("~ 'LPA Model A: %d classes;'", k)),
      VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)))
    
-   mplusModeler(body, sprintf("mplus_models/lpa/sv_lpa_a_%dclass.dat", k), run = TRUE)
+   mplusModeler(body, sprintf("mplus_models/simpview/lpa/sv_lpa_a_%dclass.dat", k), run = TRUE)
  })
 ```
 
@@ -165,13 +162,13 @@ Steps 4-5) Extract fit indices, and use to select smaller subset of candidate mo
 
 ```{r lpa-a-output}
 # Read in output
-lpa_a_out <- readModels(target = "./mplus_models/lpa", filefilter = "sv_lpa_a")
+lpa_a_out <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "sv_lpa_a")
 
 # Check warnings
-# for (model in 1:length(lpa_a_out)){
-#   print(lpa_a_out[[model]]$input$title)
-#   print(lpa_a_out[[model]]$warnings)
-# }
+for (model in 1:length(lpa_a_out)){
+  print(lpa_a_out[[model]]$input$title)
+  print(lpa_a_out[[model]]$warnings)
+}
 
 # Print table 
 lpa_a_summary <- lpa_enum_table(output = lpa_a_out)
@@ -192,9 +189,14 @@ Step 6) View classification diagnostics for candidate models. Can also inspect h
 
 ```{r lpa-a-candidates}
 # Extract participant level data
-lpa_a_rerun <- mm_extract_data(orig_mods = m_lpa_a, candidate_mods = 3:4, 
-                               filepath = "./mplus_models/lpa",
-                               rerun = TRUE, one_fit = TRUE)
+lpa_a_rerun <- mm_extract_data(orig_mods = m_lpa_a, candidate_mods = 2:3,    # change models to best candidates
+                               filepath = "./mplus_models/simpview/lpa",
+                               rerun = TRUE, optseed = NA,                   # extract optimal values from output files
+                               one_fit = TRUE)
+
+# Print table, and append bLRT values to main output 
+lpa_enum_table(lpa_b_rerun)
+lpa_a_summary <- add_bLRT(lpa_a_rerun, lpa_a_summary)
 
 # Compute classification diagnostics
 class_diag(lpa_a_rerun)
@@ -205,14 +207,15 @@ plotMixtures_simpView(lpa_a_rerun)
 # Inspect transitions 
 extract_classes(lpa_a_rerun, type = "lpa")
 ```
+
 Comments:
 **Classification diagnostics:**
 **Interpretability:** 
 
 Step 7) Select final model in class enumeration process, for model specification A. 
 ```{r lpa-a-selected}
-lpa_a_final_nclass <- 3  
-lpa_a_final_m <- lpa_a_rerun[1]  
+# lpa_a_final_nclass <- 3            # change model to best candidate
+# lpa_a_final_m <- lpa_a_rerun[1]    # change model to best candidate
 ```
 
 ### LPA Model B: Class-invariant, unrestricted
@@ -221,7 +224,7 @@ Indicator variances differ from each other within a class and can covary, but va
 
 Steps 1-3) Fit series of increasing *k*-class models.
 
-```{r lpa-b}
+```{r lpa-b-fit}
 m_lpa_b <- lapply(1:6, function(k) {
    body <- update(m_lpa_base,
      TITLE = as.formula(sprintf("~ 'LPA Model B: %d classes;'", k)),
@@ -231,7 +234,7 @@ m_lpa_b <- lapply(1:6, function(k) {
      MODEL = as.formula(sprintf("~ . + '\n %s \n %s'", lpa_vars, lpa_covars)))
    
    # Run model
-   mplusModeler(body, sprintf("mplus_models/lpa/sv_lpa_b_%dclass.dat", k), run = TRUE)
+   mplusModeler(body, sprintf("mplus_models/simpview/lpa/sv_lpa_b_%dclass.dat", k), run = TRUE)
  })
 ```
 
@@ -239,13 +242,13 @@ Steps 4-5) Extract fit indices, and use to select smaller subset of candidate mo
 
 ```{r lpa-b-output}
 # Read in output
-lpa_b_out <- readModels(target = "./mplus_models/lpa", filefilter = "sv_lpa_b")
+lpa_b_out <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "sv_lpa_b")
 
 # Check warnings
-# for (model in 1:length(lpa_b_out)){
-#   print(lpa_b_out[[model]]$input$title)
-#   print(lpa_b_out[[model]]$warnings)
-# }
+for (model in 1:length(lpa_b_out)){
+  print(lpa_b_out[[model]]$input$title)
+  print(lpa_b_out[[model]]$warnings)
+}
 
 # Print table 
 lpa_b_summary <- lpa_enum_table(output = lpa_b_out)
@@ -266,9 +269,14 @@ Step 6) View classification diagnostics for candidate models.
 
 ```{r lpa-b-candidates}
 # Extract participant level data
-lpa_b_rerun <- mm_extract_data(orig_mods = m_lpa_b, candidate_mods = 2:4, 
-                               filepath = "./mplus_models/lpa",
-                               rerun = TRUE, one_fit = TRUE)
+lpa_b_rerun <- mm_extract_data(orig_mods = m_lpa_b, candidate_mods = 2:4,   # change models to best candidates
+                               filepath = "./mplus_models/simpview/lpa",
+                               rerun = TRUE, optseed = NA,                   # extract optimal values from output files
+                               one_fit = TRUE)
+
+# Print table, and append bLRT values to main output 
+lpa_enum_table(lpa_b_rerun)
+lpa_b_summary <- add_bLRT(lpa_b_rerun, lpa_b_summary)
 
 # Compute classification diagnostics
 class_diag(lpa_b_rerun)
@@ -279,6 +287,7 @@ plotMixtures_simpView(lpa_b_rerun)
 # Inspect transitions 
 extract_classes(lpa_b_rerun, type = "lpa")
 ```
+
 Comments:
 **Classification diagnostics:**
 **Interpretability:** 
@@ -286,8 +295,8 @@ Comments:
 Step 7) Select final model in class enumeration process, for model specification B. 
 
 ```{r lpa-b-selected}
-lpa_b_final_nclass <- 2
-lpa_b_final_m <- lpa_b_rerun[1]
+# lpa_b_final_nclass <- 2           # change model to best candidate
+# lpa_b_final_m <- lpa_b_rerun[1]   # change model to best candidate
 ```
 
 ### LPA Model C: Class-varying, diagonal 
@@ -296,7 +305,7 @@ Indicator variances are estimated separately for each class. No covariances are 
 
 Steps 1-3) Fit series of increasing *k*-class models.
 
-```{r lpa-c}
+```{r lpa-c-fit}
 m_lpa_c <- lapply(1:6, function(k) {
   
   # Update model spec 1: overall model estimates (variances only)
@@ -318,7 +327,7 @@ m_lpa_c <- lapply(1:6, function(k) {
      MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
    
   # Run model
-  mplusModeler(body, sprintf("mplus_models/lpa/sv_lpa_c_%dclass.dat", k), run = TRUE)
+  mplusModeler(body, sprintf("mplus_models/simpview/lpa/sv_lpa_c_%dclass.dat", k), run = TRUE)
  })
 
 ```
@@ -327,13 +336,13 @@ Steps 4-5) Extract fit indices, and use to select smaller subset of candidate mo
 
 ```{r lpa-c-output}
 # Read in output
-lpa_c_out <- readModels(target = "./mplus_models/lpa", filefilter = "sv_lpa_c")
+lpa_c_out <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "sv_lpa_c")
 
 # Check warnings
-# for (model in 1:length(lpa_c_out)){
-#   print(lpa_c_out[[model]]$input$title)
-#   print(lpa_c_out[[model]]$warnings)
-# }
+for (model in 1:length(lpa_c_out)){
+  print(lpa_c_out[[model]]$input$title)
+  print(lpa_c_out[[model]]$warnings)
+}
 
 # Print table 
 lpa_c_summary <- lpa_enum_table(output = lpa_c_out)
@@ -355,9 +364,14 @@ Step 6) View classification diagnostics for candidate models.
 
 ```{r lpa-c-candidates}
 # Extract participant level data
-lpa_c_rerun <- mm_extract_data(orig_mods = m_lpa_c, candidate_mods = 3:5, 
-                               filepath = "./mplus_models/lpa",
-                               rerun = TRUE, one_fit = TRUE)
+lpa_c_rerun <- mm_extract_data(orig_mods = m_lpa_c, candidate_mods = 3:5,  # change models to best candidates
+                               filepath = "./mplus_models/simpview/lpa",
+                               rerun = TRUE, optseed = NA,                 # extract optimal values from output files
+                               one_fit = TRUE)
+
+# Print table, and append bLRT values to main output 
+lpa_enum_table(lpa_c_rerun)
+lpa_c_summary <- add_bLRT(lpa_c_rerun, lpa_c_summary)
 
 # Compute classification diagnostics
 class_diag(lpa_c_rerun)
@@ -368,6 +382,7 @@ plotMixtures_simpView(lpa_c_rerun)
 # Inspect transitions 
 extract_classes(lpa_c_rerun, type = "lpa")
 ```
+
 Comments:
 **Classification diagnostics:**
 **Interpretability:** 
@@ -375,8 +390,8 @@ Comments:
 Step 7) Select final model in class enumeration process, for model specification C.
 
 ```{r lpa-c-selected}
-lpa_c_final_nclass <- 4
-lpa_c_final_m <- lpa_c_rerun[2]
+# lpa_c_final_nclass <- 4           # change to best model
+# lpa_c_final_m <- lpa_c_rerun[2]   # change to best model
 ```
 
 ### LPA Model D 
@@ -385,7 +400,7 @@ Indicator variances are estimated separately for each class, but covariances are
 
 Steps 1-3) Fit series of increasing *k*-class models.
 
-```{r lpa-d}
+```{r lpa-d-fit}
 m_lpa_d <- lapply(1:6, function(k) {
   
   # Update model spec 1: overall model estimates (variances and covariances)
@@ -407,7 +422,7 @@ m_lpa_d <- lapply(1:6, function(k) {
      MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
   
   # Run model
-  mplusModeler(body, sprintf("mplus_models/lpa/sv_lpa_d_%dclass.dat", k), run = TRUE)
+  mplusModeler(body, sprintf("mplus_models/simpview/lpa/sv_lpa_d_%dclass.dat", k), run = TRUE)
  })
 ```
 
@@ -415,13 +430,13 @@ Steps 4-5) Extract fit indices, and use to select smaller subset of candidate mo
 
 ```{r lpa-d-output}
 # Read in output
-lpa_d_out <- readModels(target = "./mplus_models/lpa", filefilter = "sv_lpa_d")
+lpa_d_out <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "sv_lpa_d")
 
 # Check warnings
-# for (model in 1:length(lpa_d_out)){
-#   print(lpa_d_out[[model]]$input$title)
-#   print(lpa_d_out[[model]]$warnings)
-# }
+for (model in 1:length(lpa_d_out)){
+  print(lpa_d_out[[model]]$input$title)
+  print(lpa_d_out[[model]]$warnings)
+}
 
 # Print table 
 lpa_d_summary <- lpa_enum_table(output = lpa_d_out)
@@ -443,9 +458,14 @@ Step 6) View classification diagnostics for candidate models.
 
 ```{r lpa-d-candidates}
 # Extract participant level data
-lpa_d_rerun <- mm_extract_data(orig_mods = m_lpa_d, candidate_mods = 2:3, 
-                               filepath = "./mplus_models/lpa",
-                               rerun = TRUE, one_fit = TRUE)
+lpa_d_rerun <- mm_extract_data(orig_mods = m_lpa_d, candidate_mods = 2:3,   # change models to best candidates
+                               filepath = "./mplus_models/simpview/lpa",
+                               rerun = TRUE, optseed = NA,                   # extract optimal values from output files
+                               one_fit = TRUE)
+
+# Print table, and append bLRT values to main output 
+lpa_enum_table(lpa_d_rerun)
+lpa_d_summary <- add_bLRT(lpa_d_rerun, lpa_d_summary)
 
 # Compute classification diagnostics
 class_diag(lpa_d_rerun)
@@ -456,6 +476,7 @@ plotMixtures_simpView(lpa_d_rerun)
 # Inspect transitions 
 extract_classes(lpa_d_rerun, type = "lpa")
 ```
+
 Comments:
 **Classification diagnostics:**
 **Interpretability:** 
@@ -463,8 +484,8 @@ Comments:
 Step 7) Select final model in class enumeration process, for model specification D.
 
 ```{r lpa-d-selected}
-lpa_d_final_nclass <-  2
-lpa_d_final_m <- lpa_d_rerun[1]
+# lpa_d_final_nclass <-  2           # change to selected model
+# lpa_d_final_m <- lpa_d_rerun[1]    # change to selected model
 ```
 
 ### LPA Model E: Class-varying, unrestricted
@@ -473,7 +494,7 @@ All variances and covariances can vary between clusters.
 
 Steps 1-3) Fit series of increasing *k*-class models.
 
-```{r lpa-e}
+```{r lpa-e-fit}
 m_lpa_e <- lapply(1:6, function(k) {
   
   # Update model spec 1: overall model estimates (variances and covariances)
@@ -495,7 +516,7 @@ m_lpa_e <- lapply(1:6, function(k) {
      MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
 
   # Run model
-  mplusModeler(body, sprintf("mplus_models/lpa/sv_lpa_e_%dclass.dat", k), run = TRUE)
+  mplusModeler(body, sprintf("mplus_models/simpview/lpa/sv_lpa_e_%dclass.dat", k), run = TRUE)
  })
 ```
 
@@ -503,13 +524,13 @@ Steps 4-5) Extract fit indices, and use to select smaller subset of candidate mo
 
 ```{r lpa-e-output}
 # Read in output
-lpa_e_out <- readModels(target = "./mplus_models/lpa", filefilter = "sv_lpa_e")
+lpa_e_out <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "sv_lpa_e")
 
 # Check warnings
-# for (model in 1:length(lpa_e_out)){
-#   print(lpa_e_out[[model]]$input$title)
-#   print(lpa_e_out[[model]]$warnings)
-# }
+for (model in 1:length(lpa_e_out)){
+  print(lpa_e_out[[model]]$input$title)
+  print(lpa_e_out[[model]]$warnings)
+}
 
 # Print table 
 lpa_e_summary <- lpa_enum_table(output = lpa_e_out)
@@ -530,9 +551,14 @@ Step 6) View classification diagnostics for candidate models.
 
 ```{r lpa-e-candidates}
 # Extract participant level data
-lpa_e_rerun <- mm_extract_data(orig_mods = m_lpa_e, candidate_mods = 2:3, 
-                               filepath = "./mplus_models/lpa",
-                               rerun = TRUE, one_fit = TRUE)
+lpa_e_rerun <- mm_extract_data(orig_mods = m_lpa_e, candidate_mods = 2:3,    # change models to best candidates
+                               filepath = "./mplus_models/simpview/lpa",
+                               rerun = TRUE, optseed = NA,                   # extract optimal values from output files
+                               one_fit = TRUE)
+
+# Print table, and append bLRT values to main output 
+lpa_enum_table(lpa_e_rerun)
+lpa_e_summary <- add_bLRT(lpa_e_rerun, lpa_e_summary)
 
 # Compute classification diagnostics
 class_diag(lpa_e_rerun)
@@ -551,8 +577,8 @@ Comments:
 Step 7) Select final model in class enumeration process, for model specification E.
 
 ```{r lpa-e-selected}
-lpa_e_final_nclass <-  3
-lpa_e_final_m <- lpa_e_rerun[2]
+# lpa_e_final_nclass <-  3          # change to best model
+# lpa_e_final_m <- lpa_e_rerun[2]   # change to best model
 ```
 
 ### All LPA models: Summary output & final selection
@@ -642,3 +668,9 @@ ggsave("../output/figures/SimpView_lpa_all_indices.tiff", dpi = 600, width = 7, 
 ```
 
 # Final selected model
+
+The final model will be selected on the basis of model fit, classification utility, and theoretical interpretability. This model will be taken forward for cross-validation with subsample B (WP1_SimpView_FinalModel.Rmd, script not yet developed but process described in the pre-registration).
+
+```{r final-model}
+
+```

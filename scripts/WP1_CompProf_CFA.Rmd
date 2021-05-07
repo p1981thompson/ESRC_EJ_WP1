@@ -4,12 +4,13 @@ output:
   html_document:
     toc: true
     toc_float: true
+date: '06/05/2021'
     
 knit: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding, output_dir = "../output/analysis/") })
 ---
 
-This script computes basic summary statistics for the data, ensures that they align with Mplus output, and tests the factor structure to be used for subsequent analyses. 
+This script computes basic summary statistics for the data, ensures that they align with Mplus output, and tests the factor structure to be used for subsequent analyses. This analysis is conducted using the group(s) with poor reading comprehension, extracted in WP1_SimpView_FinalModel.Rmd. 
 
 # Set-up
 
@@ -18,26 +19,37 @@ This script computes basic summary statistics for the data, ensures that they al
 pkgs <- c("tidyverse", "psych", "naniar", "MplusAutomation", "texreg", "semPlot")
 
 # Use groundhog package to load correct package versions
-# if (!require("groundhog")) install.packages("groundhog")
-# groundhog.day <- "2021-03-01"
-# groundhog::groundhog.library(pkgs, groundhog.day)
+if (!require("groundhog")) install.packages("groundhog")
+groundhog.day <- "2021-03-01"
+groundhog::groundhog.library(pkgs, groundhog.day)
 
-# Or if not using groundhog package - load currently installed package versions separately (reproducibility not guaranteed)
-invisible(lapply(pkgs, library, character.only = TRUE))
+# Or if not using groundhog package - load currently installed package versions separately (faster; reproducibility not guaranteed)
+# invisible(lapply(pkgs, library, character.only = TRUE))
 ```
 
 ```{r create-dir}
 # Create subdirectories for storing mplus scripts, data files, and output, if do not already exist
 if(dir.exists("./mplus_models/")==FALSE){dir.create("./mplus_models/")}
-if(dir.exists("./mplus_models/desc")==FALSE){dir.create("./mplus_models/desc")}
-if(dir.exists("./mplus_models/cfa")==FALSE){dir.create("./mplus_models/cfa")} 
+if(dir.exists("./mplus_models/compprof/")==FALSE){dir.create("./mplus_models/compprof/")}
+if(dir.exists("./mplus_models/compprof/desc")==FALSE){dir.create("./mplus_models/compprof/desc")}
+if(dir.exists("./mplus_models/compprof/cfa")==FALSE){dir.create("./mplus_models/compprof/cfa")} 
 ```
 
 ###  Load and prepare data for Mplus
 
+Read in the original data file extracted for WP1 (contains all variables) and the classes extracted from the previous analysis. Filter dataset to include only the classes of interest for this analysis (those with poor comprehension in the context of relatively good reading accuracy). 
+
 ```{r load-data}
-cp_data <- read.csv("../data/simulated/WP1_CompProf_sim_raw_n694_k3.csv")
-#cp_data <- read.csv("../data/processed/WP1_data.csv")
+cp_data <- read.csv("../data/simulated/WP1_CompProf_sim_raw_n694_k3.csv")   # for script checking
+
+# cp_data <- read.csv("../data/processed/WP1_data_all.csv")      # dataset containing all participants/variables
+# groups <- read.csv("../data/processed/WP1_classes.csv") %>%    # classes extracted from SimpView model
+#   select()
+
+# cp_data <- cp_data %>%
+#   left_join(groups, by = "") %>% 
+#   filter(C == ) %>% 
+#   select(yp_id:)
 ```
 
 Mplus has an 8-character limit, so rename relevant variables with short names for modelling. 
@@ -105,17 +117,17 @@ m_desc <- mplusObject(
 
 # Fit model 
 m_desc_fit <- mplusModeler(m_desc,
-                            dataout = "./mplus_models/desc/cp_sim.dat",
-                            modelout = "./mplus_models/desc/cp_check.inp",
+                            dataout = "./mplus_models/compprof/desc/cp_sim.dat",
+                            modelout = "./mplus_models/compprof/desc/cp_check.inp",
                             check = TRUE, run = TRUE, hashfilename = TRUE)
 
 # Read mplus output
-m_desc_out <- readModels("./mplus_models/desc/cp_check.out")
+m_desc_out <- readModels("./mplus_models/compprof/desc/cp_check.out")
 
 # Check that sample sizes and means match descriptive statistics from above
 r_summ <- describe(cp_data) %>%
   as.data.frame() %>% 
-  slice(3:26) %>% 
+  slice(3:24) %>% 
   select(n, mean) %>% 
   round(., 2)
 mplus_summ <- m_desc_out$sampstat$univariate.sample.statistics %>% 
@@ -124,7 +136,7 @@ mplus_summ <- m_desc_out$sampstat$univariate.sample.statistics %>%
   select(`Sample Size`, Mean) %>% 
   set_names(c("n", "mean"))
 
-if (any((r_summ == mplus_summ) == FALSE)){
+if (any((r_summ - mplus_summ) > abs(0.01))){
   print("WARNING: DIFFERENCES DETECTED BETWEEN R AND MPLUS DATA SUMMARIES. Inspect output.")
   setdiff(mplus_summ, r_summ)
   } else{
@@ -136,145 +148,102 @@ if (any((r_summ == mplus_summ) == FALSE)){
 
 ### Testing the factor structure
 
-Test whether the data support the proposed factorial model over a single reading factor.
+Fit the proposed factorial model.
 
-A good-fitting model should ideally meet the following criteria:
-* CFI & TLI > .95  
-* RMSEA <= .05  
-* SRMR < .05
-
-```{r cfa-factor-structure}
-# ONE-FACTOR MODEL
+```{r cfa-initial-fit}
+# Proposed factor structure: 5 factors + rate
 m_cfa1 <- mplusObject(
-  TITLE = "Confirmatory Factor Analysis - Single Factor;",
+  TITLE = "Confirmatory Factor Analysis - 5-factor + rate;",
   ANALYSIS = "estimator = mlr; type = general;",
   MODEL = "wordAcc nonwAcc naraAcc naraComp naraRate on f9age;
-           woldComp woldVcb wiscVcb wiscPcmp wiscCode wiscParr 
-           wiscBloc wiscObja wiscBwsp attnSel attnDiv attnOpp on f8age;
-           cntSpan on f10age;
-           read by naraComp naraAcc wordAcc nonwAcc woldComp naraRate 
-           woldVcb wiscVcb wiscPcmp wiscCode wiscParr wiscBloc wiscObja 
-           wiscBwsp cntSpan attnSel attnDiv attnOpp sdqHyp;",
-  OUTPUT = "sampstat; TECH1; TECH4; stdyx; modindices; ",
+            woldComp woldVcb wiscVcb wiscPcmp wiscCode wiscParr 
+            wiscBloc wiscObja wiscBwsp attnSel attnDiv attnOpp on f8age;
+            cntSpan on f10age;
+            acc by nonwAcc wordAcc naraAcc; 
+            comp by naraComp woldComp;
+            naraRate;
+            vocab by wiscVcb woldVcb ;
+            perfiq by wiscPcmp wiscCode wiscParr wiscBloc wiscObja;
+            execfun by wiscBwsp cntSpan attnSel attnDiv attnOpp sdqHyp;
+            acc with comp; acc with naraRate; acc with vocab; 
+            acc with perfiq; acc with execfun;
+            comp with naraRate; comp with vocab; 
+            comp with perfiq; comp with execfun;
+            naraRate with vocab; naraRate with perfiq; 
+            naraRate with execfun; 
+            vocab with perfiq; vocab with execfun;
+            perfiq with execfun;",
+  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
   PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "yp_no", "k")]),
+  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "yp_no")]),
   rdata = cp_data)
 
 m_cfa1_fit <- mplusModeler(m_cfa1,
-                           modelout = "./mplus_models/cfa/cp_cfa1.inp",
+                           modelout = "./mplus_models/compprof/cfa/cp_cfa1.inp",
                            check = TRUE, run = TRUE)
 
-# TWO-FACTOR MODEL
-m_cfa2 <- update(m_cfa1,
-                 TITLE = ~ "Confirmatory Factor Analysis - Six-Factor;",
-                 ANALYSIS = ~ . + "starts = 20;",
-                 MODEL = ~ "wordAcc nonwAcc naraAcc naraComp naraRate on f9age;
-                            woldComp woldVcb wiscVcb wiscPcmp wiscCode wiscParr 
-                            wiscBloc wiscObja wiscBwsp attnSel attnDiv attnOpp on f8age;
-                            cntSpan on f10age;
-                            acc by nonwAcc wordAcc naraAcc; 
-                            comp by naraComp woldComp;
-                            naraRate;
-                            vocab by wiscVcb woldVcb ;
-                            perfiq by wiscPcmp wiscCode wiscParr wiscBloc wiscObja;
-                            execfun by wiscBwsp cntSpan attnSel attnDiv attnOpp sdqHyp;
-                            acc with comp; acc with naraRate; acc with vocab; 
-                            acc with perfiq; acc with execfun;
-                            comp with naraRate; comp with vocab; 
-                            comp with perfiq; comp with execfun;
-                            naraRate with vocab; naraRate with perfiq; 
-                            naraRate with execfun; 
-                            vocab with perfiq; vocab with execfun;
-                            perfiq with execfun;") # 6-factor
-m_cfa2_fit <- mplusModeler(m_cfa2,
-                           modelout = "./mplus_models/cfa/cp_cfa2.inp",
-                           check = TRUE, run = TRUE)
 
-# COMPARE MODELS
-cfa_models <- readModels(target = "./mplus_models/cfa", filefilter = "cp_cfa")
-SummaryTable(cfa_models, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
+# Inspect initial model fit
+cfa1_out <- readModels(target = "./mplus_models/compprof/cfa", filefilter = "cp_cfa")
+SummaryTable(cfa1_out, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
 ```
 
-* Remove indicators that do not load onto their corresponding factors (0.30 or 0.32 cut-off??)
-* >> If multiple, can trial adding in as separate factor if theoretically sensible
-* If not key indicator of interest (e.g., TEACh scales) and do not fit well >> discard???
-
-
-If a one-factor model is preferred, then we will proceed with using a Latent Profile Analysis. If the data support a two-factor model, as anticipated, then we will use a Factor Mixture Model. Consider parameters that might improve model fit for the FMM. 
 
 ### Improving fit 
 
 ```{r cfa-inspection}
 # Inspect model (by = loadings, with = covariances)
-cfa_models$cp_cfa2.out$parameters$unstandardized
-cfa_models$cp_cfa2.out$parameters$stdyx.standardized
+cfa1_out$warnings
+cfa1_out$parameters$unstandardized
+cfa1_out$parameters$stdyx.standardized
 
 # Inspect modification indices
-cfa_models$cp_cfa2.out$mod_indices %>% 
+cfa1_out$mod_indices %>% 
   filter(operator == "WITH") %>% 
   arrange(desc(MI))
 ```
-* Check for very large standardised residuals
-* Use MIs to change only one at a time, starting with largest, but must be theoretically meaningful. 
+
+* Check for very large standardised residuals.  
+* No accepted view on how large MIs should be. Change only one at a time, starting with largest, but must be theoretically meaningful.  
+* As well as the additional modifications from the SimpView analysis, we anticipate potential covariances between aspects of executive function that are more closely related to each other, such as the working memory measures or subtests from the TEACh battery. 
 
 E.g...
 
 ```{r cfa-modification1}
 # TWO-FACTOR MODEL with additional covariance between the two working memory measures
-m_cfa2b <- update(m_cfa2,
-                 TITLE = ~ "Confirmatory Factor Analysis - Two-Factor - modification1 working memory;",
-                 MODEL = ~. + "cntSpan with wiscbwsp;")
-
-m_cfa2b_fit <- mplusModeler(m_cfa2b,
-                           modelout = "./mplus_models/cfa/cp_cfa2b.inp",
-                           check = TRUE, run = TRUE)
-
-# COMPARE MODELS
-cfa_models <- readModels(target = "./mplus_models/cfa", filefilter = "cp_cfa")
-SummaryTable(cfa_models, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
-
-# Inspect model (by = loadings, with = covariances)
-cfa_models$cp_cfa2b.out$parameters$unstandardized
-cfa_models$cp_cfa2b.out$parameters$stdyx.standardized
-
-# Inspect modification indices
-cfa_models$cp_cfa2b.out$mod_indices %>% 
-  filter(operator == "WITH") %>% 
-  arrange(desc(MI))
-```
-```{r cfa-modification2}
-# TWO-FACTOR MODEL with additional covariance between the two working memory measures
-m_cfa2c <- update(m_cfa2b,
-                 TITLE = ~ "Confirmatory Factor Analysis - Two-Factor - modification2 NARA rate-acc;",
-                 MODEL = ~. + "naraRate with naraAcc;")
-
-m_cfa2c_fit <- mplusModeler(m_cfa2c,
-                           modelout = "./mplus_models/cfa/cp_cfa2c.inp",
-                           check = TRUE, run = TRUE)
-
-# COMPARE MODELS
-cfa_models <- readModels(target = "./mplus_models/cfa", filefilter = "cp_cfa")
-SummaryTable(cfa_models, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
-
-# Inspect model (by = loadings, with = covariances)
-cfa_models$cp_cfa2c.out$parameters$unstandardized
-cfa_models$cp_cfa2c.out$parameters$stdyx.standardized
-
-# Inspect modification indices
-cfa_models$cp_cfa2c.out$mod_indices %>% 
-  filter(operator == "WITH") %>% 
-  arrange(desc(MI))
+# m_cfa2 <- update(m_cfa1,
+#                  TITLE = ~ "Confirmatory Factor Analysis - Two-Factor - modification1 wm;",
+#                  MODEL = ~. + "cntSpan with wiscBwsp;")
+# 
+# m_cfa2_fit <- mplusModeler(m_cfa2,
+#                            modelout = "./mplus_models/compprof/cfa/cp_cfa2.inp",
+#                            check = TRUE, run = TRUE)
+# 
+# # COMPARE MODELS
+# cfa_models <- readModels(target = "./mplus_models/compprof/cfa", filefilter = "cp_cfa")
+# SummaryTable(cfa_models, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
+# 
+# # Inspect model (by = loadings, with = covariances)
+# cfa_models$cp_cfa2.out$warnings
+# cfa_models$cp_cfa2.out$parameters$unstandardized
+# cfa_models$cp_cfa2.out$parameters$stdyx.standardized
+# 
+# # Inspect modification indices
+# cfa_models$cp_cfa2.out$mod_indices %>% 
+#   filter(operator == "WITH") %>% 
+#   arrange(desc(MI))
 ```
 
 
-A good-fitting model should ideally meet the following criteria:
+The following rules of thumb are often used to indicate a good-fitting model:
 * CFI & TLI > .95  
 * RMSEA <= .05  
 * SRMR < .05
 
+
 ### CFA figure
 
 ```{r cfa-diagram}
-# semPaths(semPlotModel(cfa_models$cp_cfa1.out, mplusStd = "stdyx"), what = "paths", whatLabels = "std", rotation = 2, intercepts = FALSE)
+#semPaths(semPlotModel(cfa_models$cp_cfa2.out, mplusStd = "stdyx"), what = "paths", whatLabels = "std", rotation = 2, intercepts = FALSE)
 ```
 

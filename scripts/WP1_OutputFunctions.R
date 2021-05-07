@@ -2,52 +2,51 @@
 # lpa_enum_table: summarise output from class enumeration process ----
 ### function takes single argument of type mplus.model.list (created by readModels function)
 ### must also have MplusAutomation package loaded, and scientific notation turned off
+
+
 lpa_enum_table <- function(output = NA){
-  
+
   # Extract initial summary table from model output
   mm_summaries <- mixtureSummaryTable(output, keepCols = c("Title", "Classes", "Parameters", "Observations", 
-                                                           "LL", "AIC", "BIC", "aBIC", "T11_VLMR_PValue", "T11_LMR_PValue", "BLRT_PValue")) %>% 
-    
+   "LL", "AIC", "BIC", "aBIC", "T11_VLMR_PValue", "T11_LMR_PValue")) %>%
+
     # Exclude duplicates (e.g., if re-run to extract individual level data)
-    distinct(Title, .keep_all = TRUE) %>% 
-    
+    distinct(Title, .keep_all = TRUE) %>%
+
     # Order by number of classes
-    arrange(Classes) %>% 
-    
+    arrange(Classes) %>%
+
     # Create information indices
     mutate(CAIC = -2*LL + Parameters*(log(Observations) + 1),
            AWE = -2*LL + Parameters*(log(Observations) + 1.5),
            SIC = -0.5*BIC,
-           BF = round(exp(SIC-lead(SIC)), 3)) ########################################### PT PLEASE CHECK                
-  
+           BF = round(exp(SIC-lead(SIC)), 3)) 
+
   # Use SIC to compute approximate correct model probability out of k-class models
-    max_sic <- max(mm_summaries$SIC, na.rm = TRUE) 
-    
+    max_sic <- max(mm_summaries$SIC, na.rm = TRUE)
+
     # Step 1 of cmP computation (top half of equation)
-    mm_summaries <- mm_summaries %>% 
+    mm_summaries <- mm_summaries %>%
       mutate(cmp_top = exp(SIC - max_sic))
-    
+
     cmp_bottom <- sum(mm_summaries$cmp_top, na.rm = TRUE)
-  
+
   # Add cmP_k to table output, and format for output
-  mm_summaries <- mm_summaries %>% 
-    mutate(cmP_k = round(cmp_top/cmp_bottom, 2)) %>% ###################################### PT PLEASE CHECK  cmP
-    select(Title, Classes, LL, Parameters, BIC, CAIC, AWE, T11_VLMR_PValue, 
-           T11_LMR_PValue, BLRT_PValue, BF, cmP_k) %>% 
-    rename(Specification = Title, 
+  mm_summaries <- mm_summaries %>%
+    mutate(cmP_k = round(cmp_top/cmp_bottom, 2)) %>% 
+    select(Title, Classes, LL, Parameters, BIC, CAIC, AWE, T11_VLMR_PValue,
+           T11_LMR_PValue, BF, cmP_k) %>%
+    rename(Specification = Title,
            VLMR_p = T11_VLMR_PValue,
-           LMR_p = T11_LMR_PValue,
-           bLRT_p = BLRT_PValue) %>% 
-    mutate(across(where(is.numeric), round, 2)) %>% 
-    mutate(VLMR_p = pvalue(VLMR_p, accuracy = 0.01), 
+           LMR_p = T11_LMR_PValue) %>%
+    mutate(across(where(is.numeric), round, 2)) %>%
+    mutate(VLMR_p = pvalue(VLMR_p, accuracy = 0.01),
            LMR_p = pvalue(LMR_p, accuracy = 0.01),
-           bLRT_p = pvalue(bLRT_p, accuracy = 0.01),
            BF = ifelse(BF == 0.00, "<0.01",
                        ifelse(BF > 100, ">100", BF)))
-  
+
   mm_summaries
 }
-
 
 
 # fmm_enum_table: summarise output from class enumeration process ----
@@ -57,7 +56,7 @@ fmm_enum_table <- function(output = NA){
   
   # Extract initial summary table from model output
   mm_summaries <- mixtureSummaryTable(output, keepCols = c("Title", "Classes", "Parameters", "Observations", 
-                                                           "LL", "AIC", "BIC", "aBIC", "T11_VLMR_PValue", "T11_LMR_PValue", "BLRT_PValue")) %>% 
+                                                           "LL", "AIC", "BIC", "aBIC", "T11_VLMR_PValue", "T11_LMR_PValue")) %>% 
     
     # Exclude duplicates (e.g., if re-run to extract individual level data)
     distinct(Title, .keep_all = TRUE) %>% 
@@ -67,7 +66,7 @@ fmm_enum_table <- function(output = NA){
     
     # Create information indices
     mutate(SIC = -0.5*BIC,
-           BF = round(exp(SIC-lead(SIC)), 3)) ########################################### PT PLEASE CHECK                
+           BF = round(exp(SIC-lead(SIC)), 3))               
   
   # Use SIC to compute approximate correct model probability out of k-class models
   max_sic <- max(mm_summaries$SIC, na.rm = TRUE) 
@@ -80,17 +79,31 @@ fmm_enum_table <- function(output = NA){
   
   # Add cmP_k to table output, and format for output
   mm_summaries <- mm_summaries %>% 
-    mutate(cmP_k = round(cmp_top/cmp_bottom, 2)) %>% ###################################### PT PLEASE CHECK  cmP
+    mutate(cmP_k = round(cmp_top/cmp_bottom, 2)) %>% 
     select(Title, Classes, LL, Parameters, AIC, BIC, aBIC, T11_VLMR_PValue, 
-           T11_LMR_PValue, BLRT_PValue) %>% 
+           T11_LMR_PValue) %>% 
     rename(Specification = Title, 
            VLMR_p = T11_VLMR_PValue,
-           LMR_p = T11_LMR_PValue,
-           bLRT_p = BLRT_PValue) %>% 
+           LMR_p = T11_LMR_PValue) %>% 
     mutate(across(where(is.numeric), round, 2)) %>% 
     mutate(VLMR_p = pvalue(VLMR_p, accuracy = 0.01), 
-           LMR_p = pvalue(LMR_p, accuracy = 0.01),
-           bLRT_p = pvalue(bLRT_p, accuracy = 0.01))
+           LMR_p = pvalue(LMR_p, accuracy = 0.01))
+  
+  mm_summaries
+}
+
+# add_bLRT: add bLRT from model re-runs to summary table ----
+### takes argument of output from the rerun (including bLRTs) plus the original summary table
+add_bLRT <- function(rerun_output = NA, orig_summary = NA){
+  mm_summaries <- mixtureSummaryTable(rerun_output, keepCols = c("Title", "Classes", "Parameters",
+                                                                 "LL", "BLRT_PValue")) %>%
+    rename(Specification = Title, 
+           bLRT_p = BLRT_PValue) %>% 
+    mutate(across(where(is.numeric), round, 2)) %>% 
+    mutate(bLRT_p = pvalue(bLRT_p, accuracy = 0.01)) %>% 
+    right_join(orig_summary, by = c("Specification", "Classes", "Parameters", "LL")) %>% 
+    arrange(Classes) %>% 
+    relocate(bLRT_p, .after = LMR_p)
   
   mm_summaries
 }
@@ -148,12 +161,14 @@ fmm_enum_elbow <- function(mm_summaries = NA,
 }
 
 # mm_extract_data: refit subset of models to save out participant classifications ----
-### this currently requires the original model list to still be in the environment - could be improved
+### this currently requires the original model list to still be in the environment
+### NOTE: increase lrtstarts if best values not replicated https://www.statmodel.com/examples/webnotes/webnote14.pdf
 mm_extract_data <- function(orig_mods = NA,        # list of original models (in environment)
                             candidate_mods = NA,   # candidate number of classes
                             filepath = NA,         # folder to save models to
                             analysis_id = "sv",
                             rerun = TRUE,          # whether to re-run models to extract data, set to false if just loading 
+                            optseed = NA,          # vector of corresponding optseed values (manually identified from output)
                             one_fit = TRUE) {      # whether a one-class model was fitted (if not, adjusts selection from list)
   
   # Adjust index of model if one-class model not fitted 
@@ -166,15 +181,38 @@ mm_extract_data <- function(orig_mods = NA,        # list of original models (in
   
   # Update scripts 
   if (rerun == TRUE){
+    
+    # Track rerun number (for aligning optseed)
+    rerun_id <- 0
+    
     for (model in candidate_mods){
       
-      n_classes <- ifelse(one_fit == TRUE, model, model+1) # adjust name to reflect class n
+      # Count rerun number (for aligning optseed if applicable)
+      rerun_id <- rerun_id + 1
       
-      body <- update(orig_mods[[model]],
-                     VARIABLE = ~ . + "IDVARIABLE IS yp_no;",
-                     SAVEDATA = as.formula(sprintf(" ~ 'FILE IS sv_%s_%dclass.dat; SAVE = cprobabilities;'", model_name, n_classes)))
+      # Adjust name to reflect class n (if necessary)
+      n_classes <- ifelse(one_fit == TRUE, model, model+1) 
       
-      mplusModeler(body, sprintf("%s/%s_%s_rerun_%dclass.dat", filepath, analysis, model_name, n_classes), run = TRUE)
+      # If using optseed
+      if (!is.na(optseed)) {
+        optseed_val <- optseed[rerun_id]
+        
+        body <- update(orig_mods[[model]],
+                       ANALYSIS = as.formula(sprintf("~ 'estimator = mlr; type = mixture; 
+                                                   starts = 0;
+                                                   optseed = %d;
+                                                   processors = 4(starts);
+                                                   lrtstarts = 0 0 100 20;'", optseed_val)),
+                       OUTPUT = ~ . + "TECH7; TECH14; stdyx; CINTERVAL; ENTROPY;",
+                       SAVEDATA = as.formula(sprintf(" ~ 'FILE IS sv_%s_%dclass.dat; SAVE = cprobabilities;'", model_name, n_classes)))
+      } else {
+        body <- update(orig_mods[[model]],
+                       OUTPUT = ~ . + "TECH7; TECH14; stdyx; CINTERVAL; ENTROPY;",
+                       SAVEDATA = as.formula(sprintf(" ~ 'FILE IS sv_%s_%dclass.dat; SAVE = cprobabilities;'", model_name, n_classes)))
+      }
+
+      
+      mplusModeler(body, sprintf("%s/%s_%s_rerun_%dclass.dat", filepath, analysis_id, model_name, n_classes), run = TRUE)
     }
   }
   filefilter = paste0(model_name, "_rerun")

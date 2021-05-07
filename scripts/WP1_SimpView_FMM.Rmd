@@ -4,12 +4,13 @@ output:
   html_document:
     toc: true
     toc_float: true
-    
+date: '06/05/2021'
+        
 knit: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding, output_dir = "../output/analysis/") })
 ---
 
-This script is used for running the factor mixture models. It will only be used *if* the CFA supports a two-factor structure, otherwise we will use a latent profile model (WP1_SimpView_LPA.Rmd).
+This script is used for running the factor mixture models. It will only be used *if* the CFA supports a two-factor structure, otherwise we will use a latent profile model (WP1_SimpView_LPA.Rmd). This analysis is conducted using the "exploratory" or "calibration" half of the dataset (subsample A).
 
 # Set-up
 
@@ -18,18 +19,19 @@ This script is used for running the factor mixture models. It will only be used 
 pkgs <- c("tidyverse", "MplusAutomation", "texreg", "DiagrammeR", "kableExtra", "ggalluvial", "scales")
 
 # Use groundhog package to load correct package versions
-# if (!require("groundhog")) install.packages("groundhog")
-# groundhog.day <- "2021-03-01"
-# groundhog::groundhog.library(pkgs, groundhog.day)
+if (!require("groundhog")) install.packages("groundhog")
+groundhog.day <- "2021-03-01"
+groundhog::groundhog.library(pkgs, groundhog.day)
 
-# Or if not using groundhog package - load currently installed package versions separately (reproducibility not guaranteed)
-invisible(lapply(pkgs, library, character.only = TRUE))
+# Or if not using groundhog package - load currently installed package versions separately (faster; reproducibility not guaranteed)
+# invisible(lapply(pkgs, library, character.only = TRUE))
 ```
 
 ```{r create-dir}
 # Create subdirectories for storing mplus scripts, data files, and output, if do not already exist
 if(dir.exists("./mplus_models/")==FALSE){dir.create("./mplus_models/")}
-if(dir.exists("./mplus_models/fmm")==FALSE){dir.create("./mplus_models/fmm")} 
+if(dir.exists("./mplus_models/simpview/")==FALSE){dir.create("./mplus_models/simpview/")}
+if(dir.exists("./mplus_models/simpview/fmm")==FALSE){dir.create("./mplus_models/simpview/fmm")} 
 if(dir.exists("../output/")==FALSE){dir.create("../output/")}
 if(dir.exists("../output/figures")==FALSE){dir.create("../output/figures")}
 if(dir.exists("../output/tables")==FALSE){dir.create("../output/tables")}
@@ -44,9 +46,9 @@ source("WP1_OutputFunctions.R")
 ###  Load and prepare data for Mplus
 
 ```{r load-data}
-sv_data <- read.csv("../data/simulated/WP1_SimpView_sim_raw_n1000_k3.csv")
-# sv_data <- read.csv("../data/processed/WP1_data.csv") %>% 
-#  select(yp_id, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8)
+sv_data <- read.csv("../data/simulated/WP1_SimpView_sim_raw_n1000_k3.csv")   # for script testing
+# sv_data <- read.csv("../data/processed/WP1_data_subA.csv") %>%             # ALSPAC data
+#  select(yp_id, yp_no, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8)
 ```
 
 Mplus has an 8-character limit, so rename relevant variables with short names for modelling. 
@@ -84,11 +86,7 @@ sv_data <- sv_data %>%
 
 Set up initial model, based on the final model from the WP1_SimpView_CFA.Rmd script. 
 
-Options reduced to save time for now, but possibly change for actual modelling:
-starts - 500 50
-lrtbootstrap 50
-lrtstarts 50 20 50 20
-(taken from Geiser book)
+*Note:* Increase starts to 2000 200 for a model if best log-likelihood value not replicated (Lubke & Luningham, 2017)
 
 ```{r fmm-base}
 # Specify final selected model - TO BE EDITED
@@ -102,12 +100,14 @@ model_spec <- paste0("%OVERALL%",
 # Create base model
 m_fmm_base <- mplusObject(
   TITLE = "Factor mixture model;",
-  ANALYSIS = "estimator = mlr; type = mixture; starts = 100 20; algorithm = integration;",
-  VARIABLE = "classes = c(1);",
+  ANALYSIS = "estimator = mlr; type = mixture; starts = 500 50;
+              processors = 4(STARTS);",
+  VARIABLE = "IDVARIABLE IS yp_no; 
+              classes = c(1);",
   MODEL = model_spec,
-  OUTPUT = "sampstat; stdyx; CINTERVAL; TECH1; TECH8; TECH11; TECH14;",
+  OUTPUT = "TECH1; TECH8; TECH11;",
   PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(sv_data[,!names(sv_data) %in% c("yp_id","k")]),
+  usevariables = colnames(sv_data[,!names(sv_data) %in% c("yp_id")]),
   rdata = sv_data)
 ```
 
@@ -117,10 +117,10 @@ Follow same class-enumeration process as set out by Masyn (2013) for LCA and LPA
 m_fmm_benchmark <- update(m_fmm_base,
      TITLE = ~ "FMM Benchmark")
 
-mplusModeler(m_fmm_benchmark, "./mplus_models/fmm/sv_fmm_mbenchmark.dat", run = TRUE)
+mplusModeler(m_fmm_benchmark, "./mplus_models/simpview/fmm/sv_fmm_mbenchmark.dat", run = TRUE)
 
 # Extract parameters for the benchmark model
-m_fmm_benchmark <- readModels(target = "./mplus_models/fmm", filefilter = "mbenchmark") %>% 
+m_fmm_benchmark <- readModels(target = "./mplus_models/simpview/fmm", filefilter = "mbenchmark") %>% 
   mixtureSummaryTable(keepCols = c("Parameters", "Observations", "LL", "AIC", "BIC", "aBIC")) %>% 
   select(LL, AIC, BIC, aBIC) %>%
   pivot_longer(LL:aBIC, names_to = "statistic", values_to = "benchmark") %>% 
@@ -144,8 +144,8 @@ graph [layout = neato,
 node [shape = rectangle,fontsize=20]
 
 
-a [pos = '-5,7!', label = 'woldcomp']
-b [pos = '-3,7!', label = 'naracomp']
+a [pos = '-5,7!', label = 'woldComp']
+b [pos = '-3,7!', label = 'naraComp']
 c [pos = '0,7!', label = 'naraAcc']
 d [pos = '2,7!', label = 'wordAcc']
 e [pos = '4,7!', label = 'nonwAcc']
@@ -196,11 +196,11 @@ m_fmm_a <- lapply(2:6, function(k) {
   # ...Update model spec 2: class estimates
   body <- update(body,
      TITLE = as.formula(sprintf("~ 'FMM Model A: %d classes;'", k)),
-     VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
+     VARIABLE = as.formula(sprintf("~ 'IDVARIABLE IS yp_no; classes = c(%d);'", k)),
      MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
 
   # Run model
-  mplusModeler(body, sprintf("./mplus_models/fmm/sv_fmm_a_%dclass.dat", k), run = TRUE)
+  mplusModeler(body, sprintf("./mplus_models/simpview/fmm/sv_fmm_a_%dclass.dat", k), run = TRUE)
  })
 ```
 
@@ -208,13 +208,13 @@ Steps 4-5) Extract fit indices, and use to select smaller subset of candidate mo
 
 ```{r fmm-a-output}
 # Read in output
-fmm_a_out <- readModels(target = "./mplus_models/fmm", filefilter = "sv_fmm_a")
+fmm_a_out <- readModels(target = "./mplus_models/simpview/fmm", filefilter = "sv_fmm_a")
 
 # Check warnings
-# for (model in 1:length(fmm_a_out)){
-#   print(fmm_a_out[[model]]$input$title)
-#   print(fmm_a_out[[model]]$warnings)
-# }
+for (model in 1:length(fmm_a_out)){
+  print(fmm_a_out[[model]]$input$title)
+  print(fmm_a_out[[model]]$warnings)
+}
 
 # Print table 
 fmm_a_summary <- fmm_enum_table(output = fmm_a_out)
@@ -225,17 +225,22 @@ fmm_enum_elbow(fmm_a_summary, benchmark_stats = m_fmm_benchmark)
 ```
 
 Best model for:
-**a) Absolute fit (fewest classes with better LL than benchmark):** 2
-**b) Information heuristics (diminishing gains from elbow plots):** 3 or 4
-**c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 4
+**a) Absolute fit (fewest classes with better LL than benchmark):** 
+**b) Information heuristics (diminishing gains from elbow plots):** 
+**c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 
 
 Step 6) View classification diagnostics for candidate models. Can also inspect how the classes correspond across models. 
 
 ```{r fmm-a-candidates}
 # Extract participant level data
-fmm_a_rerun <- mm_extract_data(orig_mods = m_fmm_a, candidate_mods = 3:4, 
-                               filepath = "./mplus_models/fmm",
-                               rerun = TRUE, one_fit = FALSE)
+fmm_a_rerun <- mm_extract_data(orig_mods = m_fmm_a, candidate_mods = 2:3,   # change models to best candidates
+                               filepath = "./mplus_models/simpview/fmm",
+                               rerun = TRUE, optseed = NA,                   # extract optimal values from output files
+                               one_fit = TRUE)
+
+# Print table, and append bLRT values to main output 
+fmm_enum_table(fmm_a_rerun)
+fmm_a_summary <- add_bLRT(fmm_a_rerun, fmm_a_summary)
 
 # Compute classification diagnostics
 class_diag(fmm_a_rerun)
@@ -253,14 +258,14 @@ Comments:
 
 Step 7) Select final model in class enumeration process, for model specification A. 
 ```{r fmm-a-selected}
-fmm_a_final_nclass <- 3
-fmm_a_final_m <- fmm_a_rerun[1]  
+# fmm_a_final_nclass <- 3           # change to selected model
+# fmm_a_final_m <- fmm_a_rerun[1]   # change to selected model
 ```
 
 
 ### FMM Model B
 
-Tests different N-Class, 2 factor FMM models. Class varying item means, class varying factor loadings, class varying factor covariance matrix, factor means fixed at zero (for identifiability)
+Tests different N-Class, 2 factor FMM models. Class varying item means, class varying factor loadings, class varying factor covariance matrix, factor means fixed at zero (for identifiability).
 
 ```{r fmm-b-diag}
 grViz("
@@ -342,7 +347,7 @@ m_fmm_b <- lapply(2:6, function(k) {
      MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
  
   # Run model
-   mplusModeler(body, sprintf("./mplus_models/fmm/sv_fmm_b_%dclass.dat", k), run = TRUE)
+   mplusModeler(body, sprintf("./mplus_models/simpview/fmm/sv_fmm_b_%dclass.dat", k), run = TRUE)
  })
 ```
 
@@ -350,13 +355,13 @@ Steps 4-5) Extract fit indices, and use to select smaller subset of candidate mo
 
 ```{r fmm-b-output}
 # Read in output
-fmm_b_out <- readModels(target = "./mplus_models/fmm", filefilter = "sv_fmm_b")
+fmm_b_out <- readModels(target = "./mplus_models/simpview/fmm", filefilter = "sv_fmm_b")
 
 # Check warnings
-# for (model in 1:length(fmm_b_out)){
-#   print(fmm_b_out[[model]]$input$title)
-#   print(fmm_b_out[[model]]$warnings)
-# }
+for (model in 1:length(fmm_b_out)){
+  print(fmm_b_out[[model]]$input$title)
+  print(fmm_b_out[[model]]$warnings)
+}
 
 # Print table 
 fmm_b_summary <- fmm_enum_table(output = fmm_b_out)
@@ -367,18 +372,23 @@ fmm_enum_elbow(fmm_b_summary, benchmark_stats = m_fmm_benchmark)
 ```
 
 Best model for:
-**a) Absolute fit (fewest classes with better LL than benchmark):** 2
-**b) Information heuristics (diminishing gains from elbow plots):** 3
-**c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 3 or 4
+**a) Absolute fit (fewest classes with better LL than benchmark):** 
+**b) Information heuristics (diminishing gains from elbow plots):** 
+**c) Adjusted LRTs (fewest classes not sig improved by additional classes):**
 
 
 Step 6) View classification diagnostics for candidate models. Can also inspect how the classes correspond across models. 
 
 ```{r fmm-b-candidates}
 # Extract participant level data
-fmm_b_rerun <- mm_extract_data(orig_mods = m_fmm_b, candidate_mods = 3:4,
-                               filepath = "./mplus_models/fmm",
-                               rerun = TRUE, one_fit = FALSE)
+fmm_b_rerun <- mm_extract_data(orig_mods = m_fmm_b, candidate_mods = 3:4, # change models to best candidates
+                               filepath = "./mplus_models/simpview/fmm",
+                               rerun = TRUE, optseed = NA,                   # extract optimal values from output files
+                               one_fit = TRUE)
+
+# Print table, and append bLRT values to main output 
+fmm_enum_table(fmm_b_rerun)
+fmm_b_summary <- add_bLRT(fmm_b_rerun, fmm_b_summary)
 
 # Compute classification diagnostics
 class_diag(fmm_b_rerun)
@@ -396,14 +406,14 @@ Comments:
 
 Step 7) Select final model in class enumeration process, for model specification A. 
 ```{r fmm-b-selected}
-fmm_b_final_nclass <- 3
-fmm_b_final_m <- fmm_b_rerun[1]
+# fmm_b_final_nclass <- 3           # change to selected model
+# fmm_b_final_m <- fmm_b_rerun[1]   # change to selected model
 ```
 
 
 ### All FMM models: Summary output & final selection
 
-Use the 2 best candidate models identified above to recalculate the approximate correct model probability.
+Inspect best overall models.
 
 ```{r final-candidates}
 # Select best models
@@ -471,3 +481,9 @@ ggsave("../output/figures/SimpView_fmm_all_indices.tiff", dpi = 600, width = 7, 
 ```
 
 # Final selected model
+
+The final model will be selected on the basis of model fit, classification utility, and theoretical interpretability. This model will be taken forward for cross-validation with subsample B (WP1_SimpView_FinalModel.Rmd, script not yet developed but process described in the pre-registration).
+
+```{r final-model}
+
+```
