@@ -335,10 +335,10 @@ Steps 4-5) Extract fit indices, and use to select smaller subset of candidate mo
 fmm_a_out <- readModels(target = "./mplus_models/compprof/fmm", filefilter = "cp_fmm_a")
 
 # Check warnings
-# for (model in 1:length(fmm_a_out)){
-#   print(fmm_a_out[[model]]$input$title)
-#   print(fmm_a_out[[model]]$warnings)
-# }
+for (model in 1:length(fmm_a_out)){
+  print(fmm_a_out[[model]]$input$title)
+  print(fmm_a_out[[model]]$warnings)
+}
 
 # Print table 
 fmm_a_summary <- fmm_enum_table(output = fmm_a_out)
@@ -357,9 +357,11 @@ Step 6) View classification diagnostics for candidate models. Can also inspect h
 
 ```{r fmm-a-candidates}
 # Extract participant level data
-fmm_a_rerun <- mm_extract_data(orig_mods = m_fmm_a, candidate_mods = 3:4,    # change to candidate models
+fmm_a_rerun <- mm_extract_data(orig_mods = m_fmm_a, orig_output = fmm_a_out,
+                               candidate_mods = 3:4,    # change to candidate models
                                filepath = "./mplus_models/compprof/fmm", analysis_id = "cp",
-                               rerun = FALSE, one_fit = FALSE)
+                               rerun = FALSE, optseed = TRUE,
+                               one_fit = FALSE)
 
 # Compute classification diagnostics
 class_diag(fmm_a_rerun)
@@ -574,9 +576,11 @@ Step 6) View classification diagnostics for candidate models. Can also inspect h
 
 ```{r fmm-b-candidates}
 # Extract participant level data
-fmm_b_rerun <- mm_extract_data(orig_mods = m_fmm_b, candidate_mods = 3:4,   # change to selected candidate models
-                               filepath = "./mplus_models/compprof/fmm", analysis_id = "cp",
-                               rerun = TRUE, one_fit = FALSE)
+fmm_b_rerun <- mm_extract_data(orig_mods = m_fmm_b, orig_output = fmm_b_out, 
+                               candidate_mods = 2:3,                           # change models to best candidates
+                               filepath = "mplus_models/simpview/fmm",
+                               rerun = TRUE, optseed = TRUE,          
+                               one_fit = FALSE)
 
 # Compute classification diagnostics
 class_diag(fmm_b_rerun)

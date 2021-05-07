@@ -233,10 +233,11 @@ Step 6) View classification diagnostics for candidate models. Can also inspect h
 
 ```{r fmm-a-candidates}
 # Extract participant level data
-fmm_a_rerun <- mm_extract_data(orig_mods = m_fmm_a, candidate_mods = 2:3,   # change models to best candidates
-                               filepath = "./mplus_models/simpview/fmm",
-                               rerun = TRUE, optseed = NA,                   # extract optimal values from output files
-                               one_fit = TRUE)
+fmm_a_rerun <- mm_extract_data(orig_mods = m_fmm_a, orig_output = fmm_a_out, 
+                               candidate_mods = 2:3,                           # change models to best candidates
+                               filepath = "mplus_models/simpview/fmm",
+                               rerun = TRUE, optseed = TRUE,          
+                               one_fit = FALSE)
 
 # Print table, and append bLRT values to main output 
 fmm_enum_table(fmm_a_rerun)
@@ -381,10 +382,11 @@ Step 6) View classification diagnostics for candidate models. Can also inspect h
 
 ```{r fmm-b-candidates}
 # Extract participant level data
-fmm_b_rerun <- mm_extract_data(orig_mods = m_fmm_b, candidate_mods = 3:4, # change models to best candidates
-                               filepath = "./mplus_models/simpview/fmm",
-                               rerun = TRUE, optseed = NA,                   # extract optimal values from output files
-                               one_fit = TRUE)
+fmm_b_rerun <- mm_extract_data(orig_mods = m_fmm_b, orig_output = fmm_b_out, 
+                               candidate_mods = 2:3,                           # change models to best candidates
+                               filepath = "mplus_models/simpview/fmm",
+                               rerun = TRUE, optseed = TRUE,          
+                               one_fit = FALSE)
 
 # Print table, and append bLRT values to main output 
 fmm_enum_table(fmm_b_rerun)

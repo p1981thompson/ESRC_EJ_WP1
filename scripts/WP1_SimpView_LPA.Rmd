@@ -189,9 +189,10 @@ Step 6) View classification diagnostics for candidate models. Can also inspect h
 
 ```{r lpa-a-candidates}
 # Extract participant level data
-lpa_a_rerun <- mm_extract_data(orig_mods = m_lpa_a, candidate_mods = 2:3,    # change models to best candidates
-                               filepath = "./mplus_models/simpview/lpa",
-                               rerun = TRUE, optseed = NA,                   # extract optimal values from output files
+lpa_a_rerun <- mm_extract_data(orig_mods = m_lpa_a, orig_output = lpa_a_out, 
+                               candidate_mods = 2:3,                           # change models to best candidates
+                               filepath = "mplus_models/simpview/lpa",
+                               rerun = TRUE, optseed = TRUE,          
                                one_fit = TRUE)
 
 # Print table, and append bLRT values to main output 
@@ -269,9 +270,10 @@ Step 6) View classification diagnostics for candidate models.
 
 ```{r lpa-b-candidates}
 # Extract participant level data
-lpa_b_rerun <- mm_extract_data(orig_mods = m_lpa_b, candidate_mods = 2:4,   # change models to best candidates
-                               filepath = "./mplus_models/simpview/lpa",
-                               rerun = TRUE, optseed = NA,                   # extract optimal values from output files
+lpa_b_rerun <- mm_extract_data(orig_mods = m_lpa_b, orig_output = lpa_b_out, 
+                               candidate_mods = 2:3,                           # change models to best candidates
+                               filepath = "mplus_models/simpview/lpa",
+                               rerun = TRUE, optseed = TRUE,          
                                one_fit = TRUE)
 
 # Print table, and append bLRT values to main output 
@@ -364,9 +366,10 @@ Step 6) View classification diagnostics for candidate models.
 
 ```{r lpa-c-candidates}
 # Extract participant level data
-lpa_c_rerun <- mm_extract_data(orig_mods = m_lpa_c, candidate_mods = 3:5,  # change models to best candidates
-                               filepath = "./mplus_models/simpview/lpa",
-                               rerun = TRUE, optseed = NA,                 # extract optimal values from output files
+lpa_c_rerun <- mm_extract_data(orig_mods = m_lpa_c, orig_output = lpa_c_out, 
+                               candidate_mods = 2:3,                           # change models to best candidates
+                               filepath = "mplus_models/simpview/lpa",
+                               rerun = TRUE, optseed = TRUE,          
                                one_fit = TRUE)
 
 # Print table, and append bLRT values to main output 
@@ -458,9 +461,10 @@ Step 6) View classification diagnostics for candidate models.
 
 ```{r lpa-d-candidates}
 # Extract participant level data
-lpa_d_rerun <- mm_extract_data(orig_mods = m_lpa_d, candidate_mods = 2:3,   # change models to best candidates
-                               filepath = "./mplus_models/simpview/lpa",
-                               rerun = TRUE, optseed = NA,                   # extract optimal values from output files
+lpa_d_rerun <- mm_extract_data(orig_mods = m_lpa_d, orig_output = lpa_d_out, 
+                               candidate_mods = 2:3,                           # change models to best candidates
+                               filepath = "mplus_models/simpview/lpa",
+                               rerun = TRUE, optseed = TRUE,          
                                one_fit = TRUE)
 
 # Print table, and append bLRT values to main output 
@@ -551,9 +555,10 @@ Step 6) View classification diagnostics for candidate models.
 
 ```{r lpa-e-candidates}
 # Extract participant level data
-lpa_e_rerun <- mm_extract_data(orig_mods = m_lpa_e, candidate_mods = 2:3,    # change models to best candidates
-                               filepath = "./mplus_models/simpview/lpa",
-                               rerun = TRUE, optseed = NA,                   # extract optimal values from output files
+lpa_e_rerun <- mm_extract_data(orig_mods = m_lpa_e, orig_output = lpa_e_out, 
+                               candidate_mods = 2:3,                           # change models to best candidates
+                               filepath = "mplus_models/simpview/lpa",
+                               rerun = TRUE, optseed = TRUE,          
                                one_fit = TRUE)
 
 # Print table, and append bLRT values to main output 
