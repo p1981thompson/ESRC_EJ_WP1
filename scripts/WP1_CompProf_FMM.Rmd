@@ -4,12 +4,13 @@ output:
   html_document:
     toc: true
     toc_float: true
+date: '06/05/2021' 
     
 knit: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding, output_dir = "../output/analysis/") })
 ---
 
-This script is used for running the factor mixture models.
+This script is used for running the factor mixture models. This analysis is conducted using the group(s) with poor reading comprehension, extracted in WP1_SimpView_FinalModel.Rmd. 
 
 # Set-up
 
@@ -18,18 +19,19 @@ This script is used for running the factor mixture models.
 pkgs <- c("tidyverse", "MplusAutomation", "texreg", "DiagrammeR", "kableExtra", "ggalluvial", "scales", "ggpubr")
 
 # Use groundhog package to load correct package versions
-# if (!require("groundhog")) install.packages("groundhog")
-# groundhog.day <- "2021-03-01"
-# groundhog::groundhog.library(pkgs, groundhog.day)
+if (!require("groundhog")) install.packages("groundhog")
+groundhog.day <- "2021-03-01"
+groundhog::groundhog.library(pkgs, groundhog.day)
 
-# Or if not using groundhog package - load currently installed package versions separately (reproducibility not guaranteed)
-invisible(lapply(pkgs, library, character.only = TRUE))
+# Or if not using groundhog package - load currently installed package versions separately (faster; reproducibility not guaranteed)
+# invisible(lapply(pkgs, library, character.only = TRUE))
 ```
 
 ```{r create-dir}
 # Create subdirectories for storing mplus scripts, data files, and output, if do not already exist
 if(dir.exists("./mplus_models/")==FALSE){dir.create("./mplus_models/")}
-if(dir.exists("./mplus_models/fmm")==FALSE){dir.create("./mplus_models/fmm")} 
+if(dir.exists("./mplus_models/compprof/")==FALSE){dir.create("./mplus_models/compprof/")} 
+if(dir.exists("./mplus_models/compprof/fmm")==FALSE){dir.create("./mplus_models/compprof/fmm")} 
 if(dir.exists("../output/")==FALSE){dir.create("../output/")}
 if(dir.exists("../output/figures")==FALSE){dir.create("../output/figures")}
 if(dir.exists("../output/tables")==FALSE){dir.create("../output/tables")}
@@ -43,9 +45,19 @@ source("WP1_OutputFunctions.R")
 
 ###  Load and prepare data for Mplus
 
+Read in the original data file extracted for WP1 (contains all variables) and the classes extracted from the previous analysis. Filter dataset to include only the classes of interest for this analysis (those with poor comprehension in the context of relatively good reading accuracy). 
+
 ```{r load-data}
-cp_data <- read.csv("../data/simulated/WP1_CompProf_sim_raw_n694_k3.csv")
-#cp_data <- read.csv("../data/processed/WP1_data.csv")
+cp_data <- read.csv("../data/simulated/WP1_CompProf_sim_raw_n694_k3.csv")   # for script checking
+
+# cp_data <- read.csv("../data/processed/WP1_data_all.csv")      # dataset containing all participants/variables
+# groups <- read.csv("../data/processed/WP1_classes.csv") %>%    # classes extracted from SimpView model
+#   select()
+
+# cp_data <- cp_data %>%
+#   left_join(groups, by = "") %>% 
+#   filter(C == ) %>% 
+#   select(yp_id:)
 ```
 
 Mplus has an 8-character limit, so rename relevant variables with short names for modelling. 
@@ -70,7 +82,7 @@ cp_data <- cp_data %>%
          wiscBloc = wisc_bloc_raw_f8,
          wiscObja = wisc_obja_raw_f8,
          wiscBwsp = wisc_bwsp_raw_f8,
-         cntspan = cntsp_span_raw_f10,
+         cntSpan = cntsp_span_raw_f10,
          attnSel = teach_slct_raw_f8,
          attnDiv = teach_divd_raw_f8,
          attnOpp = teach_ctr_diff_f8,
@@ -93,13 +105,9 @@ cp_data <- cp_data %>%
 
 ### Base model
 
-Set up initial model, based on the final model from the WP1_SimpView_CFA.Rmd script. 
+Set up initial model, based on the final model from the WP1_CompProf_CFA.Rmd script. 
 
-Options reduced to save time for now, but possibly change for actual modelling:
-starts - 500 50
-lrtbootstrap 50
-lrtstarts 50 20 50 20
-(taken from Geiser book)
+*Note:* Increase starts to 2000 200 for a model if best log-likelihood value not replicated (Lubke & Luningham, 2017)
 
 ```{r}
 # Age regressors
@@ -112,7 +120,7 @@ age_spec <- "
 # Factor specification (for overall statement)
 factor_spec <- " 
                 acc by nonwAcc wordAcc naraAcc; 
-                comp by naraComp; woldComp 
+                comp by naraComp woldComp; 
                 naraRate;
                 vocab by wiscVcb woldVcb ;
                 perfiq by wiscPcmp wiscCode wiscParr wiscBloc wiscObja;
@@ -129,11 +137,11 @@ factor_spec_class <- "
 
 # Set factor means to 0 for identifiability
 factor_means <- "
-                 [comp@0]; [acc@0]; [vocab@0]; [perfiq@0]; [execfun@0];"     # means at 0 ? what about naraRate? 
+                 [comp@0]; [acc@0]; [vocab@0]; [perfiq@0]; [execfun@0];"
 
 # Factor variances
 factor_vars <- " 
-                acc; comp; naraRate; vocab; perfiq; execfun;" # Not sure about naraRate here as not latent variable? 
+                acc; comp; vocab; perfiq; execfun;" 
 
 # Factor covariances  
 factor_covars <- " 
@@ -154,30 +162,28 @@ ind_means <- "
               attnSel attnDiv attnOpp cntSpan];"
 
 # Additional covariances between indicator variables (determined by initial CFA model)
-ind_covars <- " 
-               cntSpan with wiscBwsp;
-               naraRate with naraAcc;"        # e.g., from MIs in CFA script
+# ind_covars <- "
+#                cntSpan with wiscBwsp;"        # TO BE EDITED
 ```
 
 
 ```{r fmm-base}
-
 # Create mixture model specification (including age regressors)
 model_spec <- paste0("%OVERALL% \n ",
                      age_spec,
                      factor_spec,
                      factor_means,
-                     ind_covars)      ### not sure where these go - in all models in overall statement???
+                     ind_covars)
 
 # Create base model
 m_fmm_base <- mplusObject(
   TITLE = "Factor mixture model;",
-  ANALYSIS = "estimator = mlr; type = mixture; starts = 100 20; algorithm = integration;",
+  ANALYSIS = "estimator = mlr; type = mixture; starts = 500 50;",
   VARIABLE = "classes = c(1);",
   MODEL = model_spec,
-  OUTPUT = "sampstat; stdyx; CINTERVAL; TECH1; TECH8; TECH11; TECH14;",
+  OUTPUT = "TECH1; TECH8; TECH11;",
   PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "yp_no", "k")]),
+  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "yp_no")]),
   rdata = cp_data)
 ```
 
@@ -187,10 +193,10 @@ Follow same class-enumeration process as set out by Masyn (2013) for LCA and LPA
 m_fmm_benchmark <- update(m_fmm_base,
      TITLE = ~ "FMM Benchmark")
 
-mplusModeler(m_fmm_benchmark, "./mplus_models/fmm/cp_fmm_mbenchmark.dat", run = TRUE)
+mplusModeler(m_fmm_benchmark, "./mplus_models/compprof/fmm/cp_fmm_mbenchmark.dat", run = TRUE)
 
 # Extract parameters for the benchmark model
-m_fmm_benchmark <- readModels(target = "./mplus_models/fmm", filefilter = "mbenchmark") %>% 
+m_fmm_benchmark <- readModels(target = "./mplus_models/compprof/fmm", filefilter = "mbenchmark") %>% 
   mixtureSummaryTable(keepCols = c("Parameters", "Observations", "LL", "AIC", "BIC", "aBIC")) %>% 
   select(LL, AIC, BIC, aBIC) %>%
   pivot_longer(LL:aBIC, names_to = "statistic", values_to = "benchmark") %>% 
@@ -203,55 +209,103 @@ m_fmm_benchmark <- readModels(target = "./mplus_models/fmm", filefilter = "mbenc
 Tests different N-Class, 2 factor FMM models. Class varying item means, class invariant factor loadings, class varying factor covariance matrix, factor means fixed at zero (for identifiability)
 
 ```{r fmm-a-diag}
-
 grViz("
 digraph SEM {
-
 graph [layout = neato,
-       overlap = false,
+       overlap = true,
        outputorder = edgesfirst]
-
-node [shape = rectangle,fontsize=20]
-
-
-a [pos = '-5,7!', label = 'woldcomp']
-b [pos = '-3,7!', label = 'naracomp']
-c [pos = '0,7!', label = 'naraAcc']
-d [pos = '2,7!', label = 'wordAcc']
-e [pos = '4,7!', label = 'nonwAcc']
-
-f [pos = '-4,5!', label = 'comp', shape = ellipse,fontsize=20]
-
-g [pos = '2,5!', label = 'acc', shape = ellipse,fontsize=20]
-
-
-h [pos = '-1,9!', label = 'C', shape = ellipse,fontsize=20]
-
-
+node [shape = rectangle,fontsize=16]
+a [pos = '-6,6!', label = 'woldcomp']
+b [pos = '-4.5,6!', label = 'naracomp']
+c [pos = '-3,6!', label = 'naraAcc']
+d [pos = '-1.5,6!', label = 'wordAcc']
+e [pos = '0,6!', label = 'nonwAcc']
+f [pos = '-5,5!', label = 'comp', shape = ellipse,fontsize=16]
+g [pos = '-1.5,5!', label = 'acc', shape = ellipse,fontsize=16]
+h [pos = '-1,8!', label = 'C', shape = ellipse,fontsize=20]
+i [pos = '-7.5,6!', label = 'naraRate']
+j [pos = '2,6!', label = 'wiscVcb']
+k [pos = '3.5,6!', label = 'woldVcb']
+l [pos = '3,5!', label = 'vocab', shape = ellipse,fontsize=16]
+m [pos = '-3,13!', label = 'perfig', shape = ellipse,fontsize=16]
+a2 [pos = '-6,11!', label = 'wiscPcmp']
+b2 [pos = '-4.5,11!', label = 'wiscCode']
+c2 [pos = '-3,11!', label = 'wiscParr']
+d2 [pos = '-1.5,11!', label = 'wiscBloc']
+e2 [pos = '0,11!', label = 'wiscObja']
+n [pos = '6,13!', label = 'execfun', shape = ellipse,fontsize=16]
+a3 [pos = '2,11!', label = 'wiscBwsp']
+b3 [pos = '3.5,11!', label = 'cntSpan']
+c3 [pos = '5,11!', label = 'attnSel']
+d3 [pos = '6.5,11!', label = 'attnDiv']
+e3 [pos = '8,11!', label = 'attnOpp']
+f3 [pos = '9.5,11!', label = 'sdqHyp']
+ag1 [pos = '9,9!', label = 'f8Age']
+ag2 [pos = '9,8!', label = 'f9Age']
+ag3 [pos = '9,7!', label = 'f10Age']
+ag1->d2
+ag1->e2
+ag1->a3
+ag1->c3
+ag1->d3
+ag1->e3
+ag2->d
+ag2->e
+ag2->c
+ag2->b
+ag2->i
+ag2->a
+ag2->k
+ag2->a2
+ag2->b2
+ag2->c2
+ag3->b3
 f->a
 f->b 
-
 g->c
 g->d
 g->e
-
 h->a 
 h->b
 h->c
 h->d
 h->e
-
+h->i
+h->j
+h->k
+h->a2 
+h->b2
+h->c2
+h->d2
+h->e2
+h->a3 
+h->b3
+h->c3
+h->d3
+h->e3
+h->f3
+l->j
+l->k
+m->a2 
+m->b2
+m->c2
+m->d2
+m->e2
+n->a3 
+n->b3
+n->c3
+n->d3
+n->e3
+n->f3
 }
 ")
-
-
 #d->c [dir = both]
 ```
 
 Steps 1-3) Fit series of increasing *k*-class models.
 
 ```{r fmm-a-fit}
-m_fmm_a <- lapply(2:4, function(k) {
+m_fmm_a <- lapply(2:6, function(k) {
   
   # Update model spec 1: overall model estimates (variances and covariances)
   body<-update(m_fmm_base,
@@ -270,7 +324,7 @@ m_fmm_a <- lapply(2:4, function(k) {
      MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
 
   # Run model
-  mplusModeler(body, sprintf("./mplus_models/fmm/cp_fmm_a_%dclass.dat", k), run = FALSE)
+  mplusModeler(body, sprintf("./mplus_models/compprof/fmm/cp_fmm_a_%dclass.dat", k), run = TRUE)
  })
 ```
 
@@ -278,7 +332,7 @@ Steps 4-5) Extract fit indices, and use to select smaller subset of candidate mo
 
 ```{r fmm-a-output}
 # Read in output
-fmm_a_out <- readModels(target = "./mplus_models/fmm", filefilter = "cp_fmm_a")
+fmm_a_out <- readModels(target = "./mplus_models/compprof/fmm", filefilter = "cp_fmm_a")
 
 # Check warnings
 # for (model in 1:length(fmm_a_out)){
@@ -295,16 +349,16 @@ fmm_enum_elbow(fmm_a_summary, benchmark_stats = m_fmm_benchmark)
 ```
 
 Best model for:
-**a) Absolute fit (fewest classes with better LL than benchmark):** 2
-**b) Information heuristics (diminishing gains from elbow plots):** 3 or 4
-**c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 4
+**a) Absolute fit (fewest classes with better LL than benchmark):** 
+**b) Information heuristics (diminishing gains from elbow plots):** 
+**c) Adjusted LRTs (fewest classes not sig improved by additional classes):**
 
 Step 6) View classification diagnostics for candidate models. Can also inspect how the classes correspond across models. 
 
 ```{r fmm-a-candidates}
 # Extract participant level data
-fmm_a_rerun <- mm_extract_data(orig_mods = m_fmm_a, candidate_mods = 3:4, 
-                               filepath = "./mplus_models/fmm", analysis_id = "cp",
+fmm_a_rerun <- mm_extract_data(orig_mods = m_fmm_a, candidate_mods = 3:4,    # change to candidate models
+                               filepath = "./mplus_models/compprof/fmm", analysis_id = "cp",
                                rerun = FALSE, one_fit = FALSE)
 
 # Compute classification diagnostics
@@ -324,8 +378,8 @@ Comments:
 
 Step 7) Select final model in class enumeration process, for model specification A. 
 ```{r fmm-a-selected}
-fmm_a_final_nclass <- 3
-fmm_a_final_m <- fmm_a_rerun[1]  
+# fmm_a_final_nclass <- 3           # change to selected model
+# fmm_a_final_m <- fmm_a_rerun[1]   # change to selected model
 ```
 
 
@@ -336,69 +390,142 @@ Tests different N-Class, 2 factor FMM models. Class varying item means, class va
 ```{r fmm-b-diag}
 grViz("
 digraph SEM {
-
 graph [layout = neato,
-       overlap = false,
+       overlap = true,
        outputorder = edgesfirst]
-
-node [shape = rectangle,fontsize=20]
-
-
-a [pos = '-5,7!', label = 'woldcomp']
-b [pos = '-3,7!', label = 'naracomp']
-c [pos = '0,7!', label = 'naraAcc']
-d [pos = '2,7!', label = 'wordAcc']
-e [pos = '4,7!', label = 'nonwAcc']
-
-f [pos = '-4,5!', label = 'comp', shape = ellipse,fontsize=20]
-
-g [pos = '2,5!', label = 'acc', shape = ellipse,fontsize=20]
-
-
-h [pos = '-1,5!', label = 'C', shape = ellipse,fontsize=20]
-
-
+node [shape = rectangle,fontsize=16]
+a [pos = '-3.5,3!', label = 'woldcomp']
+b [pos = '-2,3!', label = 'naracomp']
+c [pos = '-0.5,3!', label = 'naraAcc']
+d [pos = '1,3!', label = 'wordAcc']
+e [pos = '2.5,3!', label = 'nonwAcc']
+f [pos = '-2.75,7!', label = 'comp', shape = ellipse,fontsize=16]
+g [pos = '1,7!', label = 'acc', shape = ellipse,fontsize=16]
+h [pos = '-1,8!', label = 'C', shape = ellipse,fontsize=20]
+i [pos = '-5,3!', label = 'naraRate']
+j [pos = '5,3!', label = 'wiscVcb']
+k [pos = '6.5,3!', label = 'woldVcb']
+l [pos = '5.5,7!', label = 'vocab', shape = ellipse,fontsize=16]
+m [pos = '-4.5,9!', label = 'perfig', shape = ellipse,fontsize=16]
+a2 [pos = '-6,11!', label = 'wiscPcmp']
+b2 [pos = '-4.5,11!', label = 'wiscCode']
+c2 [pos = '-3,11!', label = 'wiscParr']
+d2 [pos = '-1.5,11!', label = 'wiscBloc']
+e2 [pos = '0,11!', label = 'wiscObja']
+n [pos = '6.5,9!', label = 'execfun', shape = ellipse,fontsize=16]
+a3 [pos = '2,11!', label = 'wiscBwsp']
+b3 [pos = '3.5,11!', label = 'cntSpan']
+c3 [pos = '5,11!', label = 'attnSel']
+d3 [pos = '6.5,11!', label = 'attnDiv']
+e3 [pos = '8,11!', label = 'attnOpp']
+f3 [pos = '9.5,11!', label = 'sdqHyp']
+ag1 [pos = '0,13!', label = 'f8Age']
+ag2 [pos = '-8,8!', label = 'f9Age']
+ag3 [pos = '3.5,13!', label = 'f10Age']
+ag1->d2
+ag1->e2
+ag1->a3
+ag1->c3
+ag1->d3
+ag1->e3
+ag2->d
+ag2->e
+ag2->c
+ag2->b
+ag2->i
+ag2->a
+ag2->k
+ag2->a2
+ag2->b2
+ag2->c2
+ag3->b3
 f->a
 f->b 
-
 g->c
 g->d
 g->e
-
 h->a 
 h->b
 h->c
 h->d
 h->e
-
+h->i
+h->j
+h->k
+h->a2 
+h->b2
+h->c2
+h->d2
+h->e2
+h->a3 
+h->b3
+h->c3
+h->d3
+h->e3
+h->f3
+l->j
+l->k
+m->a2 
+m->b2
+m->c2
+m->d2
+m->e2
+n->a3 
+n->b3
+n->c3
+n->d3
+n->e3
+n->f3
 node [shape = circle,
         fixedsize = true,
         width = 0.1,
         color = white,
         fontcolor = white]
-
-wc [pos = '-4.5,6!']
-nc [pos = '-3.5,6!']
-na [pos = '1,6!']
-wa [pos = '2,6!']
-nwa [pos = '3,6!']
-
-h -> wc [style = dashed]
-h -> nc [style = dashed]
-h -> na [style = dashed]
-h -> wa [style = dashed]
-h -> nwa [style = dashed]
+ah [pos = '-3.2,5!']
+bh [pos = '-2.5,5.2!']
+ch [pos = '0.4,5.2!']
+dh [pos = '1,5.4!']
+eh [pos = '1.72,5!']
+jh [pos = '5.3,5!']
+kh [pos = '6,5!']
+a2h [pos = '-5.3,10!']
+b2h [pos = '-4.5,10!']
+c2h [pos = '-3.8,10!']
+d2h [pos = '-3.1,10!']
+e2h [pos = '-2.5,10!']
+a3h [pos = '4,10.2!']
+b3h [pos = '4.8,10.2!']
+c3h [pos = '5.75,10!']
+d3h [pos = '6.5,10!']
+e3h [pos = '7.25,10!']
+f3h [pos = '8,10!']
+h->ah [style = dashed]
+h->bh [style = dashed]
+h->ch [style = dashed]
+h->dh [style = dashed]
+h->eh [style = dashed]
+h->jh [style = dashed]
+h->kh [style = dashed]
+h->a2h [style = dashed]
+h->b2h [style = dashed]
+h->c2h [style = dashed]
+h->d2h [style = dashed]
+h->e2h [style = dashed]
+h->a3h [style = dashed] 
+h->b3h [style = dashed]
+h->c3h [style = dashed]
+h->d3h [style = dashed]
+h->e3h [style = dashed]
+h->f3h [style = dashed]
 }
 ")
-
-
 #d->c [dir = both]
 ```
 
 Steps 1-3) Fit series of increasing *k*-class models.
 
 ```{r fmm-b-fit}
-m_fmm_b <- lapply(2:3, function(k) {
+m_fmm_b <- lapply(2:6, function(k) {
   
   # Create class-level specifications (factor loadings, factor variance and covariance)
   class_spec <- paste0("%c#1%", factor_spec_class, factor_vars, factor_covars, ind_means)
@@ -413,7 +540,7 @@ m_fmm_b <- lapply(2:3, function(k) {
      MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
  
   # Run model
-   mplusModeler(body, sprintf("./mplus_models/fmm/cp_fmm_b_%dclass.dat", k), run = TRUE)
+   mplusModeler(body, sprintf("./mplus_models/compprof/fmm/cp_fmm_b_%dclass.dat", k), run = TRUE)
  })
 ```
 
@@ -421,13 +548,13 @@ Steps 4-5) Extract fit indices, and use to select smaller subset of candidate mo
 
 ```{r fmm-b-output}
 # Read in output
-fmm_b_out <- readModels(target = "./mplus_models/fmm", filefilter = "cp_fmm_b")
+fmm_b_out <- readModels(target = "./mplus_models/compprof/fmm", filefilter = "cp_fmm_b")
 
 # Check warnings
-# for (model in 1:length(fmm_b_out)){
-#   print(fmm_b_out[[model]]$input$title)
-#   print(fmm_b_out[[model]]$warnings)
-# }
+for (model in 1:length(fmm_b_out)){
+  print(fmm_b_out[[model]]$input$title)
+  print(fmm_b_out[[model]]$warnings)
+}
 
 # Print table 
 fmm_b_summary <- fmm_enum_table(output = fmm_b_out)
@@ -438,17 +565,17 @@ fmm_enum_elbow(fmm_b_summary, benchmark_stats = m_fmm_benchmark)
 ```
 
 Best model for:
-**a) Absolute fit (fewest classes with better LL than benchmark):** 2
-**b) Information heuristics (diminishing gains from elbow plots):** 3
-**c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 3 or 4
+**a) Absolute fit (fewest classes with better LL than benchmark):** 
+**b) Information heuristics (diminishing gains from elbow plots):** 
+**c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 
 
 
 Step 6) View classification diagnostics for candidate models. Can also inspect how the classes correspond across models. 
 
 ```{r fmm-b-candidates}
 # Extract participant level data
-fmm_b_rerun <- mm_extract_data(orig_mods = m_fmm_b, candidate_mods = 3:4,
-                               filepath = "./mplus_models/fmm", analysis_id = "cp",
+fmm_b_rerun <- mm_extract_data(orig_mods = m_fmm_b, candidate_mods = 3:4,   # change to selected candidate models
+                               filepath = "./mplus_models/compprof/fmm", analysis_id = "cp",
                                rerun = TRUE, one_fit = FALSE)
 
 # Compute classification diagnostics
@@ -466,9 +593,9 @@ Comments:
 **Interpretability:** 
 
 Step 7) Select final model in class enumeration process, for model specification A. 
-```{r fmm-b-selected}
-fmm_b_final_nclass <- 3
-fmm_b_final_m <- fmm_b_rerun[1]
+```{r fmm-b-selected} 
+# fmm_b_final_nclass <- 3           # change to selected model
+# fmm_b_final_m <- fmm_b_rerun[1]   # change to selected model
 ```
 
 
@@ -516,7 +643,7 @@ table_all <- fmm_all_summaries %>%
 table_all
 
 # Save table as pdf for later viewing
-# save_kable(table_all, file = "../output/tables/SimpView_fmm_all_modelfit.pdf")
+# save_kable(table_all, file = "../output/tables/CompProf_fmm_all_modelfit.pdf")
 ```
 
 ```{r fmm-all-elbow}
@@ -538,7 +665,13 @@ fmm_all_summaries %>%
     labs(shape = "Model spec:", linetype = "Model spec:")
 
 # save out for easier viewing
-ggsave("../output/figures/SimpView_fmm_all_indices.tiff", dpi = 600, width = 7, height = 4, units = "in")
+ggsave("../output/figures/CompProf_fmm_all_indices.tiff", dpi = 600, width = 7, height = 4, units = "in")
 ```
 
 # Final selected model
+
+The final model will be re-run using bootstrapping to indicate robustness. 
+
+```{r final-model}
+
+```

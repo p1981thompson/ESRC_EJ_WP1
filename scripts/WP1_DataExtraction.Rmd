@@ -4,6 +4,7 @@ output:
   html_document:
     toc: true
     toc_float: true
+date: '06/05/2021'
 ---
 
 ```{r libraries}
@@ -19,15 +20,17 @@ library(finalfit)
 library(MissMech)
 library(BaylorEdPsych)
 library(broom)
+library(psych)
+library(WriteXLS)
 
 options(scipen = 999)
 ```
 
-This script incorporates the selection of relevant variables and cases for the research questions included in Work Package 1: *Identifying heterogeneity in reading comprehension difficulties using data collected from ALSPAC*. It also includes preliminary exploration and documentation of patterns of missingness in the key variables of interest.
+This script incorporates the selection of relevant variables and cases for the research questions included in Work Package 1: *Identifying heterogeneity in reading comprehension difficulties using data collected from ALSPAC*. It also includes preliminary exploration and documentation of patterns of missingness in the key variables of interest, and splits the sample in two for calibration and validation purposes.
 
 # Access statement
 
-Under ALSPAC's Data Access arrangements, we will receive all data associated with the grant at the beginning of the project. However, the grant incorporates a number of sub-projects (or work packages) that build on each other, making it challenging to specify later all hypotheses and analysis plans in advance.
+Under ALSPAC's Data Access arrangements, we will receive all data associated with the grant at the beginning of the project. However, the grant incorporates a number of sub-projects (or work packages) that build on each other, making it challenging to specify all later hypotheses and analysis plans in advance.
 
 We will pre-register each set of hypotheses and analyses prior to working with the data for each sub-project, and make clear in the pre-registration where analyses include variables that we have already interacted with. We will extract the relevant data for each sub-project only after it has been pre-registered, and work only with the relevant data for that sub-project.
 
@@ -35,14 +38,15 @@ We will pre-register each set of hypotheses and analyses prior to working with t
 
 ### Rename variables 
 
-Read in and rename variables (might need some tweaking depending on format data arrives in)
+Read in and rename variables (might need some tweaking depending on format data arrives in).
+Will need to edit variable name for ALSPAC ID in codebook.
 
 ```{r rename-data}
 # Read in data
-data_orig <- read.csv("../data/simulated/dummy_alspac.csv")
-#data_orig <- read.csv("../data/raw/XXXXXX.csv")
+#data_orig <- read.csv("../data/simulated/dummy_alspac.csv")  # for script testing
+#data_orig <- read.csv("../data/raw/XXXXXX.csv")              # ALSPAC data
 
-# Read in codebook 
+# Read in codebook for renaming
 codebook <- read_excel("../data/codebook.xlsx", sheet = "codebook") %>% 
   select(`Var name`, R_var_name)
 
@@ -53,11 +57,11 @@ names(data_named) <- codebook$R_var_name[match(names(data_named), codebook$`Var 
 
 ### WP1 Dataset 
 
-Rename variables received from ALSPAC according to the codebook; select relevant variables; select participants to be included (i.e., those who completed the Neale Analysis of Reading Ability at age 9); create sum scores to be used.
+Specify variables to be used in these analyses.
 
 ```{r wp1-vars}
 # Variables for pre-registered analyses
-RQ1 <- c("age_m_f8", "age_m_f9",                                      # age
+RQ1 <- c("age_m_f8", "age_m_f9",                                       # age
          "read_word_raw_f9", "read_nonw_raw_f9", "nara_acc_raw_f9",    # accuracy
          "nara_comp_raw_f9", "wold_comp_raw_f8")                       # comprehension
 
@@ -70,23 +74,39 @@ RQ2 <- c("age_m_f10",                                                # age
          "teach_slct_raw_f8", "teach_divd_raw_f8", "teach_ctrs_raw_f8", "teach_ctro_raw_f8", "sdq_hyp_prnt_ku") #attention  
 
 # Variables for descriptives, exploratory analyses (subject to change)
-other <- c("nara_acc_std_f9", "nara_comp_std_f9", "nara_rate_std_f9", "nara_npass_f9",
+other <- c("sex",
+           "nara_acc_std_f9", "nara_comp_std_f9", "nara_rate_std_f9", "nara_npass_f9",
            "wisc_vcb_std_f8",
            "wisc_pcmp_std_f8", "wisc_code_std_f8", "wisc_parr_std_f8", "wisc_bloc_std_f8", "wisc_obja_std_f8", "wisc_perf_std_f8") 
   
 # Additional variables for exploring missingness
-missingness <-  c("sex", "m_cigs_n_a", "m_marry_a", "m_socc_c", "m_fdif_tot_c", "m_home_a")
+missingness <-  c("ethn_c", "wght_birth", "gest_birth", "m_age_birth", "m_edu_c", "m_home_a", "mtcq_vcb_raw_kg")
 
 # All variables for extraction
 wp1_vars <- c("yp_id", RQ1, RQ2, other, missingness)  
 ```
 
-Extract and process
-```{r wp1-data}
-wp1_data <- data_named %>% 
+Extract relevant variables (including all observations at this stage) and process missing data.
+
+```{r wp1-all-obs}
+# Extract relevant variables from dataset, and processing missing data
+wp1_allobs <- data_named %>% 
   
   # Select relevant variables
   select(all_of(wp1_vars)) %>% 
+  
+  # Relabel missing data 
+  replace_with_na_at(.vars = wp1_vars[!wp1_vars %in% c("teach_divd_raw_f8")],  # TO-DO check missing data for TEACh divided attention var
+                       condition = ~.x < 0)
+
+# Inspect summary statistics and check that match up with expectations from data dictionary (i.e., to make sure missing data recoded correctly)
+describe(wp1_allobs)
+```
+
+Select participants to be included (i.e., those who completed the Neale Analysis of Reading Ability at age 9); create sum scores to be used.
+
+```{r wp1-data}
+wp1_data <- wp1_allobs %>%  
   
   # Filter for participants with NARA
   filter(!is.na(nara_comp_raw_f9)) %>% 
@@ -103,26 +123,11 @@ wp1_data <- data_named %>%
 # Test whether meets expected  number of participants
 length(unique(wp1_data$yp_id)) == 6943
 
-# Create numeric ID variable for working with mplus
-wp1_data <- wp1_data %>% 
-  mutate(yp_no = as.numeric(as.factor(yp_id)))
-
-# Save data
-# write.csv(wp1_data, "../data/processed/WP1_data.csv", row.names = FALSE)
+# Inspect summary statistics
+describe(wp1_data)
 ```
 
 # Missingness
-
-### Process labels
-
-Missing data are coded as negative values in raw data; recode as NA to avoid incorporating into analyses. 
-
-********* EDIT FOR TEACh SCORES (decrement score can be negative) ***********
-
-```{r assign-na}
-wp1_data <- wp1_data %>% 
-  replace_with_na_all(condition = ~.x < 0)
-```
 
 ### Description
 
@@ -213,3 +218,74 @@ for (var in prereg_vars){
 }
 print(miss_pred)
 ```
+
+# Split sample and save out data
+
+Create subsamples to be used for RQ1 initial class enumeration process and subsequent validation. 
+
+```{r split-half}
+# Create numeric ID variable for working with mplus, remove unnecessary variables and tidy order
+wp1_tidy <- wp1_data %>% 
+  mutate(yp_no = as.numeric(as.factor(yp_id))) %>% 
+  select(-all_of(missingness)) %>% 
+  relocate(yp_no, .after = yp_id) %>% 
+  relocate(age_m_f10, .after = age_m_f9) %>% 
+  relocate(teach_ctr_diff_f8, .after = teach_divd_raw_f8) %>% 
+  relocate(wold_vcb_raw_f8, .after = wisc_vcb_raw_f8)
+
+# Create exploratory/calibration dataset
+sampleA <- wp1_tidy %>% 
+  sample_frac(.50)
+
+# Create confirmatory/validation dataset
+sampleB <- wp1_tidy %>% 
+  anti_join(sampleA, by = "yp_id")
+  
+# Check
+sampleA$yp_id[(sampleA$yp_id %in% sampleB$yp_id)]
+sampleB$yp_id[(sampleB$yp_id %in% sampleA$yp_id)]
+(nrow(sampleA) + nrow(sampleB)) == nrow(wp1_tidy)
+
+# Save
+# write.csv(sampleA, "../data/processed/WP1_data_subA.csv")
+# write.csv(sampleB, "../data/processed/WP1_data_subB.csv")
+# write.csv(WP1_tidy, "../data/processed/WP1_data_all.csv")
+```
+
+Save record of additional variables created to the codebook. A record of generated variables will need to be returned to ALSPAC upon completion of the project.
+
+```{r new_vars}
+# List variables not in original dataset
+vars_created <- setdiff(names(wp1_data), names(data_named)) %>% 
+  as.data.frame() %>% 
+  set_names("R_var_name") %>% 
+  mutate(workpack = 1,
+         script_created = "WP1_DataExtraction.Rmd")
+
+# Read in sheet of codebook that contains created variables
+new_vars <- read_excel("../data/generated_variables.xlsx", sheet = "new_vars") %>% 
+  mutate(R_var_name = as.character(R_var_name))
+
+# Combine the two lists, retain only distinct variable names 
+vars_combined <- new_vars %>% 
+  bind_rows(vars_created) %>% 
+  distinct(R_var_name, .keep_all = TRUE) 
+
+# Save out new sheet if new rows have been added
+if (nrow(vars_combined) > nrow(new_vars)){
+  
+  # Update sheet
+  new_vars <- vars_combined
+  
+  # Read in existing sheets
+  metadata <- read_excel("../data/generated_variables.xlsx", sheet = "metadata")
+  
+  # Write out together
+  WriteXLS(c("metadata", "new_vars"), "../data/generated_variables.xlsx", perl = "C:/Perl64/bin/perl.exe")
+  
+  # Request edits in excel
+  print("New variables generated. Update documentation in generated_variables.xlsx file.")
+  shell.exec(here::here("./data/generated_variables.xlsx")) # open file to add further details
+}  
+```
+

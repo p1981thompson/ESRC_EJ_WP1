@@ -7,7 +7,7 @@ This script simulates data designed around the variables available in ALSPAC for
 
 ```{r libraries}
 # List packages
-pkgs <- c("SIN", "MASS", "psych", "tidyverse", "naniar", "GGally")
+pkgs <- c("SIN", "MASS", "psych", "tidyverse", "naniar", "GGally", "Matrix")
 
 # Use groundhog package to load correct package versions
 # if (!require("groundhog")) install.packages("groundhog")
@@ -269,6 +269,7 @@ sdq_hyp_sd3 <- 2
 
 corr <- read.csv("../data/simulated/WP1_CompProF_CorrForSim.csv")
 corr <- as.matrix(corr[,2:23])
+corr <- as.matrix(nearPD(x = corr, corr = TRUE, keepDiag = TRUE)$mat) 
 ```
 
 Dataset will need to take age into account. Do not expect large age differences between groups, so specify same means and correlations for each. 

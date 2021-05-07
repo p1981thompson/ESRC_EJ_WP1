@@ -4,12 +4,13 @@ output:
   html_document:
     toc: true
     toc_float: true
-    
+date: '06/05/2021'
+      
 knit: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding, output_dir = "../output/analysis/") })
 ---
 
-This script computes basic summary statistics for the data, ensures that they align with Mplus output, and tests the factor structure to be used for subsequent analyses. 
+This script computes basic summary statistics for the data, ensures that they align with Mplus output, and tests the factor structure to be used for subsequent analyses. This analysis is conducted using the "exploratory" or "calibration" half of the dataset (subsample A).
 
 # Set-up
 
@@ -18,26 +19,27 @@ This script computes basic summary statistics for the data, ensures that they al
 pkgs <- c("tidyverse", "psych", "naniar", "MplusAutomation", "texreg", "semPlot")
 
 # Use groundhog package to load correct package versions
-# if (!require("groundhog")) install.packages("groundhog")
-# groundhog.day <- "2021-03-01"
-# groundhog::groundhog.library(pkgs, groundhog.day)
+if (!require("groundhog")) install.packages("groundhog")
+groundhog.day <- "2021-03-01"
+groundhog::groundhog.library(pkgs, groundhog.day)
 
 # Or if not using groundhog package - load currently installed package versions separately (reproducibility not guaranteed)
-invisible(lapply(pkgs, library, character.only = TRUE))
+# invisible(lapply(pkgs, library, character.only = TRUE))
 ```
 
 ```{r create-dir}
 # Create subdirectories for storing mplus scripts, data files, and output, if do not already exist
 if(dir.exists("./mplus_models/")==FALSE){dir.create("./mplus_models/")}
-if(dir.exists("./mplus_models/desc")==FALSE){dir.create("./mplus_models/desc")}
-if(dir.exists("./mplus_models/cfa")==FALSE){dir.create("./mplus_models/cfa")} 
+if(dir.exists("./mplus_models/simpview/")==FALSE){dir.create("./mplus_models/simpview/")}
+if(dir.exists("./mplus_models/simpview/desc")==FALSE){dir.create("./mplus_models/simpview/desc")}
+if(dir.exists("./mplus_models/simpview/cfa")==FALSE){dir.create("./mplus_models/simpview/cfa")} 
 ```
 
 ###  Load and prepare data for Mplus
 
 ```{r load-data}
-sv_data <- read.csv("../data/simulated/WP1_SimpView_sim_raw_n1000_k3.csv")
-#sv_data <- read.csv("../data/processed/WP1_data.csv")
+#sv_data <- read.csv("../data/simulated/WP1_SimpView_sim_raw_n1000_k3.csv") # for script testing 
+#sv_data <- read.csv("../data/processed/WP1_data_subA.csv")                 # ALSPAC data
 ```
 
 Mplus has an 8-character limit, so rename relevant variables with short names for modelling. 
@@ -76,7 +78,7 @@ describe(sv_data)
 vis_miss(sv_data)
 ```
 
-Patterns of missingness are more thoroughly explored for all WP1 variables in the initial data processing script. For this particular analysis, we anticipate relatively low levels of missingness as measures were collected close in time (all at age 9 clinic, except WOLD comprehension at age 8 clinic), and that this will likely be MCAR. However, if these assumptions are not met then we will use multiple imputation (*ref code chunk*). 
+Patterns of missingness are more thoroughly explored for all WP1 variables in the initial data processing script. For this particular analysis, we anticipate relatively low levels of missingness as measures were collected close in time (all at age 9 clinic, except WOLD comprehension at age 8 clinic), and that this will likely be MCAR. Missingness will be dealt with using full information maximum likelihood. 
 
 ### Check that mplus reading data as expected
 
@@ -92,12 +94,12 @@ m_desc <- mplusObject(
 
 # Fit model 
 m_desc_fit <- mplusModeler(m_desc,
-                            dataout = "./mplus_models/desc/sv_sim.dat",
-                            modelout = "./mplus_models/desc/sv_check.inp",
+                            dataout = "./mplus_models/simpview/desc/sv_sim.dat",
+                            modelout = "./mplus_models/simpview/desc/sv_check.inp",
                             check = TRUE, run = TRUE, hashfilename = TRUE)
 
 # Read mplus output
-m_desc_out <- readModels("./mplus_models/desc/sv_check.out")
+m_desc_out <- readModels("./mplus_models/simpview/desc/sv_check.out")
 
 # Check that sample sizes and means match descriptive statistics from above
 r_summ <- describe(sv_data) %>%
@@ -110,7 +112,7 @@ mplus_summ <- m_desc_out$sampstat$univariate.sample.statistics %>%
   round(.,2) %>% 
   select(`Sample Size`, Mean)
 
-if (any((r_summ == mplus_summ) == FALSE)){
+if (any((r_summ - mplus_summ) > abs(0.01))){  # allowing for rounding errors
   print("WARNING: DIFFERENCES DETECTED BETWEEN R AND MPLUS DATA SUMMARIES")
   } else{
       print("Data check passed")
@@ -122,11 +124,7 @@ if (any((r_summ == mplus_summ) == FALSE)){
 ### One vs. Two Factors
 
 Test whether the data support the proposed two-factor model (accuracy, comprehension) over a single reading factor.
-
-A good-fitting model should ideally meet the following criteria:
-* CFI & TLI > .95  
-* RMSEA <= .05  
-* SRMR < .05
+Each model additionally includes age as a covariate.
 
 ```{r cfa-factor-structure}
 # ONE-FACTOR MODEL
@@ -138,11 +136,11 @@ m_cfa1 <- mplusObject(
            woldcomp on f8age;",   # single reading factor, plus age covariates 
   OUTPUT = "sampstat; TECH1; TECH4; stdyx; modindices; ",
   PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(sv_data[,!names(sv_data) %in% c("yp_id", "yp_no", "k")]),
+  usevariables = colnames(sv_data[,!names(sv_data) %in% c("yp_id", "yp_no")]),
   rdata = sv_data)
 
 m_cfa1_fit <- mplusModeler(m_cfa1,
-                           modelout = "./mplus_models/cfa/sv_cfa1.inp",
+                           modelout = "./mplus_models/simpview/cfa/sv_cfa1.inp",
                            check = TRUE, run = TRUE)
 
 # TWO-FACTOR MODEL
@@ -153,15 +151,15 @@ m_cfa2 <- update(m_cfa1,
                             woldcomp on f8age;
                             acc with comp;") # two factors, plus age covariates
 m_cfa2_fit <- mplusModeler(m_cfa2,
-                           modelout = "./mplus_models/cfa/sv_cfa2.inp",
+                           modelout = "./mplus_models/simpview/cfa/sv_cfa2.inp",
                            check = TRUE, run = TRUE)
 
 # COMPARE MODELS
-cfa_models <- readModels(target = "./mplus_models/cfa", filefilter = "sv_cfa")
+cfa_models <- readModels(target = "./mplus_models/simpview/cfa", filefilter = "sv_cfa")
 SummaryTable(cfa_models, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
 ```
 
-If a one-factor model is preferred, then we will proceed with using a Latent Profile Analysis. If the data support a two-factor model, as anticipated, then we will use a Factor Mixture Model. Consider parameters that might improve model fit for the FMM. 
+If a one-factor model is preferred, then we will proceed with using a Latent Profile Analysis. If the data support a two-factor model, as anticipated, then we will use a Factor Mixture Model. If proceeding with FMM, consider parameters that might improve model fit.
 
 ### Improving fit for a Two-Factor Model
 
@@ -173,35 +171,36 @@ cfa_models$sv_cfa2.out$parameters$stdyx.standardized
 # Inspect modification indices
 cfa_models$sv_cfa2.out$mod_indices
 ```
-* Check for very large standardised residuals
-* No accepted view on how large MIs should be. Change only one at a time, starting with largest, but must be theoretically meaningful. 
-* *A priori*, we consider possible meaningful influences to be to be (in this order): naracomp with naraacc (taken from same assessment), wordacc with nonwacc (same battery of tests, similar format), wordacc with naraacc (both real word accuracy measures).
+
+* Check for very large standardised residuals.  
+* No accepted view on how large MIs should be. Change only one at a time, starting with largest, but must be theoretically meaningful.  
+* *A priori*, we consider possible meaningful influences to be to be (in this order): naracomp with naraacc (taken from same assessment), wordacc with nonwacc (same battery of tests, similar format), wordacc with naraacc (both real word accuracy measures).  
 
 E.g...
 
 ```{r cfa-modification}
 # TWO-FACTOR MODEL with additional covariance between NARA accuracy and comprehension
-m_cfa2b <- update(m_cfa2,
-                 TITLE = ~ "Confirmatory Factor Analysis - Two-Factor - modification1 nara covariance;",
-                 MODEL = ~. + "naraAcc with naraComp;")
-
-m_cfa2b_fit <- mplusModeler(m_cfa2b,
-                           modelout = "./mplus_models/cfa/sv_cfa2b.inp",
-                           check = TRUE, run = TRUE)
-
-# COMPARE MODELS
-cfa_models <- readModels(target = "./mplus_models/cfa", filefilter = "sv_cfa")
-SummaryTable(cfa_models, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
-
-# Inspect model (by = loadings, with = covariances)
-cfa_models$sv_cfa2b.out$parameters$unstandardized
-cfa_models$sv_cfa2b.out$parameters$stdyx.standardized
-
-# Inspect modification indices
-cfa_models$sv_cfa2b.out$mod_indices
+# m_cfa2b <- update(m_cfa2,
+#                  TITLE = ~ "Confirmatory Factor Analysis - Two-Factor - modification1 nara covariance;",
+#                  MODEL = ~. + "naraAcc with naraComp;")
+# 
+# m_cfa2b_fit <- mplusModeler(m_cfa2b,
+#                            modelout = "./mplus_models/simpview/cfa/sv_cfa2b.inp",
+#                            check = TRUE, run = TRUE)
+# 
+# # COMPARE MODELS
+# cfa_models <- readModels(target = "./mplus_models/simpview/cfa", filefilter = "sv_cfa")
+# SummaryTable(cfa_models, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
+# 
+# # Inspect model (by = loadings, with = covariances)
+# cfa_models$sv_cfa2b.out$parameters$unstandardized
+# cfa_models$sv_cfa2b.out$parameters$stdyx.standardized
+# 
+# # Inspect modification indices
+# cfa_models$sv_cfa2b.out$mod_indices
 ```
 
-A good-fitting model should ideally meet the following criteria:
+The following rules of thumb are often used to indicate a good-fitting model:
 * CFI & TLI > .95  
 * RMSEA <= .05  
 * SRMR < .05
@@ -209,6 +208,6 @@ A good-fitting model should ideally meet the following criteria:
 ### CFA figure
 
 ```{r cfa-diagram}
-semPaths(semPlotModel(cfa_models$sv_cfa2b.out, mplusStd = "stdyx"), what = "paths", whatLabels = "std", rotation = 1, intercepts = FALSE)
+# semPaths(semPlotModel(cfa_models$sv_cfa2b.out, mplusStd = "stdyx"), what = "paths", whatLabels = "std", rotation = 1, intercepts = FALSE)
 ```
 
