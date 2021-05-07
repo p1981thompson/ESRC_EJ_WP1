@@ -1,4 +1,6 @@
 
+if (!require("here")) install.packages("here")
+
 # lpa_enum_table: summarise output from class enumeration process ----
 ### function takes single argument of type mplus.model.list (created by readModels function)
 ### must also have MplusAutomation package loaded, and scientific notation turned off
@@ -160,15 +162,94 @@ fmm_enum_elbow <- function(mm_summaries = NA,
   elbow_fig
 }
 
+# getSection: extract file info ----
+###Borrowed code from here: https://r-forge.r-project.org/scm/viewvc.php/pkg/R/utilityFunctions.R?view=markup&root=mplusautomation
+####Needs some refinements.
+getSection <- function(sectionHeader, outfiletext, headers="standard", omit=NULL) {
+  #encode the top-level major headers here, but allow for custom headers to be passed in
+  #omit allows for one or more strings from headers not to be considered
+  #just used for factor score statistics at the moment (these include a SAMPLE STATISTICS section)
+  if (headers[1L] == "standard") headers <- c("INPUT INSTRUCTIONS", "SUMMARY OF ANALYSIS",
+                                              "SUMMARY OF DATA FOR THE FIRST DATA SET", "SUMMARY OF DATA FOR THE FIRST REPLICATION",
+                                              "SUMMARY OF MISSING DATA PATTERNS FOR THE FIRST REPLICATION",
+                                              "SUMMARY OF MISSING DATA PATTERNS",
+                                              "COVARIANCE COVERAGE OF DATA FOR THE FIRST REPLICATION",
+                                              "SAMPLE STATISTICS", "SAMPLE STATISTICS FOR THE FIRST REPLICATION",
+                                              "CROSSTABS FOR CATEGORICAL VARIABLES", "UNIVARIATE PROPORTIONS AND COUNTS FOR CATEGORICAL VARIABLES",
+                                              "RANDOM STARTS RESULTS RANKED FROM THE BEST TO THE WORST LOGLIKELIHOOD VALUES",
+                                              "TESTS OF MODEL FIT", "MODEL FIT INFORMATION", "CLASSIFICATION QUALITY",
+                                              "FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASSES",
+                                              "FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASS PATTERNS",
+                                              "LATENT TRANSITION PROBABILITIES BASED ON THE ESTIMATED MODEL",
+                                              "FINAL CLASS COUNTS AND PROPORTIONS FOR EACH LATENT CLASS VARIABLE",
+                                              "CLASSIFICATION OF INDIVIDUALS BASED ON THEIR MOST LIKELY LATENT CLASS MEMBERSHIP",
+                                              "Average Latent Class Probabilities for Most Likely Latent Class Membership \\(Row\\)",
+                                              "MODEL RESULTS", "LOGISTIC REGRESSION ODDS RATIO RESULTS", "RESULTS IN PROBABILITY SCALE",
+                                              "IRT PARAMETERIZATION IN TWO-PARAMETER LOGISTIC METRIC",
+                                              "LATENT CLASS ODDS RATIO RESULTS", "LOGRANK OUTPUT", "STANDARDIZED MODEL RESULTS", 
+                                              "R-SQUARE", "QUALITY OF NUMERICAL RESULTS", "TECHNICAL OUTPUT", "TECHNICAL \\d+ OUTPUT",
+                                              "TECHNICAL 5/6 OUTPUT", 
+                                              "TOTAL, TOTAL INDIRECT, SPECIFIC INDIRECT, AND DIRECT EFFECTS",
+                                              "STANDARDIZED TOTAL, TOTAL INDIRECT, SPECIFIC INDIRECT, AND DIRECT EFFECTS", "CONFIDENCE INTERVALS OF MODEL RESULTS",
+                                              "CONFIDENCE INTERVALS FOR THE LOGISTIC REGRESSION ODDS RATIO RESULTS",
+                                              "CREDIBILITY INTERVALS OF MODEL RESULTS",
+                                              "CONFIDENCE INTERVALS OF STANDARDIZED MODEL RESULTS",
+                                              "CREDIBILITY INTERVALS OF STANDARDIZED MODEL RESULTS",
+                                              "CONFIDENCE INTERVALS OF TOTAL, TOTAL INDIRECT, SPECIFIC INDIRECT, AND DIRECT EFFECTS",
+                                              "CONFIDENCE INTERVALS OF STANDARDIZED TOTAL, TOTAL INDIRECT, SPECIFIC INDIRECT,", #omitted "AND DIRECT EFFECTS"
+                                              "EQUALITY TESTS OF MEANS ACROSS CLASSES USING POSTERIOR PROBABILITY-BASED",
+                                              "THE FOLLOWING DATA SET\\(S\\) DID NOT RESULT IN A COMPLETED REPLICATION:",
+                                              "RESIDUAL OUTPUT", "MODEL MODIFICATION INDICES", "MODEL COMMAND WITH FINAL ESTIMATES USED AS STARTING VALUES",
+                                              "FACTOR SCORE INFORMATION \\(COMPLETE DATA\\)", "SUMMARY OF FACTOR SCORES", "PLOT INFORMATION", "SAVEDATA INFORMATION",
+                                              "SAMPLE STATISTICS FOR ESTIMATED FACTOR SCORES", "DIAGRAM INFORMATION",
+                                              "Beginning Time:\\s*\\d+:\\d+:\\d+", "MUTHEN & MUTHEN"
+  )
+  if (!is.null(omit)) headers <- headers[which(!headers %in% omit)] #drop omit
+  beginSection <- grep(sectionHeader, outfiletext, perl=TRUE)[1]
+  #if section header cannot be found, then bail out
+  if (is.na(beginSection)) return(NULL)
+  #form alternation pattern for regular expression (currently adds leading and trailing spaces permission to each header)
+  headerRegexpr <- paste("(", paste(gsub("(.*)", "^\\\\s*\\1\\\\s*$", headers, perl=TRUE), sep="", collapse="|"), ")", sep="") 
+  headerLines <- grep(headerRegexpr, outfiletext, perl=TRUE)
+  subsequentHeaders <- which(headerLines > beginSection)
+  if (length(subsequentHeaders) == 0) nextHeader <- length(outfiletext) #just return the whole enchilada
+  else nextHeader <- headerLines[subsequentHeaders[1]] - 1
+  section.found <- outfiletext[(beginSection+1):nextHeader]
+  attr(section.found, "lines") <- beginSection:nextHeader
+  return(section.found)
+}
+
+# get_optseed: extract optseed from initial models ----
+get_optseed <- function(filename){
+  ############################################################################
+  outfiletext_pt<-readLines(filename)
+  test<-getSection("RANDOM STARTS RESULTS RANKED FROM THE BEST TO THE WORST LOGLIKELIHOOD VALUES", outfiletext=outfiletext_pt, headers="standard", omit=NULL)
+  ############################################################################
+  test<-test[str_detect(test,"[[:alpha:]]")==FALSE]
+  for(i in 1:length(test))
+  {
+    test[i]<-ifelse(test[i]=="",NA,test[i])
+  }
+  test<-na.omit(test)
+  test<-str_split_fixed(test, "\\s+", 4)[,-1]
+  test<-data.frame(test)
+  test<-sapply(test,as.numeric)
+  test<-data.frame(test)
+  names(test)<-c("LoMax","seed","starts")
+  optiseed<-test$seed[which.min(test$LoMax)]
+  optiseed
+}
+
 # mm_extract_data: refit subset of models to save out participant classifications ----
 ### this currently requires the original model list to still be in the environment
 ### NOTE: increase lrtstarts if best values not replicated https://www.statmodel.com/examples/webnotes/webnote14.pdf
 mm_extract_data <- function(orig_mods = NA,        # list of original models (in environment)
+                            orig_output = NA, 
                             candidate_mods = NA,   # candidate number of classes
                             filepath = NA,         # folder to save models to
                             analysis_id = "sv",
                             rerun = TRUE,          # whether to re-run models to extract data, set to false if just loading 
-                            optseed = NA,          # vector of corresponding optseed values (manually identified from output)
+                            optseed = TRUE,        # vector of corresponding optseed values (manually identified from output)
                             one_fit = TRUE) {      # whether a one-class model was fitted (if not, adjusts selection from list)
   
   # Adjust index of model if one-class model not fitted 
@@ -182,20 +263,20 @@ mm_extract_data <- function(orig_mods = NA,        # list of original models (in
   # Update scripts 
   if (rerun == TRUE){
     
-    # Track rerun number (for aligning optseed)
-    rerun_id <- 0
     
     for (model in candidate_mods){
       
-      # Count rerun number (for aligning optseed if applicable)
-      rerun_id <- rerun_id + 1
       
       # Adjust name to reflect class n (if necessary)
       n_classes <- ifelse(one_fit == TRUE, model, model+1) 
       
       # If using optseed
-      if (!is.na(optseed)) {
-        optseed_val <- optseed[rerun_id]
+      if (optseed == TRUE) {
+        
+        # Extract filename from original output, extract optseed
+        mod_file <- names(orig_output)[[model]]
+        optseed_path <- paste0(here::here(), "/scripts/", filepath, "/", mod_file)
+        optseed_val <- get_optseed(optseed_path)
         
         body <- update(orig_mods[[model]],
                        ANALYSIS = as.formula(sprintf("~ 'estimator = mlr; type = mixture; 
@@ -210,7 +291,7 @@ mm_extract_data <- function(orig_mods = NA,        # list of original models (in
                        OUTPUT = ~ . + "TECH7; TECH14; stdyx; CINTERVAL; ENTROPY;",
                        SAVEDATA = as.formula(sprintf(" ~ 'FILE IS sv_%s_%dclass.dat; SAVE = cprobabilities;'", model_name, n_classes)))
       }
-
+      
       
       mplusModeler(body, sprintf("%s/%s_%s_rerun_%dclass.dat", filepath, analysis_id, model_name, n_classes), run = TRUE)
     }
@@ -220,6 +301,8 @@ mm_extract_data <- function(orig_mods = NA,        # list of original models (in
   fmm_classification
   
 }
+
+
 
 
 # plotMixtures_simpView: plot standardised class means for task variables ----
@@ -457,84 +540,3 @@ extract_classes <- function(output = NULL, type = NULL){
 
 
 
-
-
-
-
-
-################ GRAVEYARD ----
-
-
-# ave_pp: compute the average posterior class probability (classification uncertainty) ----
-### takes list of models as input
-ave_pp <- function(output = NA){
-  
-  for (model in 1:length(output)) {
-    
-    
-    print(paste0("Classification diagnostics - Average posterior class probability for:", output[[model]]$input$title))
-    ave_pp <- (diag(output[[model]][["class_counts"]][["classificationProbs.mostLikely"]]))
-    print(ave_pp)
-    
-    # Print additional warning if do not meet rule of thumb
-    if(any(ave_pp < 0.7)){
-      print("Class assignment accuracy potentially inadequate (Nagin, 2005)")
-    }
-    cat("\n")
-  }}
-
-
-# classification diagnostics
-class_diagn2 <- function(output = NA){
-  
-  # Create a table from model output including title and entropy measure 
-  diagnostics <- mixtureSummaryTable(output, keepCols = c("Title", "Classes", "Entropy"))
-  
-  # Extract average posterior class probability
-  for (model in 1:length(output)) {
-
-    Title <- output[[model]]$input$title
-    ave_pp <- (diag(output[[model]][["class_counts"]][["classificationProbs.mostLikely"]]))
-
-    
-    diag_df <- data.frame(Title, avePP = list(ave_pp), prop = list(modest_prop)) %>% 
-      set_names(c("Title", "class_id", "proportion"))
-    
-    diagnostics <- diagnostics %>% 
-      left_join(diag_df, by = "c(Title") 
-  } 
-  
-  # Join to model
-    # diagnostics <- diagnostics %>% 
-    #   unite(col = "class_avepp", contains("class_id"), na.rm = TRUE) %>% 
-    #   group_by(Classes) %>% 
-    #   mutate(class_no = row_number())# %>% 
-      # ungroup() %>% 
-      # pivot_wider(names_from = class_no, names_prefix = "avepp_c", values_from = class_avepp)
-    
-   # Extract class proportions
-
-    for (model in 1:length(output)) {
-      
-      Title <- output[[model]]$input$title
-      modest_prop <- output[[model]][["class_counts"]][["modelEstimated"]][["proportion"]]
-      
-      diag_df2 <- data.frame(Title, prop = list(modest_prop)) %>% 
-        set_names(c("Title", "proportion"))
-      
-      diagnostics <- diagnostics %>% 
-        left_join(diag_df2, by = c("Title")) 
-    } 
-    
-    # Join to model
-    diagnostics <- diagnostics %>% 
-      unite(col = "class_prop", contains("proportion"), na.rm = TRUE) %>% 
-      group_by(Classes) %>% 
-      mutate(class_no = row_number()) # %>% 
-    # ungroup() %>% 
-    # pivot_wider(names_from = class_no, names_prefix = "avepp_c", values_from = class_avepp)
-    
-    
-       
-  print(diagnostics) 
-  }
