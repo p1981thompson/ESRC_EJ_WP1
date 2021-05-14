@@ -178,7 +178,8 @@ model_spec <- paste0("%OVERALL% \n ",
 # Create base model
 m_fmm_base <- mplusObject(
   TITLE = "Factor mixture model;",
-  ANALYSIS = "estimator = mlr; type = mixture; starts = 500 50;",
+  ANALYSIS = "estimator = mlr; type = mixture; starts = 500 50;
+              processors = 4(STARTS);",
   VARIABLE = "classes = c(1);",
   MODEL = model_spec,
   OUTPUT = "TECH1; TECH8; TECH11;",
