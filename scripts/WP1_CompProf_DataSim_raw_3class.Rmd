@@ -1,0 +1,447 @@
+---
+title: "WP1: Comprehension Profiles - Data Simulation"
+output: html_document
+---
+
+This script simulates data designed around the variables available in ALSPAC for the second analysis of Work Package 1. We assume that we have extracted a cluster of participants with relatively weak comprehension. This was created for the purposes of script development and testing, and is not representative of the real data. We do not have strong predictions over the groups that will emerge from this analysis, but create three groups here for developing the analysis scripts. 
+
+```{r libraries}
+# List packages
+pkgs <- c("SIN", "MASS", "psych", "tidyverse", "naniar", "GGally", "Matrix")
+
+# Use groundhog package to load correct package versions
+# if (!require("groundhog")) install.packages("groundhog")
+# groundhog.day <- "2021-03-01"
+# groundhog::groundhog.library(pkgs, groundhog.day)
+
+# Or if not using groundhog package - load currently installed package versions separately (reproducibility not guaranteed)
+invisible(lapply(pkgs, library, character.only = TRUE))
+
+# Set random seed
+set.seed(4926)
+```
+
+
+### Specify variables and relationships
+
+Create dataset similar to one that we will use. Use ALSPAC Databooks to get an estimate of ranges of values for each variable, and average performance (across whole sample).
+
+* NARA comp - range 0-45, M = 25 >> sample here should have ~M = 15
+* NARA acc - range 0-100, M = 66
+* Word and nonword acc - range 0-10 
+* WOLD comp - range 2-14
+
+* NARA rate - range 0-200, M = 80.7
+
+* WOLD vocab - range 0-10, M not known but fairly high
+* WISC vocab - range 0-45, M = 13.9
+
+* WISC pic completion - range 0-25, M = 15.7
+* WISC coding - range 0-55, M = 34.5
+* WISC pic arrangement - 0-50. M = 20.1
+* WISC block design - range 0-65, M = 32.2
+* WISC object assembly - range 0-40, M = 24
+
+* WISC backward digit span - range 1-7, M = 3.5
+* Working memory span - range 0-5, m = 3.42
+* TEACh selective attention - range 0-15, M = 5.21 (lower score better)
+* TEACh dual task - range -10-80, M = 5.66 (lower score better)
+* TEACH opposite worlds cost score - M = 4.1 (lower score better)
+* SDQ hyperactivity - 0-10, M ~ 2.6?
+
+```{r measures}
+################# CLASS 1 MEASURES ################### - Poor language only
+
+# NARA - comprehension
+nara_comp_m1 <- 15
+nara_comp_sd1 <- 5
+  
+# NARA - accuracy
+nara_acc_m1 <- 75
+nara_acc_sd1 <- 10
+
+# Word/nonword reading
+word_acc_m1 <- 9
+word_acc_sd1 <- 1
+nonword_acc_m1 <- 8
+nonword_acc_sd1 <- 1
+
+# WOLD listening
+wold_comp_m1 <- 4
+wold_comp_sd1 <- 2
+
+# NARA - rate
+nara_rate_m1 <- 90
+nara_rate_sd1 <- 10
+
+# WOLD vocab
+wold_vocab_m1 <- 4
+wold_vocab_sd1 <- 2
+
+# WISC vocab
+wisc_vocab_m1 <- 6
+wisc_vocab_sd1 <- 3
+
+# WISC Perf subtests
+wisc_pc_m1 <- 16
+wisc_pc_sd1 <- 5
+
+wisc_code_m1 <- 36
+wisc_code_sd1 <- 7
+
+wisc_pa_m1 <- 23
+wisc_pa_sd1 <- 7
+
+wisc_bd_m1 <- 35
+wisc_bd_sd1 <- 10
+
+wisc_obj_m1 <- 25
+wisc_obj_sd1 <- 6
+
+# WISC digit span
+wisc_bds_m1 <- 4
+wisc_bds_sd1 <- 1.5
+
+# Working memory span
+wm_span_m1 <- 4
+wm_span_sd1 <- 1
+
+# TEACh
+teach_select_m1 <- 5
+teach_select_sd1 <- 1.5
+
+teach_dual_m1 <- 5
+teach_dual_sd1 <- 1.5
+
+teach_opp_m1 <- 4
+teach_opp_sd1 <- 1.1
+
+# SDQ
+sdq_hyp_m1 <- 3
+sdq_hyp_sd1 <- 1
+
+
+################# CLASS 2 MEASURES ################### - Poor language and EF
+
+# NARA - comprehension
+nara_comp_m2 <- 15
+nara_comp_sd2 <- 5
+  
+# NARA - accuracy
+nara_acc_m2 <- 70
+nara_acc_sd2 <- 10
+
+# Word/nonword reading
+word_acc_m2 <- 8
+word_acc_sd2 <- 1
+nonword_acc_m2 <- 7
+nonword_acc_sd2 <- 1
+
+# WOLD listening
+wold_comp_m2 <- 2
+wold_comp_sd2 <- 1
+
+# NARA - rate
+nara_rate_m2 <- 50
+nara_rate_sd2 <- 10
+
+# WOLD vocab
+wold_vocab_m2 <- 5
+wold_vocab_sd2 <- 1
+
+# WISC vocab
+wisc_vocab_m2 <- 6
+wisc_vocab_sd2 <- 3
+
+# WISC Perf subtests
+wisc_pc_m2 <- 13
+wisc_pc_sd2 <- 4
+
+wisc_code_m2 <- 30 
+wisc_code_sd2 <- 5
+
+wisc_pa_m2 <- 18
+wisc_pa_sd2 <- 5
+
+wisc_bd_m2 <- 25
+wisc_bd_sd2 <- 7
+
+wisc_obj_m2 <- 20
+wisc_obj_sd2 <- 5
+
+# WISC digit span
+wisc_bds_m2 <- 2
+wisc_bds_sd2 <- 1
+
+# Working memory span
+wm_span_m2 <- 1.5
+wm_span_sd2 <- 1
+
+# TEACh
+teach_select_m2 <- 8
+teach_select_sd2 <- 2
+
+teach_dual_m2 <- 20
+teach_dual_sd2 <- 5
+
+teach_opp_m2 <- 9
+teach_opp_sd2 <- 2
+
+# SDQ
+sdq_hyp_m2 <- 7
+sdq_hyp_sd2 <- 2
+
+
+################# CLASS 3 MEASURES ################### - Poor language and low NVIQ
+
+# NARA - comprehension
+nara_comp_m3 <- 15
+nara_comp_sd3 <- 5
+  
+# NARA - accuracy
+nara_acc_m3 <- 72
+nara_acc_sd3 <- 10
+
+# Word/nonword reading
+word_acc_m3 <- 8
+word_acc_sd3 <- 1
+nonword_acc_m3 <- 7
+nonword_acc_sd3 <- 1
+
+# WOLD listening
+wold_comp_m3 <- 3
+wold_comp_sd3 <- 2
+
+# NARA - rate
+nara_rate_m3 <- 90
+nara_rate_sd3 <- 10
+
+# WOLD vocab
+wold_vocab_m3 <- 6
+wold_vocab_sd3 <- 1.5
+
+# WISC vocab
+wisc_vocab_m3 <- 8
+wisc_vocab_sd3 <- 2
+
+# WISC Perf subtests
+wisc_pc_m3 <- 5
+wisc_pc_sd3 <- 2
+
+wisc_code_m3 <- 15
+wisc_code_sd3 <- 4
+
+wisc_pa_m3 <- 10
+wisc_pa_sd3 <- 3
+
+wisc_bd_m3 <- 18
+wisc_bd_sd3 <- 5
+
+wisc_obj_m3 <- 12
+wisc_obj_sd3 <- 4
+
+# WISC digit span
+wisc_bds_m3 <- 3
+wisc_bds_sd3 <- 1
+
+# Working memory span
+wm_span_m3 <- 3
+wm_span_sd3 <- 1
+
+# TEACh
+teach_select_m3 <- 6
+teach_select_sd3 <- 1.5
+
+teach_dual_m3 <- 6
+teach_dual_sd3 <- 2
+
+teach_opp_m3 <- 5
+teach_opp_sd3 <- 1.5
+
+# SDQ
+sdq_hyp_m3 <- 4
+sdq_hyp_sd3 <- 2
+
+
+################# CORRELATIONS ###################
+
+# Assumption for purpose of creating simulated dataset is that we have same correlation among measures for each class. For simplicity, the correlation matrix is specified in a separate file.
+
+corr <- read.csv("../data/simulated/WP1_CompProF_CorrForSim.csv")
+corr <- as.matrix(corr[,2:23])
+corr <- as.matrix(nearPD(x = corr, corr = TRUE, keepDiag = TRUE)$mat) 
+```
+
+Dataset will need to take age into account. Do not expect large age differences between groups, so specify same means and correlations for each. 
+
+```{r ages}
+# Set age means - roughly guided by those that attended clinic
+age_months_f8_m <- 103
+age_months_f8_sd <- 4
+age_months_f9_m <- 119
+age_months_f9_sd <- 4
+age_months_f10_m <- 128
+age_months_f10_sd <- 4
+```
+
+### Simulate dataset
+
+Compute covariance matrix based on the above estimates, and use to simulate specified number of observations.
+
+```{r simulate-data}
+################# COVARIANCES ###################
+
+# List SDs in order for each group
+stddev1 <- c(nara_comp_sd1, nara_acc_sd1, word_acc_sd1, nonword_acc_sd1, wold_comp_sd1, nara_rate_sd1, wold_vocab_sd1, wisc_vocab_sd1,
+             wisc_pc_sd1, wisc_code_sd1, wisc_pa_sd1, wisc_bd_sd1, wisc_obj_sd1, wisc_bds_sd1, wm_span_sd1,
+             teach_select_sd1, teach_dual_sd1, teach_opp_sd1, sdq_hyp_sd1, 
+             age_months_f8_sd, age_months_f9_sd, age_months_f10_sd)
+stddev2 <- c(nara_comp_sd2, nara_acc_sd2, word_acc_sd2, nonword_acc_sd2, wold_comp_sd2, nara_rate_sd2, wold_vocab_sd2, wisc_vocab_sd2,
+             wisc_pc_sd2, wisc_code_sd2, wisc_pa_sd2, wisc_bd_sd2, wisc_obj_sd2, wisc_bds_sd2, wm_span_sd2,
+             teach_select_sd2, teach_dual_sd2, teach_opp_sd2, sdq_hyp_sd2, 
+             age_months_f8_sd, age_months_f9_sd, age_months_f10_sd)
+stddev3 <- c(nara_comp_sd3, nara_acc_sd3, word_acc_sd3, nonword_acc_sd3, wold_comp_sd3, nara_rate_sd3, wold_vocab_sd3, wisc_vocab_sd3,
+             wisc_pc_sd3, wisc_code_sd3, wisc_pa_sd3, wisc_bd_sd3, wisc_obj_sd3, wisc_bds_sd3, wm_span_sd3,
+             teach_select_sd3, teach_dual_sd3, teach_opp_sd3, sdq_hyp_sd3, 
+             age_months_f8_sd, age_months_f9_sd, age_months_f10_sd)
+
+# Compute covariance matrix, for each group
+covar1 <- sdcor2cov(stddev1, corr)
+covar2 <- sdcor2cov(stddev2, corr)
+covar3 <- sdcor2cov(stddev3, corr)
+
+################# SIMULATE DATA ###################
+
+# List means in order above, for each group
+means1 <- c(nara_comp_m1, nara_acc_m1, word_acc_m1, nonword_acc_m1, wold_comp_m1, nara_rate_m1, wold_vocab_m1, wisc_vocab_m1,
+             wisc_pc_m1, wisc_code_m1, wisc_pa_m1, wisc_bd_m1, wisc_obj_m1, wisc_bds_m1, wm_span_m1,
+             teach_select_m1, teach_dual_m1, teach_opp_m1, sdq_hyp_m1, 
+             age_months_f8_m, age_months_f9_m, age_months_f10_m)
+means2 <- c(nara_comp_m2, nara_acc_m2, word_acc_m2, nonword_acc_m2, wold_comp_m2, nara_rate_m2, wold_vocab_m2, wisc_vocab_m2,
+             wisc_pc_m2, wisc_code_m2, wisc_pa_m2, wisc_bd_m2, wisc_obj_m2, wisc_bds_m2, wm_span_m2,
+             teach_select_m2, teach_dual_m2, teach_opp_m2, sdq_hyp_m2, 
+             age_months_f8_m, age_months_f9_m, age_months_f10_m)
+means3 <- c(nara_comp_m3, nara_acc_m3, word_acc_m3, nonword_acc_m3, wold_comp_m3, nara_rate_m3, wold_vocab_m3, wisc_vocab_m3,
+             wisc_pc_m3, wisc_code_m3, wisc_pa_m3, wisc_bd_m3, wisc_obj_m3, wisc_bds_m3, wm_span_m3,
+             teach_select_m3, teach_dual_m3, teach_opp_m3, sdq_hyp_m3, 
+             age_months_f8_m, age_months_f9_m, age_months_f10_m)
+
+# Number of observations
+n_ppts <- 694
+
+# Latent profile probabilities
+class_probs<-c(0.4, 0.2, 0.4)
+
+# Generate mixing profile indicator based on profile probabilities
+k<-sample(1:3,n_ppts,class_probs,replace=TRUE)
+
+# Set up empty holding dataframe
+sim_dat <-data.frame(nara_comp=numeric(), nara_acc=numeric(), word_acc=numeric(), nonword_acc=numeric(), wold_comp=numeric(), nara_rate=numeric(), wold_vocab=numeric(), wisc_vocab=numeric(), wisc_pc=numeric(), wisc_code=numeric(), wisc_pa=numeric(), wisc_bd=numeric(), wisc_obj=numeric(), wisc_bds=numeric(), wm_span=numeric(), teach_select=numeric(), teach_dual=numeric(), teach_opp=numeric(), sdq_hyp=numeric(),  age_f8=numeric(), age_f9 = numeric(), age_f10 = numeric())
+
+# Sample from the three multivariate normal distributions in the correct proportions according to profile probabilities
+for(i in 1:n_ppts){
+sim_dat[i,]<-switch(k[i],mvrnorm(n = 1, mu = means1, Sigma = covar1), mvrnorm(n = 1, mu = means2, Sigma = covar2), mvrnorm(n = 1, mu = means3, Sigma = covar3))
+}
+
+sim_dat <- as.data.frame(cbind(sim_dat,as.factor(k)))
+
+# Create a dummy ID
+sim_dat$id<-paste0("ALSPAC",sprintf('%0.4d', 1:n_ppts))
+
+# Set variable names
+names(sim_dat) <- c("nara_comp_raw_f9", "nara_acc_raw_f9", "read_word_raw_f9", "read_nonw_raw_f9", "wold_comp_raw_f8",
+                     "nara_rate_raw_f9", "wold_vcb_raw_f8", "wisc_vcb_raw_f8", "wisc_pcmp_raw_f8", "wisc_code_raw_f8", 
+                     "wisc_parr_raw_f8", "wisc_bloc_raw_f8", "wisc_obja_raw_f8", "wisc_bwsp_raw_f8", "cntsp_span_raw_f10",
+                     "teach_slct_raw_f8", "teach_divd_raw_f8", "teach_ctr_diff_f8", "sdq_hyp_prnt_ku", 
+                     "age_m_f8", "age_m_f9", "age_m_f10", "k", "yp_id")
+
+```
+
+### Missing data
+
+**Missing data expectations for this analysis:**
+* nara_comp and nara_acc should have no missing data, as inclusion in this/subsequent projects relies on having completed this assessment 
+* word_acc & nonword_acc will also have only a very small proportion - collected in same assessment session as nara. Possibly more likely that if word_acc missing then nonword_acc also missing (?), but numbers very small. 
+* wold_comp - more likely to have missing data; collected at different clinic session one year earlier 
+
+```{r missing-data}
+# specify variables collected in same session, low proportion missingness
+same_na_cols <- c("read_word_raw_f9", "read_nonw_raw_f9")
+same_na_prop <- 0.01
+
+# specify variables collected in separate session, higher proportion missingness
+sep_na_cols <- names(sim_dat)[grep("f8", names(sim_dat))]
+sep_na_cols <- sep_na_cols[sep_na_cols != "age_m_f8"]
+sep_na_prop <- 0.04
+
+sep_na_cols2 <- names(sim_dat)[grep("f10", names(sim_dat))]
+sep_na_cols2 <- sep_na_cols2[sep_na_cols2 != "age_m_f10"]
+sep_na_cols2 <- c(sep_na_cols2, "sdq_hyp_prnt_ku")
+sep_na_prop2 <- 0.08
+
+# Create dataframe with NAs
+sim_dat_NA <- sim_dat %>% 
+  pivot_longer(cols = -c(yp_id,k),names_to = "var", values_to = "value") %>%    # pivot data to long format
+  mutate(r = runif(nrow(.)),                                            # simulate a random number (r) from 0 to 1 for each row
+         value = ifelse(var %in% same_na_cols & r <= same_na_prop, NA,  # for same session vars, update to NA if r < threshold
+                        ifelse(var %in% sep_na_cols & r <= sep_na_prop, NA,
+                               ifelse(var %in% sep_na_cols2 & r <= sep_na_prop2, NA, value)))) %>%  # for separate session vars, update to NA is r < threshold, else same value
+  dplyr::select(-r) %>%                                                        # remove random number
+  pivot_wider(names_from = var, values_from = value)                    # pivot back to original format
+```
+
+
+### Data check
+
+Inspect properties of the variables.
+
+```{r summarise-vars, message = FALSE, warning = FALSE}
+# Quick summary statistics
+describe(sim_dat_NA)
+
+# # Overall histograms/correlations
+# sim_dat_NA %>% 
+#   dplyr::select(-k, -yp_id) %>% 
+#   pairs.panels()
+# 
+# # Distributions/correlations by group
+# sim_dat_NA %>% 
+#   dplyr::select(-yp_id) %>% 
+#   ggpairs(mapping = aes(color = k))
+
+# Missing data
+vis_miss(sim_dat_NA)
+```
+
+### Save data for use
+
+```{r rename-round}
+# Select columns for rounding to whole integers (all but TEACh variables)
+round_names <- sim_dat_NA %>% 
+  select_if(is.numeric) %>% 
+  dplyr::select(-contains("teach")) %>% 
+  names()
+
+sim_dat_NA <- sim_dat_NA %>% 
+  mutate_at(all_of(round_names), round)
+
+# Round TEACh variables to 2dp
+teach_vars <- sim_dat_NA %>% 
+  dplyr::select(contains("teach")) %>% 
+  names()
+
+sim_dat_NA <- sim_dat_NA %>% 
+  mutate_at(all_of(teach_vars), round, 2)
+
+# Create numeric ID for later extracting from mplus
+sim_dat_NA <- sim_dat_NA %>% 
+  mutate(yp_no = as.numeric(yp_id))
+```
+
+```{r save-simdata}
+if(dir.exists("../data/simulated")==FALSE){dir.create("../data/simulated")} 
+
+filename <- paste0("../data/simulated/WP1_CompProf_sim_raw_n", n_ppts, "_k", length(class_probs), ".csv")
+
+write.csv(sim_dat_NA, filename, row.names = FALSE)
+```

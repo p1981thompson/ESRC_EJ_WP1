@@ -107,9 +107,7 @@ cp_data <- cp_data %>%
 
 Set up initial model, based on the final model from the WP1_CompProf_CFA.Rmd script. 
 
-*Note:* Increase starts to 2000 200 for a model if best log-likelihood value not replicated (Lubke & Luningham, 2017)
-
-```{r}
+```{r model-spec}
 # Age regressors
 age_spec <- " 
              wordAcc nonwAcc naraAcc naraComp naraRate on f9age;
@@ -166,6 +164,7 @@ ind_means <- "
 #                cntSpan with wiscBwsp;"        # TO BE EDITED
 ```
 
+*Note:* Increase starts to 2000 200 for a model if best log-likelihood value not replicated (Lubke & Luningham, 2017)
 
 ```{r fmm-base}
 # Create mixture model specification (including age regressors)
@@ -202,7 +201,6 @@ m_fmm_benchmark <- readModels(target = "./mplus_models/compprof/fmm", filefilter
   select(LL, AIC, BIC, aBIC) %>%
   pivot_longer(LL:aBIC, names_to = "statistic", values_to = "benchmark") %>% 
   mutate(statistic_relevel = factor(statistic, levels = c("LL", "AIC", "BIC", "aBIC")))
-
 ```
 
 ### FMM Model A 
@@ -371,7 +369,7 @@ class_diag(fmm_a_rerun)
 ### Note - plot saves to output/figures/ >> open and inspect separately for proper viewing
 plotMixtures_compProf(fmm_a_rerun, select_model = 2)
 
-# Inspect transitions - not yet edited/working
+# Inspect transitions - to edit
 # extract_classes(fmm_a_rerun, select_model = 3:4, type = "fmm")
 ```
 

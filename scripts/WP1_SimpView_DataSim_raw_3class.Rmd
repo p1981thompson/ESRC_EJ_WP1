@@ -3,7 +3,7 @@ title: "WP1: Simple View - Data Simulation"
 output: html_document
 ---
 
-This script simulates data designed around the variables available in ALSPAC for the first analysis (extracting sub-populations of readers in line with the Simple View of reading).
+This script simulates data designed around the variables available in ALSPAC for the first analysis (extracting sub-populations of readers in line with the Simple View of reading). This was created for the purposes of script development and testing, and is not representative of the real data or our expectations for the classes. 
 
 ```{r libraries}
 # List packages
@@ -27,7 +27,7 @@ set.seed(4926)
 Create dataset similar to one that we will use - three reading accuracy measures, a reading comprehension measure and listening comprehension.  
 
 * NARA comp - range 0-45, M = 25
-* NARA acc (errors) - range 0-100, M = 66  (note that a lower score is better)
+* NARA acc - range 0-100, M = 66
 * Word and nonword acc - range 0-10 
 * WOLD comp - range 2-14
 
@@ -40,7 +40,7 @@ nara_comp_m1 <- 35
 nara_comp_sd1 <- 10
   
 # NARA - accuracy
-nara_acc_m1 <- 30
+nara_acc_m1 <- 75
 nara_acc_sd1 <- 6
 
 # Word/nonword reading
@@ -50,7 +50,7 @@ nonword_acc_m1 <- 8
 nonword_acc_sd1 <- 1
 
 # WOLD listening
-wold_comp_m1 <- 10
+wold_comp_m1 <- 11
 wold_comp_sd1 <- 3
 
 
@@ -61,7 +61,7 @@ nara_comp_m2 <- 10
 nara_comp_sd2 <- 5
   
 # NARA - accuracy
-nara_acc_m2 <- 60
+nara_acc_m2 <- 35
 nara_acc_sd2 <- 10
 
 # Word/nonword reading
@@ -83,13 +83,13 @@ nara_comp_m3 <- 20
 nara_comp_sd3 <- 6
   
 # NARA - accuracy
-nara_acc_m3 <- 50
+nara_acc_m3 <- 70
 nara_acc_sd3 <- 10
 
 # Word/nonword reading
 word_acc_m3 <- 7
 word_acc_sd3 <- 2
-nonword_acc_m3 <- 5
+nonword_acc_m3 <- 6
 nonword_acc_sd3 <- 2
 
 # WOLD listening
@@ -99,22 +99,21 @@ wold_comp_sd3 <- 3
 
 ################# CORRELATIONS ###################
 
-# Assumption is that we have same correlation among measures for each class (note NARA acc measures neg correlated; lower score = better)
+# Assumption is that we have same correlation among measures for each class
 
-nara_comp_acc <- -0.5
+nara_comp_acc <- 0.5
 nara_comp_word <- 0.4
 nara_comp_nonword <- 0.3
 nara_comp_wold <- 0.6
-nara_acc_word <- -0.6
-nara_acc_nonword <- -0.5
-nara_acc_wold <- -0.2
+nara_acc_word <- 0.6
+nara_acc_nonword <- 0.5
+nara_acc_wold <- 0.2
 word_acc_nonword <- 0.7
 word_acc_wold <- 0.2
 nonword_acc_wold <- 0.2
 ```
 
 Dataset will need to take age into account. Do not expect large age differences between groups, so specify same means and correlations for each. 
-*Note - originally used same means/SDs for all 3 groups, tried separating in case source of the problem* 
 
 ```{r ages}
 # Set age means - roughly guided by those that attended clinic
@@ -122,22 +121,6 @@ age_months_f8_m <- 103
 age_months_f8_sd <- 4
 age_months_f9_m <- 119
 age_months_f9_sd <- 4
-
-# age_months_f8_m1 <- 104
-# age_months_f8_sd1 <- 4
-# age_months_f9_m1 <- 121
-# age_months_f9_sd1 <- 4
-# 
-# age_months_f8_m2 <- 101
-# age_months_f8_sd2 <- 3
-# age_months_f9_m2 <- 117
-# age_months_f9_sd2 <- 4
-# 
-# age_months_f8_m3 <- 103
-# age_months_f8_sd3 <- 4
-# age_months_f9_m3 <- 119
-# age_months_f9_sd3 <- 4
-
 
 # F8 age should only correlate with measures taken at F8 
 nara_comp_f8age <- 0
