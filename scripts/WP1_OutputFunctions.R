@@ -5,7 +5,6 @@ if (!require("here")) install.packages("here")
 ### function takes single argument of type mplus.model.list (created by readModels function)
 ### must also have MplusAutomation package loaded, and scientific notation turned off
 
-
 lpa_enum_table <- function(output = NA){
 
   # Extract initial summary table from model output

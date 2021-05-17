@@ -1,0 +1,610 @@
+---
+title: 'WP1: Simple View - Latent Profile Analysis'
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_dir = "../output/analysis/") })
+---
+
+This script is used for running the latent profile models. It will only be used *if* the CFA indicates that a single factor is best, otherwise we will use a factor mixture model (WP1_SimpView_FMM.Rmd).
+
+# Set-up
+
+```{r libraries}
+# Specify packages
+pkgs <- c("tidyverse", "MplusAutomation", "texreg", "DiagrammeR", "kableExtra", "ggalluvial", "scales")
+
+# Use groundhog package to load correct package versions
+# if (!require("groundhog")) install.packages("groundhog")
+# groundhog.day <- "2021-03-01"
+
+# groundhog::groundhog.library(pkgs, groundhog.day)
+
+# Or if not using groundhog package - load currently installed package versions separately (reproducibility not guaranteed)
+invisible(lapply(pkgs, library, character.only = TRUE))
+```
+
+```{r create-dir}
+# Create subdirectories for storing mplus scripts, data files, and output, if do not already exist
+if(dir.exists("./mplus_models/")==FALSE){dir.create("./mplus_models/")}
+if(dir.exists("./mplus_models/simpview/lpa")==FALSE){dir.create("./mplus_models/simpview/lpa")} 
+if(dir.exists("../output/")==FALSE){dir.create("../output/")}
+if(dir.exists("../output/figures")==FALSE){dir.create("../output/figures")}
+if(dir.exists("../output/tables")==FALSE){dir.create("../output/tables")}
+```
+
+Functions for processing the output are stored in a separate script.
+
+```{r output-functions}
+source("WP1_OutputFunctions.R")
+```
+
+###  Load and prepare data for Mplus
+
+```{r load-data}
+sv_data <- read.csv("../data/simulated/WP1_SimpView_sim_raw_n1000_k3.csv")
+# sv_data <- read.csv("../data/processed/WP1_data.csv") %>% 
+#  select(yp_id, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8)
+```
+
+Mplus has an 8-character limit, so rename relevant variables with short names for modelling. 
+
+```{r mplus-names}
+# Check names
+str_sub(names(sv_data), 1, 8)
+
+# Rename any necessary, print new names
+sv_data <- sv_data %>% 
+  rename(naraComp = nara_comp_raw_f9,
+         naraAcc = nara_acc_raw_f9,
+         wordAcc = read_word_raw_f9,
+         nonwAcc = read_nonw_raw_f9,
+         woldComp = wold_comp_raw_f8,
+         f8age = age_m_f8,
+         f9age = age_m_f9) 
+
+names(sv_data)
+```
+
+Variable format problematic for mplus data conversion, change ID to factor.
+
+```{r mplus-formatting}
+sv_data <- sv_data %>% 
+  mutate(yp_id = as.factor(yp_id))
+```
+
+# Inspect for normality
+
+```{r}
+# Read in models
+ml_mods <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "ml_")
+mlr_mods <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "mlr_")
+
+# Extract relevant fit indices
+ml_fit <- lpa_enum_table(ml_mods) %>% 
+  select(1:7)
+mlr_fit <- lpa_enum_table(mlr_mods) %>% 
+  select(1:7)
+
+
+ml_fit %>% 
+  full_join(mlr_fit, by = c("Title", "Classes"), suffix = c("_ml", "_mlr")) %>% 
+  arrange(Title) %>% 
+  select(Title, Classes, LL_ml, LL_mlr, AIC_ml, AIC_mlr, BIC_ml, BIC_mlr, aBIC_ml, aBIC_mlr) %>% 
+  kbl() %>% 
+  kable_classic(html_font = "Cambria") %>%
+  add_header_above(c("Spec" = 2, "LL" = 2, "AIC" = 2, "BIC" = 2, "aBIC" = 2)) %>% 
+  column_spec(c(1, 2), bold = TRUE) %>% 
+  column_spec(c(3,4,7,8), background = "lightgrey")
+
+
+ml_mods[[1]][["parameters"]][["unstandardized"]][["se"]] 
+
+# Select version of models to proceed with 
+estimator <- "mlr"   
+```
+
+# Latent Profile Model to extract latent classes
+
+### Benchmark
+
+Follow class-enumeration process set out by Masyn (2013). Use a one-class LPA (incorporating sample means and covariances) as an absolute fit benchmark.
+
+```{r lpa-benchmark}
+# Extract parameters for the benchmark model
+m_lpa_benchmark <- readModels(target = "./mplus_models/simpview/lpa", filefilter = sprintf("%s_mbenchmark", estimator)) %>% 
+  mixtureSummaryTable(keepCols = c("Parameters", "Observations", "LL", "BIC")) %>% 
+  mutate(CAIC = -2*LL + Parameters*(log(Observations) + 1),
+           AWE = -2*LL + Parameters*(log(Observations) + 1.5)) %>% 
+  select(LL, BIC, CAIC, AWE) %>%
+  pivot_longer(LL:AWE, names_to = "statistic", values_to = "benchmark") %>% 
+  mutate(statistic_relevel = factor(statistic, levels = c("LL", "BIC", "CAIC", "AWE")))
+```
+
+### Model A: Class-invariant, diagonal
+
+Indicator variances differ from each other within a class, but are constrained to be equal across classes. No covariances are estimated. 
+
+Steps 4-5) Extract fit indices, and use to select smaller subset of candidate models.
+
+```{r lpa-a-output}
+# Read in output
+lpa_a_out <- readModels(target = "./mplus_models/simpview/lpa", filefilter = sprintf("sv_lpa_%s_a", estimator))
+
+# Print table 
+lpa_a_summary <- lpa_enum_table(output = lpa_a_out)
+lpa_a_summary
+
+# Elbow plots for information criteria
+lpa_enum_elbow(lpa_a_summary, benchmark_stats = m_lpa_benchmark)
+```
+
+Best model for:
+**a) Absolute fit (fewest classes with better LL than benchmark):** 
+**b) Information heuristics (diminishing gains from elbow plots):**  
+**c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 
+**d) Approximate BF (fewest classes with moderate-strong evidence compared to next model)**: 
+**e) Approximate correct model probability:** 
+
+Step 6) View classification diagnostics for candidate models. Can also inspect how the classes correspond across models. 
+
+```{r lpa-a-candidates}
+######## TESTING
+trial <- readModels(target = "./mplus_models/simpview/lpa", filefilter = sprintf("sv_lpa_%s_a", estimator), what = "input")
+
+test <- mplusObject(trial[[1]][[1]])
+
+# Extract participant level data
+lpa_a_rerun <- mm_extract_data(orig_mods = m_lpa_a, candidate_mods = 3:4, 
+                               filepath = "./mplus_models/simpview/lpa",
+                               rerun = TRUE, one_fit = TRUE)
+
+# Compute classification diagnostics
+class_diag(lpa_a_rerun)
+
+# Plot class means
+plotMixtures_simpView(lpa_a_rerun)
+
+# Inspect transitions 
+extract_classes(lpa_a_rerun, type = "lpa")
+```
+Comments:
+**Classification diagnostics:**
+**Interpretability:** 
+
+Step 7) Select final model in class enumeration process, for model specification A. 
+```{r lpa-a-selected}
+lpa_a_final_nclass <- 3  
+lpa_a_final_m <- lpa_a_rerun[1]  
+```
+
+### LPA Model B: Class-invariant, unrestricted
+
+Indicator variances differ from each other within a class and can covary, but variances and covariances constrained to be equal across classes.
+
+Steps 1-3) Fit series of increasing *k*-class models.
+
+```{r lpa-b}
+m_lpa_b <- lapply(1:6, function(k) {
+   body <- update(m_lpa_base,
+     TITLE = as.formula(sprintf("~ 'LPA Model B: %d classes;'", k)),
+     VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
+     
+     # Update model spec 1: overall model estimates (variances and covariances)
+     MODEL = as.formula(sprintf("~ . + '\n %s \n %s'", lpa_vars, lpa_covars)))
+   
+   # Run model
+   mplusModeler(body, sprintf("mplus_models/simpview/lpa/sv_lpa_b_%dclass.dat", k), run = TRUE)
+ })
+```
+
+Steps 4-5) Extract fit indices, and use to select smaller subset of candidate models.
+
+```{r lpa-b-output}
+# Read in output
+lpa_b_out <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "sv_lpa_b")
+
+# Check warnings
+# for (model in 1:length(lpa_b_out)){
+#   print(lpa_b_out[[model]]$input$title)
+#   print(lpa_b_out[[model]]$warnings)
+# }
+
+# Print table 
+lpa_b_summary <- lpa_enum_table(output = lpa_b_out)
+lpa_b_summary
+
+# Elbow plots for information criteria
+lpa_enum_elbow(lpa_b_summary, benchmark_stats = m_lpa_benchmark)
+```
+
+Best model for:
+**a) Absolute fit (fewest classes with better LL than benchmark):** 
+**b) Information heuristics (diminishing gains from elbow plots):**  
+**c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 
+**d) Approximate BF (fewest classes with moderate-strong evidence compared to next model)**: 
+**e) Approximate correct model probability:**
+
+Step 6) View classification diagnostics for candidate models.
+
+```{r lpa-b-candidates}
+# Extract participant level data
+lpa_b_rerun <- mm_extract_data(orig_mods = m_lpa_b, candidate_mods = 2:4, 
+                               filepath = "./mplus_models/simpview/lpa",
+                               rerun = TRUE, one_fit = TRUE)
+
+# Compute classification diagnostics
+class_diag(lpa_b_rerun)
+
+# Plot class means
+plotMixtures_simpView(lpa_b_rerun)
+
+# Inspect transitions 
+extract_classes(lpa_b_rerun, type = "lpa")
+```
+Comments:
+**Classification diagnostics:**
+**Interpretability:** 
+
+Step 7) Select final model in class enumeration process, for model specification B. 
+
+```{r lpa-b-selected}
+lpa_b_final_nclass <- 2
+lpa_b_final_m <- lpa_b_rerun[1]
+```
+
+### LPA Model C: Class-varying, diagonal 
+
+Indicator variances are estimated separately for each class. No covariances are estimated.
+
+Steps 1-3) Fit series of increasing *k*-class models.
+
+```{r lpa-c}
+m_lpa_c <- lapply(1:6, function(k) {
+  
+  # Update model spec 1: overall model estimates (variances only)
+  body <- update(m_lpa_base,
+              MODEL = as.formula(sprintf("~ . + '%s'", lpa_vars)))
+  
+  # Create class-level specifications (to include variances only)
+  class_spec <- paste0("%c#1% \n ", lpa_vars)
+  if (k > 1){
+    for (i in 2:k){
+      class_spec <- paste0(class_spec, "\n %c#", i, "% \n ", lpa_vars)
+    }
+  }
+  
+  # ...Update model spec 2: class estimates
+  body <- update(body,
+     TITLE = as.formula(sprintf("~ 'LPA Model C: %d classes;'", k)),
+     VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
+     MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
+   
+  # Run model
+  mplusModeler(body, sprintf("mplus_models/simpview/lpa/sv_lpa_c_%dclass.dat", k), run = TRUE)
+ })
+
+```
+
+Steps 4-5) Extract fit indices, and use to select smaller subset of candidate models.
+
+```{r lpa-c-output}
+# Read in output
+lpa_c_out <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "sv_lpa_c")
+
+# Check warnings
+# for (model in 1:length(lpa_c_out)){
+#   print(lpa_c_out[[model]]$input$title)
+#   print(lpa_c_out[[model]]$warnings)
+# }
+
+# Print table 
+lpa_c_summary <- lpa_enum_table(output = lpa_c_out)
+lpa_c_summary
+
+# Elbow plots for information criteria
+lpa_enum_elbow(lpa_c_summary, benchmark_stats = m_lpa_benchmark)
+```
+
+Best model for:
+**a) Absolute fit (fewest classes with better LL than benchmark):** 
+**b) Information heuristics (diminishing gains from elbow plots):**  
+**c) Adjusted LRTs (fewest classes not sig improved by additional classes):**
+**d) Approximate BF (fewest classes with moderate-strong evidence compared to next model)**: 
+**e) Approximate correct model probability:**
+
+
+Step 6) View classification diagnostics for candidate models.
+
+```{r lpa-c-candidates}
+# Extract participant level data
+lpa_c_rerun <- mm_extract_data(orig_mods = m_lpa_c, candidate_mods = 3:5, 
+                               filepath = "./mplus_models/simpview/lpa",
+                               rerun = TRUE, one_fit = TRUE)
+
+# Compute classification diagnostics
+class_diag(lpa_c_rerun)
+
+# Plot class means
+plotMixtures_simpView(lpa_c_rerun)
+
+# Inspect transitions 
+extract_classes(lpa_c_rerun, type = "lpa")
+```
+Comments:
+**Classification diagnostics:**
+**Interpretability:** 
+
+Step 7) Select final model in class enumeration process, for model specification C.
+
+```{r lpa-c-selected}
+lpa_c_final_nclass <- 4
+lpa_c_final_m <- lpa_c_rerun[2]
+```
+
+### LPA Model D 
+
+Indicator variances are estimated separately for each class, but covariances are constrained to be equal across classes.
+
+Steps 1-3) Fit series of increasing *k*-class models.
+
+```{r lpa-d}
+m_lpa_d <- lapply(1:6, function(k) {
+  
+  # Update model spec 1: overall model estimates (variances and covariances)
+  body <- update(m_lpa_base,
+              MODEL = as.formula(sprintf("~ . + '%s \n %s '", lpa_vars, lpa_covars)))   
+  
+  # Create class-level specifications (variances only)
+  class_spec <- paste0("%c#1% \n ", lpa_vars)
+  if (k > 1){
+    for (i in 2:k){
+      class_spec <- paste0(class_spec, "\n %c#", i, "% \n ", lpa_vars)
+    }
+  }
+  
+  # ...Update model spec 2: class estimates
+  body <- update(body,
+     TITLE = as.formula(sprintf("~ 'LPA Model D: %d classes;'", k)),
+     VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
+     MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
+  
+  # Run model
+  mplusModeler(body, sprintf("mplus_models/simpview/lpa/sv_lpa_d_%dclass.dat", k), run = TRUE)
+ })
+```
+
+Steps 4-5) Extract fit indices, and use to select smaller subset of candidate models.
+
+```{r lpa-d-output}
+# Read in output
+lpa_d_out <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "sv_lpa_d")
+
+# Check warnings
+# for (model in 1:length(lpa_d_out)){
+#   print(lpa_d_out[[model]]$input$title)
+#   print(lpa_d_out[[model]]$warnings)
+# }
+
+# Print table 
+lpa_d_summary <- lpa_enum_table(output = lpa_d_out)
+lpa_d_summary
+
+# Elbow plots for information criteria
+lpa_enum_elbow(lpa_d_summary, benchmark_stats = m_lpa_benchmark)
+```
+
+Best model for:
+**a) Absolute fit (fewest classes with better LL than benchmark):** 
+**b) Information heuristics (diminishing gains from elbow plots):** 
+**c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 
+**d) Approximate BF (fewest classes with moderate-strong evidence compared to next model)**: 
+**e) Approximate correct model probability:** 
+
+
+Step 6) View classification diagnostics for candidate models.
+
+```{r lpa-d-candidates}
+# Extract participant level data
+lpa_d_rerun <- mm_extract_data(orig_mods = m_lpa_d, candidate_mods = 2:3, 
+                               filepath = "./mplus_models/simpview/lpa",
+                               rerun = TRUE, one_fit = TRUE)
+
+# Compute classification diagnostics
+class_diag(lpa_d_rerun)
+
+# Plot class means
+plotMixtures_simpView(lpa_d_rerun)
+
+# Inspect transitions 
+extract_classes(lpa_d_rerun, type = "lpa")
+```
+Comments:
+**Classification diagnostics:**
+**Interpretability:** 
+
+Step 7) Select final model in class enumeration process, for model specification D.
+
+```{r lpa-d-selected}
+lpa_d_final_nclass <-  2
+lpa_d_final_m <- lpa_d_rerun[1]
+```
+
+### LPA Model E: Class-varying, unrestricted
+
+All variances and covariances can vary between clusters. 
+
+Steps 1-3) Fit series of increasing *k*-class models.
+
+```{r lpa-e}
+m_lpa_e <- lapply(1:6, function(k) {
+  
+  # Update model spec 1: overall model estimates (variances and covariances)
+  body <- update(m_lpa_base,
+              MODEL = as.formula(sprintf("~ . + '%s \n %s '", lpa_vars, lpa_covars)))   
+  
+  # Create class-level specifications (variances and covariances)
+  class_spec <- paste0("%c#1% \n ", lpa_vars,  lpa_covars)
+  if (k > 1){
+    for (i in 2:k){
+      class_spec <- paste0(class_spec, "\n %c#", i, "% \n ", lpa_vars, lpa_covars)
+    }
+  }
+  
+  # ...Update model spec 2: class estimates
+  body <- update(body,
+     TITLE = as.formula(sprintf("~ 'LPA Model E: %d classes;'", k)),
+     VARIABLE = as.formula(sprintf("~ 'classes = c(%d);'", k)),
+     MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
+
+  # Run model
+  mplusModeler(body, sprintf("mplus_models/simpview/lpa/sv_lpa_e_%dclass.dat", k), run = TRUE)
+ })
+```
+
+Steps 4-5) Extract fit indices, and use to select smaller subset of candidate models.
+
+```{r lpa-e-output}
+# Read in output
+lpa_e_out <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "sv_lpa_e")
+
+# Check warnings
+# for (model in 1:length(lpa_e_out)){
+#   print(lpa_e_out[[model]]$input$title)
+#   print(lpa_e_out[[model]]$warnings)
+# }
+
+# Print table 
+lpa_e_summary <- lpa_enum_table(output = lpa_e_out)
+lpa_e_summary
+
+# Elbow plots for information criteria
+lpa_enum_elbow(lpa_e_summary, benchmark_stats = m_lpa_benchmark)
+```
+
+Best model for:
+**a) Absolute fit (fewest classes with better LL than benchmark):** 
+**b) Information heuristics (diminishing gains from elbow plots):** 
+**c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 
+**d) Approximate BF (fewest classes with moderate-strong evidence compared to next model)**: 
+**e) Approximate correct model probability:** 
+
+Step 6) View classification diagnostics for candidate models.
+
+```{r lpa-e-candidates}
+# Extract participant level data
+lpa_e_rerun <- mm_extract_data(orig_mods = m_lpa_e, candidate_mods = 2:3, 
+                               filepath = "./mplus_models/simpview/lpa",
+                               rerun = TRUE, one_fit = TRUE)
+
+# Compute classification diagnostics
+class_diag(lpa_e_rerun)
+
+# Plot class means
+plotMixtures_simpView(lpa_e_rerun)
+
+# Inspect transitions 
+extract_classes(lpa_e_rerun, type = "lpa")
+```
+
+Comments:
+**Classification diagnostics:**
+**Interpretability:** 
+
+Step 7) Select final model in class enumeration process, for model specification E.
+
+```{r lpa-e-selected}
+lpa_e_final_nclass <-  3
+lpa_e_final_m <- lpa_e_rerun[2]
+```
+
+### All LPA models: Summary output & final selection
+
+Use the 5 best candidate models identified above to recalculate the approximate correct model probability.
+
+```{r final-candidates}
+# Select best models
+best_fits <- c(lpa_a_final_m, lpa_b_final_m, lpa_c_final_m, lpa_d_final_m, lpa_e_final_m)
+
+# Compute cMP for each
+best_summaries <- lpa_enum_table(best_fits) %>% 
+  select(-c(VLMR_p, LMR_p, bLRT_p, BF)) %>% 
+  rename(cmP_best = cmP_k) %>% 
+  arrange(Specification)
+print(best_summaries)
+
+best_cmP <- best_summaries %>% 
+  select(Specification, Classes, cmP_best)
+  
+# Compute classification diagnostics
+class_diag(best_fits)
+
+# Plot class means
+plotMixtures_simpView(best_fits)
+```
+
+```{r lpa-all-table}
+# Combine all summary tables
+lpa_all_summaries <- rbind(lpa_a_summary, lpa_b_summary, lpa_c_summary, 
+                           lpa_d_summary, lpa_e_summary) 
+
+# Extract number of classes modelled in class enumeration process
+k_classes_modelled <- max(lpa_all_summaries$Classes)
+
+# Specify table row for selected models for each spec
+a_row <- lpa_a_final_nclass
+b_row <- (1*k_classes_modelled) + lpa_b_final_nclass
+c_row <- (2*k_classes_modelled) + lpa_c_final_nclass
+d_row <- (3*k_classes_modelled) + lpa_d_final_nclass
+e_row <- (4*k_classes_modelled) + lpa_e_final_nclass
+
+# Format table, highlight class model of best fit in each specification
+lpa_all_summaries %>% 
+  left_join(best_cmP, by = c("Specification", "Classes")) %>% 
+  mutate(Specification = " ") %>%  
+  mutate(across(where(is.numeric), round, 2)) %>% 
+  mutate(VLMR_p = ifelse(VLMR_p == 0, "<0.01", VLMR_p),
+         LMR_p = ifelse(LMR_p == 0, "<0.01", LMR_p),
+         bLRT_p = ifelse(bLRT_p == 0, "<0.01", bLRT_p),
+         BF = ifelse(BF == 0.00, "<0.01",
+                     ifelse(BF > 100, ">100", BF)),
+         cmP_k = ifelse(cmP_k == 0, "<0.01",
+                      ifelse(cmP_k == 1, ">0.99", cmP_k))) %>%
+  replace(is.na(.), "-") %>% 
+  kbl(align = c("l", "c", "r", "c", "r", "r","r","r","r","r","r","r")) %>% 
+  kable_classic(html_font = "Cambria") %>% 
+  pack_rows(index = c("Model A" = k_classes_modelled, "Model B" = k_classes_modelled, "Model C" = k_classes_modelled, "Model D" = k_classes_modelled, "Model E" = k_classes_modelled)) %>%
+  row_spec(1, align = "c") %>% 
+  row_spec(7, background = "#F0F0F0") %>% 
+  row_spec(c(a_row, b_row, c_row, d_row, e_row), bold = T)  # edit for row numbers of selected models within each model spec 
+
+# Save table as pdf for later viewing
+# save_kable(table_all, file = "../output/tables/SimpView_lpa_all_modelfit.pdf")
+```
+
+```{r lpa-all-elbow}
+# Grouped elbow plots
+lpa_all_summaries %>%
+    mutate(model_spec = substr(Specification, 11, 12)) %>% 
+    select(model_spec, Classes, LL, BIC, CAIC, AWE) %>%
+    pivot_longer(LL:AWE, names_to = "statistic", values_to = "value") %>%
+    mutate(statistic_relevel = factor(statistic, levels = c("LL", "BIC", "CAIC", "AWE"))) %>% 
+    ggplot(aes(x = as.factor(Classes), y = value)) +
+    geom_point(aes(shape = model_spec)) +
+    geom_line(aes(group = model_spec, linetype = model_spec)) +
+    xlab("n classes") +
+    theme_bw() +
+    theme(panel.grid.major.x = element_blank(),
+          panel.grid.minor.y = element_blank()) +
+    geom_hline(data = m_lpa_benchmark, aes(yintercept = benchmark), linetype = "dashed", colour = "red") +
+    facet_wrap(statistic_relevel ~., scales = "free") + 
+    labs(shape = "Model spec:", linetype = "Model spec:")
+
+# save out for easier viewing
+ggsave("../output/figures/SimpView_lpa_all_indices.tiff", dpi = 600, width = 7, height = 4, units = "in")
+```
+
+# Final selected model
