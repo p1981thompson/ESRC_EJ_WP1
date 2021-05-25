@@ -4,15 +4,21 @@ output:
   html_document:
     toc: true
     toc_float: true
-date: '06/05/2021'
+date: '24/05/2021'
+
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_dir = "../output/analysis/") })
 ---
 
-```{r libraries}
-# Note - no up-to-date version of packages with MCAR tests, install prev versions
+This script incorporates the selection of relevant variables and cases for the research questions included in Work Package 1: *Identifying heterogeneity in reading comprehension difficulties using data collected from ALSPAC*. It also includes preliminary exploration and documentation of patterns of missingness in the key variables of interest, and splits the sample in two for calibration and validation purposes.
+
+```{r libraries, message = FALSE, warning = FALSE}
+# Note - no up-to-date version of packages with MCAR tests, install prev versions - use with caution
 #devtools::install_version("MissMech", version="1.0.2", repos=getOption("repos")["CRAN"])
 #devtools::install_version("BaylorEdPsych", version="0.5", repos=getOption("repos")["CRAN"])
 #devtools::install_version("mvnmle", version="0.1-11.1", repos=getOption("repos")["CRAN"])
 
+library(data.table)
 library(tidyverse)
 library(readxl)
 library(naniar)
@@ -22,11 +28,19 @@ library(BaylorEdPsych)
 library(broom)
 library(psych)
 library(WriteXLS)
+library(knitr)
 
 options(scipen = 999)
 ```
 
-This script incorporates the selection of relevant variables and cases for the research questions included in Work Package 1: *Identifying heterogeneity in reading comprehension difficulties using data collected from ALSPAC*. It also includes preliminary exploration and documentation of patterns of missingness in the key variables of interest, and splits the sample in two for calibration and validation purposes.
+```{r create-dir}
+# Create subdirectories for storing data files and output, if do not already exist
+if(dir.exists("./output/")==FALSE){dir.create("./output/")}
+if(dir.exists("./output/figures/")==FALSE){dir.create("./output/figures/")}
+if(dir.exists("./output/analysis/")==FALSE){dir.create("./output/analysis/")}
+if(dir.exists("./data/processed/")==FALSE){dir.create("./data/processed/")}
+```
+
 
 # Access statement
 
@@ -34,28 +48,98 @@ Under ALSPAC's Data Access arrangements, we will receive all data associated wit
 
 We will pre-register each set of hypotheses and analyses prior to working with the data for each sub-project, and make clear in the pre-registration where analyses include variables that we have already interacted with. We will extract the relevant data for each sub-project only after it has been pre-registered, and work only with the relevant data for that sub-project.
 
+The pre-registration for this sub-project can be found at [https://osf.io/4zahf](https://osf.io/4zahf).
+
 # Extracting data
 
 ### Rename variables 
 
-Read in and rename variables (might need some tweaking depending on format data arrives in).
-Will need to edit variable name for ALSPAC ID in codebook.
+Read in and rename variables
 
 ```{r rename-data}
 # Read in data
 #data_orig <- read.csv("../data/simulated/dummy_alspac.csv")  # for script testing
-#data_orig <- read.csv("../data/raw/XXXXXX.csv")              # ALSPAC data
+data_orig <- fread("../data/raw/B3153/Nation_19May21.csv") # ALSPAC data
 
 # Read in codebook for renaming
 codebook <- read_excel("../data/codebook.xlsx", sheet = "codebook") %>% 
+  filter(workbook != "education" | is.na(workbook)) %>%   # education data coming from separate database
   select(`Var name`, R_var_name)
+
+# # List variables not in existing codebook
+# setdiff(codebook$`Var name`, names(data_orig))
+# setdiff(names(data_orig), codebook$`Var name`)
+# 
+# # Extract variable info for updating codebook
+# alspac_codebook <- read_excel("../data/raw/B3153/Variable information.xlsx", skip = 1) %>% 
+#   filter(!Variable %in% codebook$`Var name`)
+# write.csv(alspac_codebook, "../data/raw/codebook_update.csv")
 
 # Rename
 data_named <- data_orig 
 names(data_named) <- codebook$R_var_name[match(names(data_named), codebook$`Var name`)]
+
+# Create unique identifier per participant
+data_named <- data_named %>% 
+  mutate(yp_id = paste0(cidB3153, qlet))
 ```
 
-### WP1 Dataset 
+### Participant numbers
+
+```{r dataset-nos}
+# Number of participants - minus triplets/quadruplets (n = 13 individuals)
+nrow(data_named)
+
+# Number of pregnancies
+length(unique(data_named$cidB3153))
+
+# Participants alive at 1 year (ALSPAC baseline group)
+data_named %>% 
+  mutate(alive_1yr = ifelse(kz011b == -9999, "withdrawn",
+                            ifelse(kz011b == 2, 0, kz011b))) %>% 
+  group_by(alive_1yr) %>% 
+  count()
+
+# Participants in core sample
+data_named %>% 
+  mutate(in_core = ifelse(in_core == -9999, "withdrawn",
+                            ifelse(in_core == 2, 0,
+                                   ifelse(in_core == -1, "birth outcome not known", in_core)))) %>% 
+  group_by(in_core) %>% 
+  count()
+
+# Core sample alive at 1 year (ALSPAC baseline group)
+data_named %>% 
+  filter(in_core == 1) %>% 
+  mutate(alive_1yr = ifelse(kz011b == -9999, "withdrawn",
+                            ifelse(kz011b == 2, 0, kz011b))) %>% 
+  group_by(alive_1yr) %>% 
+  count()
+
+# Participants enrolled as part of phase 2, during focus@7
+data_named %>% 
+  mutate(in_phase2 = ifelse(in_phase2 == -9999, "withdrawn",
+                            ifelse(in_phase2 == 2, 0,
+                                   ifelse(in_phase2 == -1, "birth outcome not known", in_phase2)))) %>% 
+  group_by(in_phase2) %>% 
+  count()
+
+# Participants enrolled as part of phase 3, between focus@7 and age 18
+data_named %>% 
+  mutate(in_phase3 = ifelse(in_phase3 == -9999, "withdrawn",
+                            ifelse(in_phase3 == 2, 0,
+                                   ifelse(in_phase3 == -1, "birth outcome not known", in_phase3)))) %>% 
+  group_by(in_phase3) %>% 
+  count()
+
+# Participants enrolled as part of phase 4, between ages 18 and 24
+data_named %>% 
+  mutate(in_phase4 = ifelse(in_phase4 == 2, 0, in_phase4)) %>% 
+  group_by(in_phase4) %>% 
+  count()
+```
+
+### WP1 Variables 
 
 Specify variables to be used in these analyses.
 
@@ -74,7 +158,8 @@ RQ2 <- c("age_m_f10",                                                # age
          "teach_slct_raw_f8", "teach_divd_raw_f8", "teach_ctrs_raw_f8", "teach_ctro_raw_f8", "sdq_hyp_prnt_ku") #attention  
 
 # Variables for descriptives, exploratory analyses (subject to change)
-other <- c("sex",
+other <- c("yp_id", "cidB3153", "qlet",
+           "sex",
            "nara_acc_std_f9", "nara_comp_std_f9", "nara_rate_std_f9", "nara_npass_f9",
            "wisc_vcb_std_f8",
            "wisc_pcmp_std_f8", "wisc_code_std_f8", "wisc_parr_std_f8", "wisc_bloc_std_f8", "wisc_obja_std_f8", "wisc_perf_std_f8") 
@@ -83,10 +168,10 @@ other <- c("sex",
 missingness <-  c("ethn_c", "wght_birth", "gest_birth", "m_age_birth", "m_edu_c", "m_home_a", "mtcq_vcb_raw_kg")
 
 # All variables for extraction
-wp1_vars <- c("yp_id", RQ1, RQ2, other, missingness)  
+wp1_vars <- c(RQ1, RQ2, other, missingness)  
 ```
 
-Extract relevant variables (including all observations at this stage) and process missing data.
+Extract relevant variables (including all observations at this stage) and recode missing data values.
 
 ```{r wp1-all-obs}
 # Extract relevant variables from dataset, and processing missing data
@@ -96,14 +181,67 @@ wp1_allobs <- data_named %>%
   select(all_of(wp1_vars)) %>% 
   
   # Relabel missing data 
-  replace_with_na_at(.vars = wp1_vars[!wp1_vars %in% c("teach_divd_raw_f8")],  # TO-DO check missing data for TEACh divided attention var
-                       condition = ~.x < 0)
+  replace_with_na_at(.vars = wp1_vars[!wp1_vars %in% c("teach_divd_raw_f8", "teach_slct_raw_f8")],  # exclude TEACh variables as have true negatives
+                       condition = ~.x < 0) %>% 
+  
+  replace_with_na(replace = list(teach_divd_raw_f8 = c(-9999, -103, -101, -2),
+                                 teach_slct_raw_f8 = c(-9999, -103, -102, -101)))
+
 
 # Inspect summary statistics and check that match up with expectations from data dictionary (i.e., to make sure missing data recoded correctly)
-describe(wp1_allobs)
+describe(wp1_allobs) %>%
+  round(., 2) %>% 
+  kable() 
 ```
 
-Select participants to be included (i.e., those who completed the Neale Analysis of Reading Ability at age 9); create sum scores to be used.
+```{r var-pre-checks, echo = FALSE, eval = FALSE}
+# PRE-CHECKS FOR ITEMS USED TO DERIVE NEW VARIABLES
+
+# WOLD VOCABULARY
+
+### Check missing item level data
+wp1_allobs %>% 
+  filter(wold_vcb_strt_f8 == 1) %>% 
+  select(contains("wold_vcb_i")) %>% 
+  vis_miss()
+
+### Recode incorrect items to 0
+test <- wp1_allobs %>% 
+  filter(wold_vcb_strt_f8 == 1) %>% 
+  select(contains("wold_vcb_i")) %>% 
+  mutate_at(vars(contains("wold_vcb_i")), ~ifelse(. == 2 | . == 9, 0, .))
+
+# TEACH ATTENTIONAL CONTROL
+
+### Check missing item level data
+data_named %>% 
+  filter(in_f08 == 1) %>% 
+  select(contains("teach_ctr")) %>% 
+  vis_miss()
+
+test <- wp1_allobs %>% 
+  mutate(teach_ctr_diff_f8 = teach_ctro_raw_f8 - teach_ctrs_raw_f8) %>% 
+  select(contains("teach_ctr"))
+
+hist(test$teach_ctr_diff_f8, breaks = 100)
+```
+
+### WP1 subsample
+
+Identify twins for exclusion (not pre-registered due to an oversight).
+
+```{r twins}
+exclude <- wp1_allobs %>% 
+  filter(!is.na(nara_comp_raw_f9)) %>% 
+  group_by(cidB3153) %>% 
+  filter(n() > 1) %>% 
+  slice_sample(n = 1)
+
+# Print number of twins for exclusion
+nrow(exclude)
+```
+
+Select participants to be included (i.e., those who completed the Neale Analysis of Reading Ability at age 9, minus one of each twin pair); create sum scores to be used.
 
 ```{r wp1-data}
 wp1_data <- wp1_allobs %>%  
@@ -111,20 +249,26 @@ wp1_data <- wp1_allobs %>%
   # Filter for participants with NARA
   filter(!is.na(nara_comp_raw_f9)) %>% 
   
+  # Filter out twins for exclusion
+  anti_join(exclude, by = c("cidB3153", "qlet")) %>% 
+  
+  # Pre-process WOLD item data (incorrect = 2 >> incorrect = 0)
+  mutate_at(vars(contains("wold_vcb_i")), ~ifelse(. == 2 | . == 9, 0, .)) %>% 
+  
   # Create processed vars 
   mutate(wold_vcb_raw_f8 = ifelse(wold_vcb_strt_f8 == 1,                      # wold vocab sum score
-                                  rowSums(select(., contains("wold_vcb_i"))), # TO-DO check missing item-level data
+                                  rowSums(select(., contains("wold_vcb_i"))), 
                                   NA),
          teach_ctr_diff_f8 = teach_ctro_raw_f8 - teach_ctrs_raw_f8) %>%      # difference score for teach attentional control
 
   # Remove unnecessary variables
   select(-c(wold_vcb_strt_f8:wold_vcb_i10_f8), -c(teach_ctro_raw_f8:teach_ctrs_raw_f8))
  
-# Test whether meets expected  number of participants
-length(unique(wp1_data$yp_id)) == 6943
 
 # Inspect summary statistics
-describe(wp1_data)
+describe(wp1_data) %>%
+  round(., 2) %>% 
+  kable() 
 ```
 
 # Missingness
@@ -135,28 +279,38 @@ Document prevalence and patterns of missingness for variables to be included in 
 
 ```{r missing-descr}
 # Prevalence
-wp1_data %>% 
-  select(-all_of(c(other, missingness))) %>% 
-  vis_miss()
+missing_prev <- wp1_data %>% 
+  select(-all_of(c(other, missingness, "yp_id"))) %>%
+  select(order(colnames(.))) %>% 
+  vis_miss(cluster = TRUE) 
+
+missing_prev + 
+  theme(axis.text.x = element_text(angle = 50),
+  plot.margin = unit(c(1, 3, 1, 1), "cm"))
+
+ggsave("../output/figures/WP1_missingness.png")
 
 # Pattern
-wp1_data %>% 
-  select(-all_of(c(other, missingness))) %>% 
-  missing_pattern()
+# missing_pattern <- wp1_data %>% 
+#   select(-all_of(c(RQ1, other, missingness, "yp_id", "age_m_f10"))) %>% 
+#   missing_pattern()
+#gsave("../output/figures/WP1_missingness_patterns.png", plot = missing_pattern)
 ```
 
 ### Structure
 
 Use two types of test to examine whether data is likely MCAR. Little's (1988) MCAR test examines whether variable means differ between missing data patterns. Jamshidian & Jalal's (2010) test examines whether the variances and covariances differ betwen missing data patterns. 
 
-```{r missing-tests}
-# Little's MCAR test 
-missingness_little <- wp1_data %>% 
-  select(-all_of(c(other))) %>% 
-  select(where(is.numeric)) %>% 
-  LittleMCAR()
+*TO FIX*
 
-print(cat("\nLITTLE'S TEST \nchi.square:", missingness_little$chi.square, "\ndf:", missingness_little$df, "\np = ", missingness_little$p.value))
+```{r missing-tests}
+# Little's MCAR test - DOES NOT RUN 
+# missingness_little <- wp1_data %>% 
+#   select(-all_of(c(other, "yp_id"))) %>% 
+#   select(where(is.numeric)) %>% 
+#   LittleMCAR()
+# 
+# print(cat("\nLITTLE'S TEST \nchi.square:", missingness_little$chi.square, "\ndf:", missingness_little$df, "\np = ", missingness_little$p.value))
 
 # Jamshidian & Jalal (2010) MCAR test
 wp1_data %>% 
@@ -168,6 +322,8 @@ wp1_data %>%
 ### Predictors of missingness 
 
 Given the assessments are all taken from assessments close in time, we do not anticipate structured missingness in these data. 
+
+*TO FIX*
 
 ```{r missing-predict}
 # Create updated list of pre-registered variables (incorporating new vars created above)
@@ -185,7 +341,7 @@ for (var in prereg_vars){
   data <- wp1_data %>% 
     select(-all_of(c(other))) %>% 
     mutate(is_missing = ifelse(is.na(get(var)) == TRUE, 1, 0)) %>% 
-    select(-c(yp_id, var))
+    select(-c(var))
   
   # If no missing data, print statement
   if (sum(data$is_missing) == 0) {
@@ -224,11 +380,13 @@ print(miss_pred)
 Create subsamples to be used for RQ1 initial class enumeration process and subsequent validation. 
 
 ```{r split-half}
+# Set seed for reproducibility
+set.seed(25052021)
+
 # Create numeric ID variable for working with mplus, remove unnecessary variables and tidy order
 wp1_tidy <- wp1_data %>% 
-  mutate(yp_no = as.numeric(as.factor(yp_id))) %>% 
   select(-all_of(missingness)) %>% 
-  relocate(yp_no, .after = yp_id) %>% 
+  relocate(c(yp_id, cidB3153, qlet, sex), .before = 1) %>% 
   relocate(age_m_f10, .after = age_m_f9) %>% 
   relocate(teach_ctr_diff_f8, .after = teach_divd_raw_f8) %>% 
   relocate(wold_vcb_raw_f8, .after = wisc_vcb_raw_f8)
@@ -247,9 +405,9 @@ sampleB$yp_id[(sampleB$yp_id %in% sampleA$yp_id)]
 (nrow(sampleA) + nrow(sampleB)) == nrow(wp1_tidy)
 
 # Save
-# write.csv(sampleA, "../data/processed/WP1_data_subA.csv")
-# write.csv(sampleB, "../data/processed/WP1_data_subB.csv")
-# write.csv(WP1_tidy, "../data/processed/WP1_data_all.csv")
+write.csv(sampleA, "../data/processed/WP1_data_subA.csv", row.names = FALSE)
+write.csv(sampleB, "../data/processed/WP1_data_subB.csv", row.names = FALSE)
+write.csv(wp1_tidy, "../data/processed/WP1_data_all.csv", row.names = FALSE)
 ```
 
 Save record of additional variables created to the codebook. A record of generated variables will need to be returned to ALSPAC upon completion of the project.
