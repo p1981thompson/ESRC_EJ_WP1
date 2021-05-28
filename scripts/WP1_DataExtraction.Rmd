@@ -29,6 +29,8 @@ library(broom)
 library(psych)
 library(WriteXLS)
 library(knitr)
+library(DiagrammeR)
+library(cowplot)
 
 options(scipen = 999)
 ```
@@ -37,6 +39,7 @@ options(scipen = 999)
 # Create subdirectories for storing data files and output, if do not already exist
 if(dir.exists("./output/")==FALSE){dir.create("./output/")}
 if(dir.exists("./output/figures/")==FALSE){dir.create("./output/figures/")}
+if(dir.exists("./output/figures/missingness/")==FALSE){dir.create("./output/figures/missingness/")}
 if(dir.exists("./output/analysis/")==FALSE){dir.create("./output/analysis/")}
 if(dir.exists("./data/processed/")==FALSE){dir.create("./data/processed/")}
 ```
@@ -137,7 +140,42 @@ data_named %>%
   mutate(in_phase4 = ifelse(in_phase4 == 2, 0, in_phase4)) %>% 
   group_by(in_phase4) %>% 
   count()
+
+# Participants attended F09 - this does match the sample size reported in data dictionary
+data_named %>% 
+  mutate(in_core = ifelse(in_core == -9999, "withdrawn",
+                          ifelse(in_core == 2, 0,
+                                 ifelse(in_core == -1, "birth outcome not known", in_core)))) %>% 
+  group_by(in_f09, in_core) %>% 
+  count()
+
+attended_f09 <- data_named %>% 
+  filter(in_f09 == 1) %>% 
+  count()
+
+# NARA data
+nara_avail <- data_named %>% 
+  filter(nara_comp_std_f9 > 0) %>% 
+  count()
+
+nara_withd <- data_named %>% 
+  filter(nara_comp_std_f9 == -9999) %>% 
+  count()
+
+nara_sess <- data_named %>% 
+  filter(nara_comp_std_f9 == -9) %>% 
+  count()
+
+nara_oakh <- data_named %>% 
+  filter(nara_comp_std_f9 == -8) %>% 
+  count()
+
+nara_no <- data_named %>% 
+  filter(nara_comp_std_f9 == -1) %>% 
+  count()
 ```
+
+
 
 ### WP1 Variables 
 
@@ -232,10 +270,10 @@ Identify twins for exclusion (not pre-registered due to an oversight).
 
 ```{r twins}
 exclude <- wp1_allobs %>% 
-  filter(!is.na(nara_comp_raw_f9)) %>% 
-  group_by(cidB3153) %>% 
-  filter(n() > 1) %>% 
-  slice_sample(n = 1)
+  filter(!is.na(nara_comp_raw_f9)) %>%   # for participants who completed the NARA assessment
+  group_by(cidB3153) %>%   # group by pregnancy ID
+  filter(n() > 1) %>%      # select instances where more than one child per pregnancy
+  slice_sample(n = 1)      # select one per pair at random
 
 # Print number of twins for exclusion
 nrow(exclude)
@@ -262,13 +300,68 @@ wp1_data <- wp1_allobs %>%
          teach_ctr_diff_f8 = teach_ctro_raw_f8 - teach_ctrs_raw_f8) %>%      # difference score for teach attentional control
 
   # Remove unnecessary variables
-  select(-c(wold_vcb_strt_f8:wold_vcb_i10_f8), -c(teach_ctro_raw_f8:teach_ctrs_raw_f8))
- 
+  select(-c(wold_vcb_strt_f8:wold_vcb_i10_f8), -c(teach_ctro_raw_f8:teach_ctrs_raw_f8)) %>% 
+
+# Reformat variables
+  mutate_at(vars(c("sex", "ethn_c", "m_edu_c", "m_home_a")), as.factor)
 
 # Inspect summary statistics
 describe(wp1_data) %>%
   round(., 2) %>% 
   kable() 
+```
+
+### Flowchart
+
+**TO-DO: Reformat**
+
+```{r flowchart}
+grViz("digraph graph2 {
+      
+      graph [layout = dot]
+      
+      node [shape = rectangle, width = 4, fillcolor = White]
+      a [label = '@@1']
+      b [label = '@@2']
+      c [label = '@@3']
+      d [label = '@@4']
+      e [label = '@@5']
+      f [label = '@@6']
+      g [label = '@@7']
+      h [label = '@@8']
+      i [label = '@@9']
+      j [label = '@@10']
+      k [label = '@@11']
+      l [label = '@@12']
+      m [label = '@@13']
+      n [label = '@@14']
+      
+      a -> b -> c -> d -> f -> h -> m
+      e -> d
+      d -> g
+      f -> h
+      f -> i
+      f -> j 
+      f -> k
+      f -> l
+      h -> n
+}
+[1]: paste0('Enrolled pregnancies (n = 14,541; 14,676 foetuses)')
+[2]: paste0('Children alive at 1 year (n = 13,988)')
+[3]: paste0('Invited to F09 clinic (n =', 7725 + 6641 - 408, ')')
+[4]: paste0('Attended F09 clinic (n = 7725)')
+[5]: paste0('New cases (n = 408)')
+[6]: paste0('Data available from F09 clinic (n = ', attended_f09, ')')
+[7]: paste0('Triplet/quadruplet cases removed for confidentiality (n = 3)')
+[8]: paste0('Data available from NARA assessment (n = ', nara_avail, ')')      
+[9]: paste0('Did not complete story test session (n = ', nara_sess, ')')  
+[10]: paste0('Completed different comprehension assessment (n = ', nara_oakh, ')')  
+[11]: paste0('Did not read any test stories (n = ', nara_no, ')')  
+[12]: paste0('Data withdrawn (n = ', nara_withd, ')')  
+[13]: paste0('Included in present sample (n = ', nrow(wp1_data), ')') 
+[14]: paste0('Twin excluded at random (n = ', nrow(exclude), ')') 
+")
+
 ```
 
 # Missingness
@@ -301,75 +394,195 @@ ggsave("../output/figures/WP1_missingness.png")
 
 Use two types of test to examine whether data is likely MCAR. Little's (1988) MCAR test examines whether variable means differ between missing data patterns. Jamshidian & Jalal's (2010) test examines whether the variances and covariances differ betwen missing data patterns. 
 
-*TO FIX*
-
 ```{r missing-tests}
-# Little's MCAR test - DOES NOT RUN 
-# missingness_little <- wp1_data %>% 
-#   select(-all_of(c(other, "yp_id"))) %>% 
-#   select(where(is.numeric)) %>% 
-#   LittleMCAR()
+# Little's MCAR test - FIXED
+# R package "naniar" states in help file: Code is adapted from LittleMCAR() in the *now-orphaned* BaylorEdPsych package: https://rdrr.io/cran/BaylorEdPsych/man/LittleMCAR.html. Some of code is adapted from Eric Stemmler - https://web.archive.org/web/20201120030409/https://stats-bayes.com/post/2020/08/14/r-function-for-little-s-test-for-data-missing-completely-at-random/ using Maximum likelihood estimation from norm.
+# Problem related to the packages pulled from CRAN, never a good sign. I looked at the function and it had problem with mlest()
+
+missingness_little <- wp1_data %>%
+  dplyr::select(-all_of(c(other, "yp_id"))) %>%
+  dplyr::select(where(is.numeric)) %>%
+  naniar::mcar_test()
 # 
-# print(cat("\nLITTLE'S TEST \nchi.square:", missingness_little$chi.square, "\ndf:", missingness_little$df, "\np = ", missingness_little$p.value))
+ print(cat("\nLITTLE'S TEST \nchi.square:", missingness_little$statistic, "\ndf:", missingness_little$df, "\np = ", missingness_little$p.value))
 
 # Jamshidian & Jalal (2010) MCAR test
-wp1_data %>% 
+missingness_jj <- wp1_data %>% 
   select(-all_of(c(other))) %>% 
   select(where(is.numeric)) %>% 
   TestMCARNormality()
 ```
 
+The two tests indicate that the data are not likely missing at random. 
+
 ### Predictors of missingness 
 
-Given the assessments are all taken from assessments close in time, we do not anticipate structured missingness in these data. 
+Given the assessments are all taken from assessments close in time, we did not anticipate structured missingness in these data. 
 
-*TO FIX*
+*Could be improved by reordering plots into meaningful order, not yet found way to reorder factor without retyping all vars...*
 
-```{r missing-predict}
+```{r missing-plot}
 # Create updated list of pre-registered variables (incorporating new vars created above)
 prereg_vars <- names(wp1_data) %>% 
   setdiff(c(missingness, other))
+
+# For each of the variables used in a main analysis...
+for (key_var in prereg_vars){
+  
+  # Create data frame with selected variable marked for missingness, remove irrelevant columns
+  data <- wp1_data %>%
+    select(-all_of(other), sex) %>%  # select predictor variables
+    mutate(is_missing = ifelse(is.na(get(key_var)) == TRUE, 1, 0)) %>%  # format variable as missing/not
+    select(-c(key_var))
+
+  # If no missing data, print statement
+  if (sum(data$is_missing) == 0) {
+      print(paste0("No missing values for variable ", key_var))
+
+  # Else if missing data present...
+  } else {
+    
+    # Summarise amount different
+    percent_miss <- round(mean(data$is_missing)*100, 2) 
+    
+    # Create dataframe for plotting continuous predictors    
+    cont_data <- data %>% 
+      select(c(which(sapply(., is.numeric)), "is_missing")) %>% 
+      pivot_longer(cols = -is_missing, names_to = "var_name", values_to = "var_val")
+    
+    # Plot faceted boxplots for each continuous predictor of missingness
+    cont_plot <- ggplot(cont_data, aes(x = as.factor(is_missing), y = var_val)) +
+      theme_bw() +
+      geom_boxplot() + 
+      theme(strip.text.x = element_text(size = 8)) +
+      facet_wrap(~ var_name, ncol = 5, scales = "free") +
+      labs(title = "Continuous predictors",
+           x = "", y = "") + 
+      theme(plot.title = element_text(size = 12, margin = margin(0, 0, 5, 0)))
+    
+    # Create dataframe for plotting factorial predictors
+    fact_data <- data %>%
+      select(c(which(sapply(., is.factor)), "is_missing")) %>%
+      
+      # Recode values for each one so that meaningful
+      mutate(ethn_c = recode(ethn_c, `1` = "white", `2` = "non-white"),
+             m_edu_c = recode(m_edu_c, `0` = "None", `1` = "CSE", `2` = "Vocational", 
+                              `3` = "O level", `4` = "A level", `5` = "Degree"),
+             m_home_a = recode(m_home_a, `0` = "mortgaged", `1` = "owned", `2` = "council rent", 
+                               `3` = "priv rent (furn)", `4` = "priv rent (unfurn)", `5` = "HA rented", 
+                               `6` = "other", `9` = "don't know" ),
+             sex = recode(sex, `1` = "male", `2` = "female")) %>% 
+      
+      pivot_longer(cols = -is_missing, names_to = "var_name", values_to = "var_val") %>%
+      group_by(var_name, var_val, is_missing) %>%
+      count() %>%
+      ungroup() %>%
+      group_by(var_name, is_missing) %>%
+      arrange(is_missing, var_name) %>% 
+      mutate(proportion = prop.table(n))
+    
+    # Plot stacked bar chart with proportions for each one (separately as different values)
+    fact_mult <- lapply(split(fact_data, fact_data$var_name), function(i){
+      ggplot(i, aes(x = as.factor(is_missing), y = proportion, fill = var_val)) + 
+      theme_bw() +
+      geom_col(position = "fill")  +
+      scale_y_continuous(limits = c(0, 1), expand = c(0,0)) +
+      theme(legend.position = "bottom",
+            legend.title = element_blank(),
+            legend.key.size = unit(0.3, "cm"),
+            legend.spacing.y = unit(0, "cm"),
+            legend.margin=margin(0,0,0,0),
+            legend.box.margin=margin(-20,-20,0 ,-20),
+            legend.text = element_text(size = 8)) +
+      guides(fill = guide_legend(ncol = 2, nrow = 4, byrow = FALSE)) + 
+      facet_wrap(~ var_name, ncol = 1, scales = "free") +
+      labs(x = "", y = "", fill = "")})
+    
+    # ... combine discrete predictors into single plot
+    fact_plot_a <- plot_grid(plotlist = fact_mult, nrow = 1, labels = levels(fact_data$var_name))
+    
+    # ... create and add title for discrete predictor plots
+    fact_title <- ggdraw() + 
+      draw_label(paste0("Discrete predictors"),
+                 size = 12,
+                 x = 0.06, hjust = 0)
+    
+    fact_plot_b <- plot_grid(fact_title, fact_plot_a, ncol = 1,
+                      rel_heights = c(0.08, 1))
+
+    # Combine continuous and discrete plots into single figure
+    
+    ### Create title
+    title <- ggdraw() + 
+      draw_label(paste0("Missingness in ", key_var, " (", percent_miss, "%)"),
+                 fontface = "bold",
+                 size = 18,
+                 x = 0.5)
+    
+    ### Create subtitle with plot info
+    plot_info <- ggdraw() + 
+      draw_label("0 = data available; 1 = data missing",
+                 fontface = "italic",
+                 size = 12,
+                 x = 0.5)
+    
+    ### Combine plots 
+    comb_plot <- plot_grid(cont_plot, fact_plot_b, nrow = 2, rel_heights = c(1, 0.3))
+    
+    full_fig <- plot_grid(title, plot_info, comb_plot, ncol = 1,
+                      rel_heights = c(0.03, 0.02, 1))
+    
+    ### Create file name and save
+    fig_name <- paste0("../output/figures/missingness/", key_var, ".png")
+    ggsave(fig_name, full_fig, height = 12, width = 9)    
+  }
+}
+```
+
+
+*STILL TO FIX*
+
+```{r missing-predict}
+
 
 # Create data frame for storing significant predictors
 miss_pred <- data.frame(missing_val = as.character(), predictor = as.character(), estimate = as.numeric(), std.error = as.numeric(), statistic = as.numeric(), p.value = as.numeric(), p.holm = as.numeric())
 
 for (var in prereg_vars){
   
-# for (var in names(sim_data)) { (used for testing)
-  
-  # Create data frame with selected variable marked for missingness, remove irrelevant columns 
-  data <- wp1_data %>% 
-    select(-all_of(c(other))) %>% 
-    mutate(is_missing = ifelse(is.na(get(var)) == TRUE, 1, 0)) %>% 
+  # Create data frame with selected variable marked for missingness, remove irrelevant columns
+  data <- wp1_data %>%
+    select(-all_of(c(other)), sex) %>%
+    mutate(is_missing = as.factor(ifelse(is.na(get(var)) == TRUE, 1, 0))) %>%
     select(-c(var))
-  
+
   # If no missing data, print statement
   if (sum(data$is_missing) == 0) {
       print(paste0("No missing values for variable ", var))
-    
+
   # Else if missing data present...
   } else {
-      
-      # Test every other variable as a predictor
-      missing_model <- glm(is_missing ~ ., family = binomial("logit"), data = data)
-      tidy_model <- tidy(missing_model) %>%  # format output
-        mutate(missing_val = var, p.adjust = p.adjust(p.value, "holm")) %>% 
-        rename(predictor = term) %>% 
-        select(missing_val, predictor, estimate, std.error, statistic, p.value, p.adjust)
-      
-      # If any of the values are significant, print output labelled with predictor and variable
-      if(any(tidy_model$p.value < .05)) {
-        print(paste0("Potential predictors (non-corrected) of missing values for variable  ", var))
-        
-        # Append significant predictors to missing data table
-        sig_vals <- tidy_model %>% 
-          filter(p.value < .05)
-        miss_pred <- rbind(miss_pred, sig_vals)
 
-      # Otherwise print that no significant predictors were found
-      } else {
-        print(paste0("No significant predictors of missing values found for variable ", var))
-      }
+  #     # Test every other variable as a predictor
+  #     missing_model <- glm(is_missing ~ ., family = binomial("logit"), data = data)
+  #     tidy_model <- tidy(missing_model) %>%  # format output
+  #       mutate(missing_val = var, p.adjust = p.adjust(p.value, "holm")) %>% 
+  #       rename(predictor = term) %>% 
+  #       select(missing_val, predictor, estimate, std.error, statistic, p.value, p.adjust)
+  #     
+  #     # If any of the values are significant, print output labelled with predictor and variable
+  #     if(any(tidy_model$p.value < .05)) {
+  #       print(paste0("Potential predictors (non-corrected) of missing values for variable  ", var))
+  #       
+  #       # Append significant predictors to missing data table
+  #       sig_vals <- tidy_model %>% 
+  #         filter(p.value < .05)
+  #       miss_pred <- rbind(miss_pred, sig_vals)
+  # 
+  #     # Otherwise print that no significant predictors were found
+  #     } else {
+  #       print(paste0("No significant predictors of missing values found for variable ", var))
+  #     }
   }
 }
 print(miss_pred)
