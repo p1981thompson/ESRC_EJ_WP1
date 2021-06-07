@@ -1,0 +1,20 @@
+"Data collection wave (% missing)","Wave-level missingness (%)","Measure","Data availability (n)","Total missingness (%)","Measure-specific missingness (%)"
+"f8",13.75,"teach_ctr_diff_f8",5758,15.89,2.14
+"f8",13.75,"teach_divd_raw_f8",5656,17.38,3.63
+"f8",13.75,"teach_slct_raw_f8",5744,16.1,2.35
+"f8",13.75,"wisc_bloc_raw_f8",5792,15.4,1.65
+"f8",13.75,"wisc_bwsp_raw_f8",5731,16.29,2.54
+"f8",13.75,"wisc_code_raw_f8",5856,14.46,0.710000000000001
+"f8",13.75,"wisc_obja_raw_f8",5537,19.12,5.37
+"f8",13.75,"wisc_parr_raw_f8",5796,15.34,1.59
+"f8",13.75,"wisc_pcmp_raw_f8",5829,14.86,1.11
+"f8",13.75,"wisc_vcb_raw_f8",5829,14.86,1.11
+"f8",13.75,"wold_comp_raw_f8",5853,14.5,0.75
+"f8",13.75,"wold_vcb_raw_f8",5829,14.86,1.11
+"ku",13.94,"sdq_hyp_prnt_ku",5808,15.16,1.22
+"f9",0,"nara_acc_raw_f9",6846,0,0
+"f9",0,"nara_comp_raw_f9",6846,0,0
+"f9",0,"nara_rate_raw_f9",6829,0.25,0.25
+"f9",0,"read_nonw_raw_f9",6808,0.56,0.56
+"f9",0,"read_word_raw_f9",6817,0.42,0.42
+"f10",9.76,"cntsp_span_raw_f10",5854,14.49,4.73
