@@ -15,16 +15,14 @@ This script incorporates the selection of relevant variables and cases for the r
 ```{r libraries, message = FALSE, warning = FALSE}
 # Note - no up-to-date version of packages with MCAR tests, install prev versions - use with caution
 #devtools::install_version("MissMech", version="1.0.2", repos=getOption("repos")["CRAN"])
-#devtools::install_version("BaylorEdPsych", version="0.5", repos=getOption("repos")["CRAN"])
 #devtools::install_version("mvnmle", version="0.1-11.1", repos=getOption("repos")["CRAN"])
 
 library(data.table)
 library(tidyverse)
 library(readxl)
 library(naniar)
-library(finalfit)
 library(MissMech)
-library(BaylorEdPsych)
+library(finalfit)
 library(broom)
 library(psych)
 library(WriteXLS)
@@ -33,15 +31,19 @@ library(DiagrammeR)
 library(cowplot)
 
 options(scipen = 999)
+
+# Set seed for reproducibility - check that this is working globally? 
+set.seed(25052021)
 ```
 
 ```{r create-dir}
 # Create subdirectories for storing data files and output, if do not already exist
-if(dir.exists("./output/")==FALSE){dir.create("./output/")}
-if(dir.exists("./output/figures/")==FALSE){dir.create("./output/figures/")}
-if(dir.exists("./output/figures/missingness/")==FALSE){dir.create("./output/figures/missingness/")}
-if(dir.exists("./output/analysis/")==FALSE){dir.create("./output/analysis/")}
-if(dir.exists("./data/processed/")==FALSE){dir.create("./data/processed/")}
+if(dir.exists("../output/")==FALSE){dir.create("../output/")}
+if(dir.exists("../output/figures/")==FALSE){dir.create("../output/figures/")}
+if(dir.exists("../output/figures/missingness/")==FALSE){dir.create("../output/figures/missingness/")}
+if(dir.exists("../output/tables/")==FALSE){dir.create("../output/tables/")}
+if(dir.exists("../output/analysis/")==FALSE){dir.create("../output/analysis/")}
+if(dir.exists("../data/processed/")==FALSE){dir.create("../data/processed/")}
 ```
 
 
@@ -175,8 +177,6 @@ nara_no <- data_named %>%
   count()
 ```
 
-
-
 ### WP1 Variables 
 
 Specify variables to be used in these analyses.
@@ -197,7 +197,7 @@ RQ2 <- c("age_m_f10",                                                # age
 
 # Variables for descriptives, exploratory analyses (subject to change)
 other <- c("yp_id", "cidB3153", "qlet",
-           "sex",
+           "sex", "age_m_ku",
            "nara_acc_std_f9", "nara_comp_std_f9", "nara_rate_std_f9", "nara_npass_f9",
            "wisc_vcb_std_f8",
            "wisc_pcmp_std_f8", "wisc_code_std_f8", "wisc_parr_std_f8", "wisc_bloc_std_f8", "wisc_obja_std_f8", "wisc_perf_std_f8") 
@@ -316,7 +316,7 @@ describe(wp1_data) %>%
 **TO-DO: Reformat**
 
 ```{r flowchart}
-grViz("digraph graph2 {
+grViz("digraph nicegraph {
       
       graph [layout = dot]
       
@@ -339,7 +339,6 @@ grViz("digraph graph2 {
       a -> b -> c -> d -> f -> h -> m
       e -> d
       d -> g
-      f -> h
       f -> i
       f -> j 
       f -> k
@@ -381,18 +380,18 @@ missing_prev +
   theme(axis.text.x = element_text(angle = 50),
   plot.margin = unit(c(1, 3, 1, 1), "cm"))
 
-ggsave("../output/figures/WP1_missingness.png")
+ggsave("../output/figures/missingness/WP1_missingness.png")
 
 # Pattern
 # missing_pattern <- wp1_data %>% 
 #   select(-all_of(c(RQ1, other, missingness, "yp_id", "age_m_f10"))) %>% 
 #   missing_pattern()
-#gsave("../output/figures/WP1_missingness_patterns.png", plot = missing_pattern)
+#ggsave("../output/figures/WP1_missingness_patterns.png", plot = missing_pattern)
 ```
 
 ### Structure
 
-Use two types of test to examine whether data is likely MCAR. Little's (1988) MCAR test examines whether variable means differ between missing data patterns. Jamshidian & Jalal's (2010) test examines whether the variances and covariances differ betwen missing data patterns. 
+Use two types of test to examine whether data is likely MCAR. Little's (1988) MCAR test examines whether variable means differ between missing data patterns. Jamshidian & Jalal's (2010) test examines whether the variances and covariances differ between missing data patterns. 
 
 ```{r missing-tests}
 # Little's MCAR test - FIXED
@@ -539,22 +538,34 @@ for (key_var in prereg_vars){
 }
 ```
 
+We had originally planned to examine whether missingness in which variable was predicted by every other variable in the above selection, but given that the vast majority of missingness is at the clinic level (i.e., there are significant contingencies between missingness for tasks administered at the same point in the study), the regression models had problems with separation. 
 
-*STILL TO FIX*
+Given that the majority of missingness was at the level of the data collection wave, we instead tested for predictors of data availability at each wave using the selected variables from all other collection waves. For ease of interpretation, we tested continuous predictors in using the binomial regressions as planned, but used chi-squared tests for the discrete predictors (testing for overall independence, rather than specifying numerous contrasts).
 
-```{r missing-predict}
+```{r clinic-missing-predict}
+# Select one variable per wave (not f9, as selected on this basis)
+wave_avail <- c("age_m_f8", "age_m_f10", "age_m_ku")
 
+# Continuous predictors 
 
-# Create data frame for storing significant predictors
-miss_pred <- data.frame(missing_val = as.character(), predictor = as.character(), estimate = as.numeric(), std.error = as.numeric(), statistic = as.numeric(), p.value = as.numeric(), p.holm = as.numeric())
+### Create data frame for storing significant predictors
+cont_pred <- data.frame(missing_val = as.character(), predictor = as.character(), estimate = as.numeric(), std.error = as.numeric(), statistic = as.numeric(), p.value = as.numeric(), p.holm = as.numeric())
 
-for (var in prereg_vars){
+### For the variable selected from each data collection wave
+for (var in wave_avail){
   
-  # Create data frame with selected variable marked for missingness, remove irrelevant columns
+  # Extract data collection wave
+  wave <- str_extract(var, "[^_]+$")
+  
+  # List all other measures from same wave for removal 
+  same_wave <- str_subset(prereg_vars, wave)
+  
+  # Create data frame with selected variable marked for missingness, remove variables from same wave
   data <- wp1_data %>%
-    select(-all_of(c(other)), sex) %>%
-    mutate(is_missing = as.factor(ifelse(is.na(get(var)) == TRUE, 1, 0))) %>%
-    select(-c(var))
+    select(-all_of(c(other))) %>%
+    select(c(which(sapply(., is.numeric)))) %>%   
+    mutate(is_missing = ifelse(is.na(get(var)) == TRUE, 1, 0)) %>%
+    select(-all_of(same_wave)) 
 
   # If no missing data, print statement
   if (sum(data$is_missing) == 0) {
@@ -562,6 +573,141 @@ for (var in prereg_vars){
 
   # Else if missing data present...
   } else {
+
+      # Test every other variable as a predictor
+      missing_model <- glm(is_missing ~ ., family = binomial("logit"), data = data)
+      tidy_model <- tidy(missing_model) %>%  # format output
+        mutate(missing_val = var, p.adjust = p.adjust(p.value, "holm")) %>%
+        rename(predictor = term) %>%
+        select(missing_val, predictor, estimate, std.error, statistic, p.value, p.adjust)
+
+      # If any of the values are significant, print output labelled with predictor and variable
+      if(any(tidy_model$p.value < .05)) {
+        print(paste0("Potential predictors (non-corrected) of missing values for variable  ", var))
+
+        # Append significant predictors to missing data table
+        sig_vals <- tidy_model %>%
+          filter(p.value < .05)
+        cont_pred <- rbind(cont_pred, sig_vals) %>% 
+          mutate_at(3:7, round, 3)
+
+      # Otherwise print that no significant predictors were found
+      } else {
+        print(paste0("No significant predictors of missing values found for variable ", var))
+      }
+  }
+}
+
+# Discrete predictors
+
+### Create data frame for storing significant predictors
+disc_pred <- data.frame(missing_val = as.character(), predictor = as.character(), 
+                        chisq.stat = as.numeric(), df = as.numeric(), p.value = as.numeric())
+
+### For the variable selected in each collection wave
+for (var in wave_avail){
+  
+  # Create data frame with selected variable marked for missingness, remove variables from same wave
+  data <- wp1_data %>%
+    select(c(which(sapply(., is.factor)), var)) %>%   
+    mutate(is_missing = as.factor(ifelse(is.na(get(var)) == TRUE, 1, 0))) %>%
+    select(-var) %>% 
+    mutate(ethn_c = recode(ethn_c, `1` = "white", `2` = "non-white"),
+       m_edu_c = recode(m_edu_c, `0` = "None", `1` = "CSE", `2` = "Vocational", 
+                        `3` = "O level", `4` = "A level", `5` = "Degree"),
+       m_home_a = recode(m_home_a, `0` = "mortgaged", `1` = "owned", `2` = "council rent", 
+                         `3` = "priv rent (furn)", `4` = "priv rent (unfurn)", `5` = "HA rented", 
+                         `6` = "other", `9` = "don't know"),
+       sex = recode(sex, `1` = "male", `2` = "female"))
+  
+  # List discrete variables 
+  disc_vars <- names(data)[names(data) != "is_missing"]
+  
+  # For each discrete predictor
+  for (pred_var in disc_vars){
+    
+    # Select relevant two variables for chisquare test (missing data variable and predictor)
+    test_vars <- data %>% 
+      select(pred_var, is_missing)
+    
+    # Conduct chisquare test, format, and append to output
+    chisq <- chisq.test(table(test_vars))
+    new_row <- data.frame(var, pred_var, chisq$statistic, chisq$parameter, chisq$p.value)
+    disc_pred <- rbind(disc_pred, new_row)
+  }
+}
+```
+
+Document missingness for all variables in a table
+
+```{r missing-table}
+# Clinic missing
+clinic_miss <- wp1_data %>% 
+  select(all_of(c(wave_avail, "age_m_f9"))) %>% 
+  pivot_longer(cols = everything(), names_to = "variable", values_to = "value") %>% 
+  group_by(variable) %>% 
+  summarise(n_avail = sum(!is.na(value)), n_all = n(), mean = mean(value, na.rm = TRUE)) %>% 
+  mutate(wave = str_extract(variable, "[^_]+$"),
+         wave_miss = round((1-n_avail/n_all)*100, 2)) %>% 
+  relocate(wave, .after = variable) %>% 
+  mutate(wave = fct_reorder(wave, mean)) %>% 
+  #mutate(wave = fct_relevel(wave, "ku", "f8", "f9", "f10")) %>% 
+  arrange(wave) %>% 
+  select(-n_all, -variable, -n_avail, -mean) 
+clinic_miss
+  
+# Variable missing  
+var_miss <- wp1_data %>% 
+  select(all_of(prereg_vars), -all_of(c(wave_avail, "age_m_f9"))) %>% 
+  pivot_longer(cols = everything(), names_to = "variable", values_to = "value") %>% 
+  group_by(variable) %>% 
+  summarise(n_avail = sum(!is.na(value)), n_all = n()) %>% 
+  mutate(wave = str_extract(variable, "[^_]+$"),
+         overall_miss = round((1-n_avail/n_all)*100, 2)) %>% 
+  arrange(wave, variable) %>% 
+  select(-n_all)
+
+# Total missing table (can be written out for Word table)
+missing <- left_join(clinic_miss, var_miss, by = c("wave")) %>% 
+  mutate(task_miss = overall_miss-wave_miss) %>% 
+  set_names(c("Data collection wave (% missing)", "Wave-level missingness (%)", "Measure", "Data availability (n)", "Total missingness (%)", "Measure-specific missingness (%)"))
+write.csv(missing, "../output/tables/proportion_missingness.csv", row.names = FALSE)
+
+# Formatted table
+missing %>% 
+  select(-"Wave-level missingness (%)") %>% 
+  mutate("Data collection wave (% missing)" = "") %>% 
+  kable() %>% 
+  kable_classic()  %>% 
+  pack_rows(paste0("Focus @ 8 (", clinic_miss[1,2], "%)"), 1, 12) %>% 
+  pack_rows(paste0("Parental Questionnaire (KU) (", clinic_miss[2,2], "%)"), 13, 13) %>% 
+  pack_rows(paste0("Focus @ 9 (", clinic_miss[3,2], "%)"), 14, 18) %>%
+  pack_rows(paste0("Focus @ 10 (", clinic_miss[4, 2], "%)"), 19, 19)  
+```
+
+
+```{r missing-predict, echo = FALSE, eval = FALSE}
+
+############################ TO DELETE (once sure that no longer need) ##########################################
+
+
+# # Create data frame for storing significant predictors
+# miss_pred <- data.frame(missing_val = as.character(), predictor = as.character(), estimate = as.numeric(), std.error = as.numeric(), statistic = as.numeric(), p.value = as.numeric(), p.holm = as.numeric())
+# 
+# for (var in prereg_vars){
+#   
+#   # Create data frame with selected variable marked for missingness, remove irrelevant columns
+#   data <- wp1_data %>%
+#     select(-all_of(c(other)), sex) %>%
+#     mutate(is_missing = as.factor(ifelse(is.na(get(var)) == TRUE, 1, 0))) %>%
+#     select(-c(var))
+# 
+#   # If no missing data, print statement
+#   if (sum(data$is_missing) == 0) {
+#       print(paste0("No missing values for variable ", var))
+# 
+#   # Else if missing data present...
+#   } else {
 
   #     # Test every other variable as a predictor
   #     missing_model <- glm(is_missing ~ ., family = binomial("logit"), data = data)
@@ -583,9 +729,9 @@ for (var in prereg_vars){
   #     } else {
   #       print(paste0("No significant predictors of missing values found for variable ", var))
   #     }
-  }
-}
-print(miss_pred)
+#   }
+# }
+# print(miss_pred)
 ```
 
 # Split sample and save out data
@@ -593,8 +739,6 @@ print(miss_pred)
 Create subsamples to be used for RQ1 initial class enumeration process and subsequent validation. 
 
 ```{r split-half}
-# Set seed for reproducibility
-set.seed(25052021)
 
 # Create numeric ID variable for working with mplus, remove unnecessary variables and tidy order
 wp1_tidy <- wp1_data %>% 
