@@ -29,6 +29,7 @@ library(WriteXLS)
 library(knitr)
 library(DiagrammeR)
 library(cowplot)
+library(kableExtra)
 
 options(scipen = 999)
 
@@ -313,9 +314,9 @@ describe(wp1_data) %>%
 
 ### Flowchart
 
-**TO-DO: Reformat**
+**TO-DO: Reformat. Also fix problem with passing object when knitting?**
 
-```{r flowchart}
+```{r flowchart, eval = FALSE}
 grViz("digraph nicegraph {
       
       graph [layout = dot]
@@ -562,9 +563,9 @@ for (var in wave_avail){
   
   # Create data frame with selected variable marked for missingness, remove variables from same wave
   data <- wp1_data %>%
-    select(-all_of(c(other))) %>%
-    select(c(which(sapply(., is.numeric)))) %>%   
+    select(-all_of(other), sex, age_m_ku) %>%
     mutate(is_missing = ifelse(is.na(get(var)) == TRUE, 1, 0)) %>%
+    select(c(which(sapply(., is.numeric)), is_missing)) %>%   
     select(-all_of(same_wave)) 
 
   # If no missing data, print statement
@@ -597,6 +598,14 @@ for (var in wave_avail){
       }
   }
 }
+
+# Also inspect correlation matrix
+corr_matrix <- wp1_data %>%
+    select(-all_of(other), sex, age_m_ku) %>%
+    select(c(which(sapply(., is.numeric)))) %>% 
+  cor(use = "pairwise.complete.obs") %>% 
+  round(2)
+corr_matrix[abs(corr_matrix) < 0.4] <- NA   # set threshold?
 
 # Discrete predictors
 
@@ -685,8 +694,180 @@ missing %>%
   pack_rows(paste0("Focus @ 10 (", clinic_miss[4, 2], "%)"), 19, 19)  
 ```
 
+There is structural missingness according to socio-demographic variables that are not already included in our analysis plans. These variables need incorporating as auxiliary variables in subsequent models. However, this is only implemented in mplus for continuous variables or binary dummy variables. 
 
-```{r missing-predict, echo = FALSE, eval = FALSE}
+```{r model-missingness}
+# TRY MODEL WITH SIMPLIFIED CODING SCHEMES FOR CATEGORICAL VARIABLES
+
+### Create data frame for storing significant predictors
+miss_model <- data.frame(missing_val = as.character(), predictor = as.character(), estimate = as.numeric(), std.error = as.numeric(), statistic = as.numeric(), p.value = as.numeric(), p.holm = as.numeric())
+
+### For the variable selected from each data collection wave
+for (var in wave_avail){
+  
+  # List clinic age measures from 
+  age_pred <- str_subset(wave_avail, var, negate = TRUE)
+  
+  # Create data frame with selected variable marked for missingness and key predictors from clinic-level analysis (for completeness)
+  data <- wp1_data %>%
+    select(var, all_of(age_pred), age_m_f9, nara_comp_std_f9, m_age_birth, ethn_c, m_home_a, m_edu_c) %>%
+    mutate(is_missing = ifelse(is.na(get(var)) == TRUE, 1, 0),
+           m_edu_bin = recode(m_edu_c, `0` = 0, `1` = 0, `2` = 0, 
+                        `3` = 0, `4` = 1, `5` = 2),
+           m_home_bin = recode(m_home_a, `0` = 1, `1` = 1, `2` = 0, 
+                         `3` = 0, `4` = 0, `5` = 0, 
+                         `6` = 0, `9` = 0)) %>% 
+    mutate(m_edu_bin = as.factor(m_edu_bin),
+           m_home_bin = as.factor(m_home_bin)) %>%
+    select(-var)
+  
+  # Set orthogonal contrasts for home ownership
+  #contrasts(data$m_home_bin) <- cbind(c(-2/3, 1/3, 1/3), c(0, -1/2, 1/2))
+  
+  # Set orthogonal contrasts for maternal education variable
+  contrasts(data$m_edu_bin) <- cbind(c(-2/3, 1/3, 1/3), c(0, -1/2, 1/2))
+  #contrasts(data$m_edu_bin) <- cbind(c(-3/4, 1/4, 1/4, 1/4), c(0, -2/3, 1/3, 1/3), c(0, 0, -1/2, 1/2))
+
+  # Baseline formula including key predictors of missingness (identified above) + binned variables
+  base_form <- as.formula(sprintf("is_missing ~ %s + %s + age_m_f9 + nara_comp_std_f9 + m_age_birth + ethn_c + m_home_bin + m_edu_bin", 
+                                  age_pred[1], age_pred[2]))  # age from other clinics
+
+  # Fit model with binned variables, save to global environment
+  bin_model <- glm(formula = base_form, family = binomial("logit"), data = data)
+  
+  model_name <- paste0("missing_", var)
+  assign(model_name, bin_model, envir = .GlobalEnv)
+  
+  # Full output
+  tidy_model <- tidy(bin_model) %>%  # format output
+    mutate(missing_val = var, p.adjust = p.adjust(p.value, "holm")) %>%
+    rename(predictor = term) %>%
+    select(missing_val, predictor, estimate, std.error, statistic, p.value, p.adjust)
+
+    miss_model <- rbind(miss_model, tidy_model) %>% 
+      mutate_at(3:7, round, 3)
+}
+
+# LABELS FOR REFERENCE
+# ethn_c = recode(ethn_c, `1` = "white", `2` = "non-white"),
+#        m_edu_c = recode(m_edu_c, `0` = "None", `1` = "CSE", `2` = "Vocational", 
+#                         `3` = "O level", `4` = "A level", `5` = "Degree"),
+#        m_home_a = recode(m_home_a, `0` = "mortgaged", `1` = "owned", `2` = "council rent", 
+#                          `3` = "priv rent (furn)", `4` = "priv rent (unfurn)", `5` = "HA rented", 
+#                          `6` = "other", `9` = "don't know"),
+```
+
+```{r test-chunk1, include = FALSE, eval = FALSE}
+# Try manual coding contrasts as variables to save out in dataset
+test <- wp1_data %>%
+    select(-all_of(other), sex, age_m_ku) %>%
+    mutate(m_edu_contr = recode(m_edu_c, `0` = 0, `1` = 0, `2` = 0, 
+                        `3` = 0, `4` = 1, `5` = 2),
+           m_edu_bin1 = recode(m_edu_c, `1` = -2/3, `2` = -2/3, 
+                        `3` = -2/3, `4` = 1/3, `5` = 1/3),
+           m_edu_bin2 = recode(m_edu_c, `0` = 0, `1` = 0, `2` = 0,       # this wouldn't work? 
+                        `3` = 0, `4` = -1/2, `5` = 1/2),
+           m_home_bin = recode(m_home_a, `0` = 1, `1` = 1, `2` = 0, 
+                         `3` = 0, `4` = 0, `5` = 0, 
+                         `6` = 0, `9` = 0),
+           sex = as.numeric(sex),
+           ethn_c = as.numeric(ethn_c)) %>% 
+  select(-m_edu_c, - m_home_a,)
+
+# Also inspect correlation matrix to see whether variables are good predictors of values ?
+corr_matrix <- data %>%
+  cor(use = "pairwise.complete.obs") %>% 
+  round(2)
+corr_matrix[abs(corr_matrix) < 0.4] <- NA   # set threshold?
+  
+```
+
+```{r test-chunk2, include = FALSE, eval = FALSE}
+
+# WAS TRYING TO AMEND TO INCLUDE ALL OTHER PRE-REGISTERED VARIABLES # but decided to stick to key predictors for time being
+### can probably delete
+
+### For the variable selected from each data collection wave
+for (var in wave_avail){
+  
+  # Extract data collection wave
+  wave <- str_extract(var, "[^_]+$")
+  
+  # List all other measures from same wave for removal 
+  same_wave <- str_subset(prereg_vars, wave)
+  
+  # Create data frame with selected variable marked for missingness, remove variables from same wave
+  data <- wp1_data %>%
+    select(-all_of(other), sex, age_m_ku) %>%
+    mutate(is_missing = ifelse(is.na(get(var)) == TRUE, 1, 0)) %>%
+    select(c(which(sapply(., is.numeric)), is_missing)) %>%   
+    select(-all_of(same_wave)) 
+
+
+
+      # Test every other variable as a predictor
+      missing_model <- glm(is_missing ~ ., family = binomial("logit"), data = data)
+
+
+
+# Try simplified model
+### For the variable selected from each data collection wave
+for (var in wave_avail){
+  
+  # Extract data collection wave
+  wave <- str_extract(var, "[^_]+$")
+  
+  # List all other measures from same wave for removal 
+  same_wave <- str_subset(prereg_vars, wave)
+  
+  # List all other measures from same wave for removal 
+  age_pred <- str_subset(wave_avail, var, negate = TRUE)
+  
+  for (predictor in c("m_home_a", "m_edu_c")) {
+  
+  # Create data frame with selected variable marked for missingness, remove variables from same wave
+  data <- wp1_data %>%
+    select(var, all_of(age_pred), all_of(prereg_vars), -all_of(same_wave), age_m_f9, m_age_birth, ethn_c, m_home_a, m_edu_c) %>%
+    mutate(is_missing = ifelse(is.na(get(var)) == TRUE, 1, 0),
+           m_edu_bin = recode(m_edu_c, `0` = 0, `1` = 0, `2` = 0, 
+                        `3` = 0, `4` = 1, `5` = 1),
+           m_home_bin = recode(m_home_a, `0` = 1, `1` = 1, `2` = 0, 
+                         `3` = 0, `4` = 0, `5` = 0, 
+                         `6` = 0, `9` = 0)) %>% 
+    select(-var)
+
+      # Incorporate age into baseline model
+      base_form <- as.formula(sprintf("is_missing ~ %s + %s + age_m_f9 + m_age_birth + ethn_c + m_home_bin + m_edu_bin", 
+                                      age_pred[1], age_pred[2]))
+  
+      # Test every other variable as a predictor
+      bin_model <- glm(formula = base_form, family = binomial("logit"), data = data)
+      
+      add_model <- update(bin_model, as.formula(sprintf(" . ~ . + %s", predictor)))
+      compare <- anova(bin_model, add_model)
+      
+      print(compare)
+      print(1-pchisq( abs(compare$Deviance[2]), abs(compare$Df[2])))
+
+      
+      # tidy_model <- tidy(bin_model) %>%  # format output
+      #   mutate(missing_val = var, p.adjust = p.adjust(p.value, "holm")) %>%
+      #   rename(predictor = term) %>%
+      #   select(missing_val, predictor, estimate, std.error, statistic, p.value, p.adjust)
+      # 
+      #   miss_model <- rbind(miss_model, tidy_model) %>% 
+      #     mutate_at(3:7, round, 3)
+      }
+}
+# ethn_c = recode(ethn_c, `1` = "white", `2` = "non-white"),
+#        m_edu_c = recode(m_edu_c, `0` = "None", `1` = "CSE", `2` = "Vocational", 
+#                         `3` = "O level", `4` = "A level", `5` = "Degree"),
+#        m_home_a = recode(m_home_a, `0` = "mortgaged", `1` = "owned", `2` = "council rent", 
+#                          `3` = "priv rent (furn)", `4` = "priv rent (unfurn)", `5` = "HA rented", 
+#                          `6` = "other", `9` = "don't know"),
+```
+
+```{r missing-predict, include= FALSE, eval = FALSE}
 
 ############################ TO DELETE (once sure that no longer need) ##########################################
 

@@ -138,7 +138,8 @@ Each model additionally includes age as a covariate.
 m_cfa1 <- mplusObject(
   TITLE = "Confirmatory Factor Analysis - Single Factor;",
   ANALYSIS = "estimator = mlr; type = general;",                  
-  MODEL = "read by naraComp naraAcc wordAcc nonwAcc woldComp;
+  MODEL = "f8age; f9age;
+           read by naraComp naraAcc wordAcc nonwAcc woldComp;
            wordAcc nonwAcc naraAcc naraComp on f9age;
            woldcomp on f8age;",   # single reading factor, plus age covariates 
   OUTPUT = "sampstat; TECH1; TECH4; stdyx; modindices; ",
@@ -150,13 +151,20 @@ m_cfa1_fit <- mplusModeler(m_cfa1,
                            modelout = "./mplus_models/simpview/cfa/sv_cfa1.inp",
                            check = TRUE, run = TRUE)
 
+
 # TWO-FACTOR MODEL
 m_cfa2 <- update(m_cfa1,
                  TITLE = ~ "Confirmatory Factor Analysis - Two-Factor;",
-                 MODEL = ~ "acc by nonwAcc wordAcc naraAcc; comp by woldComp naraComp;
+                 MODEL = ~ "f8age; f9age;
+                            acc by nonwAcc wordAcc naraAcc; comp by woldComp naraComp;
                             wordAcc nonwAcc naraAcc naraComp on f9age;
                             woldcomp on f8age;
-                            acc with comp;") # two factors, plus age covariates
+                            acc with comp;
+                            ",
+                 DEFINE = ~ "naraAcc = naraAcc/10; naraComp = naraComp/5;
+                             f8age = f8age/2; f9age = f9age/2;") # two factors, plus age covariates
+
+
 m_cfa2_fit <- mplusModeler(m_cfa2,
                            modelout = "./mplus_models/simpview/cfa/sv_cfa2.inp",
                            check = TRUE, run = TRUE)
@@ -173,15 +181,15 @@ If a one-factor model is preferred, then we will proceed with using a Latent Pro
 
 ```{r cfa-inspection}
 # # Inspect model (by = loadings, with = covariances)
-# cfa_models$sv_cfa2.out$parameters$unstandardized %>% 
+# cfa_models$sv_cfa2.out$parameters$unstandardized %>%
 #   kable()
-# cfa_models$sv_cfa2.out$parameters$stdyx.standardized %>% 
+# cfa_models$sv_cfa2.out$parameters$stdyx.standardized %>%
 #   kable()
 # 
 # # Inspect modification indices
-# cfa_models$sv_cfa2.out$mod_indices %>% 
-#   arrange(desc(MI)) %>% 
-#   filter(operator == "WITH") %>% 
+# cfa_models$sv_cfa2.out$mod_indices %>%
+#   arrange(desc(MI)) %>%
+#   filter(operator == "WITH") %>%
 #   kable()
 ```
 
@@ -192,19 +200,19 @@ If a one-factor model is preferred, then we will proceed with using a Latent Pro
 The modification indices support that model fit would be improved by estimating the covariance between the word and nonword reading accuracy tasks. 
 
 ```{r cfa-modification}
-# # TWO-FACTOR MODEL with additional covariance between the two single word reading tasks (word, nonword)
-# m_cfa2b <- update(m_cfa2,
-#                  TITLE = ~ "Confirmatory Factor Analysis - Two-Factor - modification1 single reading tasks;",
-#                  MODEL = ~. + "nonwAcc with wordAcc;")
-# 
-# m_cfa2b_fit <- mplusModeler(m_cfa2b,
-#                            modelout = "./mplus_models/simpview/cfa/sv_cfa2b.inp",
-#                            check = TRUE, run = TRUE)
-# 
-# # COMPARE MODELS
-# cfa_models <- readModels(target = "./mplus_models/simpview/cfa", filefilter = "sv_cfa")
-# SummaryTable(cfa_models, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR")) %>% 
-#   kable()
+# TWO-FACTOR MODEL with additional covariance between the two single word reading tasks (word, nonword)
+m_cfa2b <- update(m_cfa2,
+                 TITLE = ~ "Confirmatory Factor Analysis - Two-Factor - modification1 single reading tasks;",
+                 MODEL = ~. + "nonwAcc with wordAcc;")
+
+m_cfa2b_fit <- mplusModeler(m_cfa2b,
+                           modelout = "./mplus_models/simpview/cfa/sv_cfa2b.inp",
+                           check = TRUE, run = TRUE)
+
+# COMPARE MODELS
+cfa_models <- readModels(target = "./mplus_models/simpview/cfa", filefilter = "sv_cfa")
+SummaryTable(cfa_models, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR")) %>%
+  kable()
 ```
 
 The following rules of thumb are often used to indicate a good-fitting model:  
@@ -225,6 +233,6 @@ The following rules of thumb are often used to indicate a good-fitting model:
 ### CFA figure
 
 ```{r cfa-diagram}
-# semPaths(semPlotModel(cfa_models$sv_cfa2b.out, mplusStd = "stdyx"), what = "paths", whatLabels = "std", rotation = 1, intercepts = FALSE)
+semPaths(semPlotModel(cfa_models$sv_cfa2.out, mplusStd = "stdyx"), what = "paths", whatLabels = "std", rotation = 1, intercepts = FALSE)
 ```
 
