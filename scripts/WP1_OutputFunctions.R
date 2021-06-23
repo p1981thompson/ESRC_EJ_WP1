@@ -21,7 +21,7 @@ lpa_enum_table <- function(output = NA){
     mutate(CAIC = -2*LL + Parameters*(log(Observations) + 1),
            AWE = -2*LL + Parameters*(log(Observations) + 1.5),
            SIC = -0.5*BIC,
-           BF = round(exp(SIC-lead(SIC)), 3)) 
+           BF = round(exp(SIC-lag(SIC)), 3)) 
 
   # Use SIC to compute approximate correct model probability out of k-class models
     max_sic <- max(mm_summaries$SIC, na.rm = TRUE)
@@ -67,7 +67,7 @@ fmm_enum_table <- function(output = NA){
     
     # Create information indices
     mutate(SIC = -0.5*BIC,
-           BF = round(exp(SIC-lead(SIC)), 3))               
+           BF = round(exp(SIC-lag(SIC)), 3))               
   
   # Use SIC to compute approximate correct model probability out of k-class models
   max_sic <- max(mm_summaries$SIC, na.rm = TRUE) 
@@ -102,7 +102,7 @@ add_bLRT <- function(rerun_output = NA, orig_summary = NA){
            bLRT_p = BLRT_PValue) %>% 
     mutate(across(where(is.numeric), round, 2)) %>% 
     mutate(bLRT_p = pvalue(bLRT_p, accuracy = 0.01)) %>% 
-    right_join(orig_summary, by = c("Specification", "Classes", "Parameters", "LL")) %>% 
+    right_join(orig_summary, by = c("Specification", "Classes", "Parameters", "LL"), copy = TRUE) %>% 
     arrange(Classes) %>% 
     relocate(bLRT_p, .after = LMR_p)
   
@@ -235,7 +235,8 @@ get_optseed <- function(filename){
   test<-sapply(test,as.numeric)
   test<-data.frame(test)
   names(test)<-c("LoMax","seed","starts")
-  optiseed<-test$seed[which.min(test$LoMax)]
+  #optiseed<-test$seed[which.min(test$LoMax)]   # incorrect?
+  optiseed<- test$seed[1]  # edited to best value
   optiseed
 }
 
@@ -283,11 +284,14 @@ mm_extract_data <- function(orig_mods = NA,        # list of original models (in
                                                    optseed = %d;
                                                    processors = 4(starts);
                                                    lrtstarts = 0 0 100 20;'", optseed_val)),
-                       OUTPUT = ~ . + "TECH7; TECH14; stdyx; CINTERVAL; ENTROPY;",
+                      # VARIABLE = ~ . + "AUXILIARY = cidB3153;",
+                       OUTPUT = ~ "TECH7 TECH11 TECH14 stdyx CINTERVAL ENTROPY;",
                        SAVEDATA = as.formula(sprintf(" ~ 'FILE IS sv_%s_%dclass.dat; SAVE = cprobabilities;'", model_name, n_classes)))
       } else {
         body <- update(orig_mods[[model]],
-                       OUTPUT = ~ . + "TECH7; TECH14; stdyx; CINTERVAL; ENTROPY;",
+                       OUTPUT = ~ "TECH7 TECH11 TECH14 stdyx CINTERVAL ENTROPY;",
+                       ANALYSIS = ~ "estimator = mlr; type = mixture; starts = 1000 250; 
+              processors = 4(STARTS);",
                        SAVEDATA = as.formula(sprintf(" ~ 'FILE IS sv_%s_%dclass.dat; SAVE = cprobabilities;'", model_name, n_classes)))
       }
       
