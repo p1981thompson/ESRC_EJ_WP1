@@ -1,0 +1,1894 @@
+Mplus VERSION 8.5
+MUTHEN & MUTHEN
+06/21/2021   1:00 PM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+   LPA Benchmark
+  DATA:
+  FILE = "./mplus_models/simpview/lpa/sv_lpa_mbenchmark_71407e46d98e5016017ad9a2654f310f.dat
+
+  VARIABLE:
+  NAMES = cidB3153 f8age f9age naraAcc wordAcc nonwAcc naraComp woldComp;
+   MISSING=.;
+    idvariable = cidB3153; classes = c(1);
+  ANALYSIS:
+  estimator = mlr; type = mixture; starts = 500 50;
+                processors = 4(STARTS);
+  MODEL:
+  %OVERALL%
+             f8age; f9age;
+             wordAcc nonwAcc naraAcc naraComp on f9age;
+             woldcomp on f8age;
+   %OVERALL%
+   naraComp; naraAcc; wordAcc; nonwAcc; woldComp;
+
+    naraComp with naraAcc;
+    naraComp with wordAcc;
+    naraComp with nonwAcc;
+    naraComp with woldComp;
+    naraAcc with wordAcc;
+    naraAcc with nonwAcc;
+    naraAcc with woldComp;
+    wordAcc with nonWacc;
+    wordAcc with woldComp;
+    nonwAcc with woldComp;
+  OUTPUT:
+  TECH1 TECH8 TECH11;
+  PLOT:
+  TYPE = PLOT3;
+
+
+
+*** WARNING
+  Input line exceeded 90 characters. Some input may be truncated.
+  FILE = "./mplus_models/simpview/lpa/sv_lpa_mbenchmark_71407e46d98e5016017ad9a2654f310f.dat"
+*** WARNING in DATA command
+  Statement not terminated by a semicolon:
+  FILE = "./mplus_models/simpview/lpa/sv_lpa_mbenchmark_71407e46d98e5016017ad9a2654f310f.dat"
+*** WARNING in OUTPUT command
+  TECH11 option is not available for TYPE=MIXTURE with only one class.
+  Request for TECH11 is ignored.
+   3 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
+
+
+
+
+LPA Benchmark
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                        3423
+
+Number of dependent variables                                    5
+Number of independent variables                                  2
+Number of continuous latent variables                            0
+Number of categorical latent variables                           1
+
+Observed dependent variables
+
+  Continuous
+   NARAACC     WORDACC     NONWACC     NARACOMP    WOLDCOMP
+
+Observed independent variables
+   F8AGE       F9AGE
+
+Categorical latent variables
+   C
+
+Variables with special functions
+
+  ID variable           CIDB3153
+
+Estimator                                                      MLR
+Information matrix                                        OBSERVED
+Optimization Specifications for the Quasi-Newton Algorithm for
+Continuous Outcomes
+  Maximum number of iterations                                 100
+  Convergence criterion                                  0.100D-05
+Optimization Specifications for the EM Algorithm
+  Maximum number of iterations                                 500
+  Convergence criteria
+    Loglikelihood change                                 0.100D-06
+    Relative loglikelihood change                        0.100D-06
+    Derivative                                           0.100D-05
+Optimization Specifications for the M step of the EM Algorithm for
+Categorical Latent variables
+  Number of M step iterations                                    1
+  M step convergence criterion                           0.100D-05
+  Basis for M step termination                           ITERATION
+Optimization Specifications for the M step of the EM Algorithm for
+Censored, Binary or Ordered Categorical (Ordinal), Unordered
+Categorical (Nominal) and Count Outcomes
+  Number of M step iterations                                    1
+  M step convergence criterion                           0.100D-05
+  Basis for M step termination                           ITERATION
+  Maximum value for logit thresholds                            15
+  Minimum value for logit thresholds                           -15
+  Minimum expected cell size for chi-square              0.100D-01
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+Optimization algorithm                                         EMA
+Random Starts Specifications
+  Number of initial stage random starts                        500
+  Number of final stage optimizations                           50
+  Number of initial stage iterations                            10
+  Initial stage convergence criterion                    0.100D+01
+  Random starts scale                                    0.500D+01
+  Random seed for generating random starts                       0
+
+Input data file(s)
+  ./mplus_models/simpview/lpa/sv_lpa_mbenchmark_71407e46d98e5016017ad9a2654f310f
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns             7
+     Number of y missing data patterns           7
+     Number of u missing data patterns           0
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT FOR Y
+
+
+           Covariance Coverage
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        1.000
+ WORDACC        0.997         0.997
+ NONWACC        0.996         0.996         0.996
+ NARACOMP       1.000         0.997         0.996         1.000
+ WOLDCOMP       0.852         0.850         0.850         0.852         0.852
+ F8AGE          0.861         0.859         0.858         0.861         0.852
+ F9AGE          1.000         0.997         0.996         1.000         0.852
+
+
+           Covariance Coverage
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.861
+ F9AGE          0.861         1.000
+
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     NARAACC              66.334      -0.525       0.000    0.06%      48.000     62.000     69.000
+            3423.000     417.180      -0.469     100.000    0.06%      76.000     86.000
+     WORDACC               7.536      -1.219       0.000    1.93%       6.000      8.000      8.000
+            3414.000       6.273       0.849      10.000   23.58%       9.000     10.000
+     NONWACC               5.239      -0.308       0.000    4.23%       3.000      5.000      5.000
+            3408.000       6.217      -0.688      10.000    1.79%       6.000      8.000
+     NARACOMP             25.018      -0.273       0.000    0.09%      18.000     23.000     25.000
+            3423.000      62.018      -0.237      44.000    0.03%      28.000     32.000
+     WOLDCOMP              7.517       0.082       2.000    0.41%       6.000      7.000      7.000
+            2917.000       3.758       0.190      15.000    0.03%       8.000      9.000
+     F8AGE               103.533       2.579      94.000    0.03%     102.000    102.000    103.000
+            2947.000      11.227       8.561     126.000    0.03%     103.000    105.000
+     F9AGE               118.643       1.305     105.000    0.03%     116.000    117.000    118.000
+            3423.000      14.907       2.626     139.000    0.06%     119.000    121.000
+
+RANDOM STARTS RESULTS RANKED FROM THE BEST TO THE WORST LOGLIKELIHOOD VALUES
+
+Final stage loglikelihood values at local maxima, seeds, and initial stage start numbers:
+
+          -60569.236  387701           275
+          -60569.236  741484           441
+          -60569.236  608849           224
+          -60569.236  76974            16
+          -60569.236  903420           5
+          -60569.236  679832           302
+          -60569.236  292884           103
+          -60569.236  840031           276
+          -60569.236  79945            395
+          -60569.236  794236           127
+          -60569.236  195763           358
+          -60569.236  991329           182
+          -60569.236  496881           192
+          -60569.236  25127            107
+          -60569.236  360419           356
+          -60569.236  85462            51
+          -60569.236  127215           9
+          -60569.236  50887            389
+          -60569.236  772131           407
+          -60569.236  965639           463
+          -60569.236  830529           279
+          -60569.236  900268           327
+          -60569.236  902278           21
+          -60569.236  963053           43
+          -60569.236  364676           27
+          -60569.236  349360           464
+          -60569.236  170118           238
+          -60569.236  782821           272
+          -60569.236  417035           149
+          -60569.236  967902           52
+          -60569.236  153394           429
+          -60569.236  112586           494
+          -60569.236  81117            305
+          -60569.236  34346            330
+          -60569.236  636396           168
+          -60569.236  608496           4
+          -60569.236  793035           187
+          -60569.236  726035           191
+          -60569.236  533738           11
+          -60569.236  714455           476
+          -60569.236  264935           281
+          -60569.236  618760           489
+          -60569.236  232559           136
+          -60569.236  948615           140
+          -60569.236  526324           178
+          -60569.236  700349           401
+          -60569.236  340112           126
+          -60569.236  642909           251
+          -60569.236  655497           376
+          -60569.236  unperturbed      0
+
+
+
+THE MODEL ESTIMATION TERMINATED NORMALLY
+
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                       30
+
+Loglikelihood
+
+          H0 Value                      -60569.236
+          H0 Scaling Correction Factor      1.2228
+            for MLR
+
+Information Criteria
+
+          Akaike (AIC)                  121198.472
+          Bayesian (BIC)                121382.620
+          Sample-Size Adjusted BIC      121287.296
+            (n* = (n + 2) / 24)
+
+
+
+FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASSES
+BASED ON THE ESTIMATED MODEL
+
+    Latent
+   Classes
+
+       1       3423.00000          1.00000
+
+
+FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASSES
+BASED ON ESTIMATED POSTERIOR PROBABILITIES
+
+    Latent
+   Classes
+
+       1       3423.00000          1.00000
+
+
+FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASSES
+BASED ON THEIR MOST LIKELY LATENT CLASS MEMBERSHIP
+
+Class Counts and Proportions
+
+    Latent
+   Classes
+
+       1             3423          1.00000
+
+
+Average Latent Class Probabilities for Most Likely Latent Class Membership (Row)
+by Latent Class (Column)
+
+           1
+
+    1   1.000
+
+
+Classification Probabilities for the Most Likely Latent Class Membership (Column)
+by Latent Class (Row)
+
+           1
+
+    1   1.000
+
+
+Logits for the Classification Probabilities for the Most Likely Latent Class Membership (Column)
+by Latent Class (Row)
+
+              1
+
+    1      0.000
+
+
+MODEL RESULTS
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+Latent Class 1
+
+ WORDACC    ON
+    F9AGE              0.013      0.012      1.101      0.271
+
+ NONWACC    ON
+    F9AGE              0.006      0.011      0.576      0.565
+
+ NARAACC    ON
+    F9AGE              0.244      0.093      2.630      0.009
+
+ NARACOMP   ON
+    F9AGE              0.107      0.035      3.075      0.002
+
+ WOLDCOMP   ON
+    F8AGE              0.034      0.010      3.395      0.001
+
+ NARACOMP WITH
+    NARAACC          132.581      3.422     38.740      0.000
+    WORDACC           13.927      0.462     30.120      0.000
+    NONWACC           11.759      0.378     31.086      0.000
+    WOLDCOMP           6.430      0.309     20.779      0.000
+
+ NARAACC  WITH
+    WORDACC           41.941      1.220     34.388      0.000
+    NONWACC           37.285      0.976     38.188      0.000
+    WOLDCOMP          11.562      0.776     14.896      0.000
+
+ WORDACC  WITH
+    NONWACC            4.625      0.132     35.004      0.000
+    WOLDCOMP           1.180      0.096     12.245      0.000
+
+ NONWACC  WITH
+    WOLDCOMP           0.912      0.091      9.980      0.000
+
+ F9AGE    WITH
+    F8AGE              3.233      0.421      7.683      0.000
+
+ Means
+    F8AGE            103.607      0.066   1561.580      0.000
+    F9AGE            118.643      0.066   1797.818      0.000
+
+ Intercepts
+    NARAACC           37.338     11.021      3.388      0.001
+    WORDACC            6.000      1.393      4.307      0.000
+    NONWACC            4.469      1.321      3.382      0.001
+    NARACOMP          12.283      4.139      2.967      0.003
+    WOLDCOMP           3.932      1.043      3.768      0.000
+
+ Variances
+    F8AGE             11.336      0.687     16.510      0.000
+    F9AGE             14.907      0.548     27.201      0.000
+
+ Residual Variances
+    NARAACC          416.854      8.841     47.152      0.000
+    WORDACC            6.282      0.181     34.618      0.000
+    NONWACC            6.264      0.123     50.749      0.000
+    NARACOMP          61.984      1.412     43.907      0.000
+    WOLDCOMP           3.776      0.104     36.427      0.000
+
+
+QUALITY OF NUMERICAL RESULTS
+
+     Condition Number for the Information Matrix              0.360E-07
+       (ratio of smallest to largest eigenvalue)
+
+
+TECHNICAL 1 OUTPUT
+
+
+     PARAMETER SPECIFICATION FOR LATENT CLASS 1
+
+
+           NU
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                    0             0             0             0             0
+
+
+           NU
+              F8AGE         F9AGE
+              ________      ________
+                    0             0
+
+
+           LAMBDA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC            0             0
+ WORDACC            0             0
+ NONWACC            0             0
+ NARACOMP           0             0
+ WOLDCOMP           0             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           THETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0
+ WORDACC            0             0
+ NONWACC            0             0             0
+ NARACOMP           0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           THETA
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE              0
+ F9AGE              0             0
+
+
+           ALPHA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                    1             2             3             4             5
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+                    6             7
+
+
+           BETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC            0             8
+ WORDACC            0             9
+ NONWACC            0            10
+ NARACOMP           0            11
+ WOLDCOMP          12             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           PSI
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC           13
+ WORDACC           14            15
+ NONWACC           16            17            18
+ NARACOMP          19            20            21            22
+ WOLDCOMP          23            24            25            26            27
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE             28
+ F9AGE             29            30
+
+
+     PARAMETER SPECIFICATION FOR LATENT CLASS REGRESSION MODEL PART
+
+
+           ALPHA(C)
+              C#1
+              ________
+                    0
+
+
+     STARTING VALUES FOR LATENT CLASS 1
+
+
+           NU
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              F8AGE         F9AGE
+              ________      ________
+                0.000         0.000
+
+
+           LAMBDA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        1.000         0.000         0.000         0.000         0.000
+ WORDACC        0.000         1.000         0.000         0.000         0.000
+ NONWACC        0.000         0.000         1.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         1.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         1.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ F8AGE          1.000         0.000
+ F9AGE          0.000         1.000
+
+
+           THETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.000
+ F9AGE          0.000         0.000
+
+
+           ALPHA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+               66.334         7.536         5.239        25.018         7.517
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+              103.533       118.643
+
+
+           BETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        0.000         0.000         0.000         0.000         0.000
+ WORDACC        0.000         0.000         0.000         0.000         0.000
+ NONWACC        0.000         0.000         0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ F8AGE          0.000         0.000
+ F9AGE          0.000         0.000
+
+
+           PSI
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC      208.590
+ WORDACC        0.000         3.136
+ NONWACC        0.000         0.000         3.108
+ NARACOMP       0.000         0.000         0.000        31.009
+ WOLDCOMP       0.000         0.000         0.000         0.000         1.879
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          5.613
+ F9AGE          0.000         7.454
+
+
+     STARTING VALUES FOR LATENT CLASS REGRESSION MODEL PART
+
+
+           ALPHA(C)
+              C#1
+              ________
+                0.000
+
+
+TECHNICAL 8 OUTPUT
+
+
+  INITIAL STAGE ITERATIONS
+
+
+  TECHNICAL 8 OUTPUT FOR UNPERTURBED STARTING VALUE SET
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.69850660D+05    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 9281.4234995    0.1328752  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 1
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 2
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23867889D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746231  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 3
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23857033D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746116  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 4
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 5
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 6
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23857631D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746122  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 7
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 8
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23867626D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746228  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 9
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23866102D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746212  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 10
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23862290D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746172  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 11
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 12
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 13
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 14
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 15
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 16
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 17
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 18
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23852721D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746070  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 19
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869448D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 20
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 21
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 22
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23856760D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746113  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 23
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23858286D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746129  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 24
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 25
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 26
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 27
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 28
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 29
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 30
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 31
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 32
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 33
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 34
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 35
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 36
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 37
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23864694D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746197  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 38
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 39
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 40
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 41
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 42
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 43
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 44
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 45
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 46
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 47
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 48
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23860003D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746147  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 49
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23867656D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746229  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 50
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23848904D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746029  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 51
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23865287D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746204  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 52
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 53
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23859379D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746141  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 54
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 55
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23859599D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746143  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 56
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 57
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 58
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23866351D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746215  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 59
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23841860D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9745954  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 60
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 61
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 62
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869291D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746246  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 63
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 64
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 65
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 66
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23838357D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9745917  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 67
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 68
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 69
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 70
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 71
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 72
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23863810D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746188  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 73
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 74
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 75
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23857736D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746123  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 76
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 77
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23810433D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9745619  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 78
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 79
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 80
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23865895D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746210  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 81
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 82
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 83
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 84
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 85
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 86
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 87
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23868195D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746235  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 88
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 89
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 90
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 91
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 92
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23850306D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746044  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 93
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 94
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 95
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23864224D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746192  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 96
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 97
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 98
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 99
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 100
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23868513D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746238  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 101
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23868153D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746234  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 102
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23863125D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746181  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 103
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 104
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 105
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 106
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 107
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 108
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 109
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23868946D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746243  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 110
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 111
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 112
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 113
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 114
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 115
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 116
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 117
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 118
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 119
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 120
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23863284D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746182  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 121
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 122
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23856542D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746111  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 123
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 124
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23869451D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746248  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 125
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23867892D+07    0.0000000    0.0000000  EM
+              2 -0.60569236D+05 ************    0.9746231  EM
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  FINAL STAGE ITERATIONS
+
+
+  TECHNICAL 8 OUTPUT FOR UNPERTURBED STARTING VALUE SET
+
+
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+              4 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 16
+
+
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+              4 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 5
+
+
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+              4 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 103
+
+
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+              4 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 107
+
+
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+              4 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 51
+
+
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+              4 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 9
+
+
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+              4 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 21
+
+
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+              4 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 43
+
+
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+              4 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 27
+
+
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+              4 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 52
+
+
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+              4 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 4
+
+
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+              4 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 11
+
+
+              3 -0.60569236D+05    0.0000000    0.0000000  EM
+              4 -0.60569236D+05    0.0000000    0.0000000  EM
+
+
+PLOT INFORMATION
+
+The following plots are available:
+
+  Histograms (sample values)
+  Scatterplots (sample values)
+  Estimated overall and class-specific distributions
+
+     Beginning Time:  13:00:37
+        Ending Time:  13:00:42
+       Elapsed Time:  00:00:05
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2020 Muthen & Muthen

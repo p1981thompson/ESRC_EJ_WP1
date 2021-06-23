@@ -1,0 +1,1503 @@
+Mplus VERSION 8.5
+MUTHEN & MUTHEN
+06/22/2021   9:48 AM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+   Confirmatory Factor Analysis - Final model with auxiliary variables (full spec)
+  DATA:
+  FILE = "./mplus_models/simpview/cfa/sv_final_aux_d7a8dc6038f76e3b88b0c13edc7005e5.dat";
+
+  VARIABLE:
+  NAMES = f8age f9age naraAcc wordAcc nonwAcc naraComp woldComp ethn_white m_age_birth
+       m_home_own m_edu_alev;
+   MISSING=.;
+
+  ANALYSIS:
+  estimator = mlr; type = general;
+  MODEL:
+  f8age; f9age;
+             read by naraComp naraAcc wordAcc nonwAcc woldComp;
+             wordAcc nonwAcc naraAcc naraComp on f9age;
+             woldcomp on f8age;
+   f8age with ethn_white m_age_birth m_home_own m_edu_alev;
+                                  f9age with ethn_white m_age_birth m_home_own m_edu_alev;
+
+                                  ethn_white with m_age_birth m_home_own m_edu_alev;
+                                  m_age_birth with m_home_own m_edu_alev;
+                                  m_home_own with m_edu_alev;
+
+                                  woldcomp with ethn_white m_age_birth
+                                  m_home_own m_edu_alev;
+
+                                  nonwacc with ethn_white m_age_birth
+                                  m_home_own m_edu_alev;
+
+                                  wordacc with ethn_white m_age_birth
+                                  m_home_own m_edu_alev;
+
+                                  naraacc with ethn_white m_age_birth
+                                  m_home_own m_edu_alev;
+
+                                  naracomp with ethn_white m_age_birth
+                                  m_home_own m_edu_alev;
+
+                                  woldcomp with ethn_white m_age_birth
+                                  m_home_own m_edu_alev;
+  OUTPUT:
+  sampstat; TECH1; TECH4; stdyx; modindices;
+  PLOT:
+  TYPE = PLOT3;
+
+
+
+*** WARNING in VARIABLE command
+  Note that only the first 8 characters of variable names are used in the output.
+  Shorten variable names to avoid any confusion.
+*** WARNING in PLOT command
+  Note that only the first 8 characters of variable names are used in plots.
+  If variable names are not unique within the first 8 characters, problems
+  may occur.
+   2 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
+
+
+
+
+Confirmatory Factor Analysis - Final model with auxiliary variables (full spec)
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                        3423
+
+Number of dependent variables                                    9
+Number of independent variables                                  2
+Number of continuous latent variables                            1
+
+Observed dependent variables
+
+  Continuous
+   NARAACC     WORDACC     NONWACC     NARACOMP    WOLDCOMP    ETHN_WHITE
+   M_AGE_BIRT  M_HOME_OWN  M_EDU_ALEV
+
+Observed independent variables
+   F8AGE       F9AGE
+
+Continuous latent variables
+   READ
+
+
+Estimator                                                      MLR
+Information matrix                                        OBSERVED
+Maximum number of iterations                                  1000
+Convergence criterion                                    0.500D-04
+Maximum number of steepest descent iterations                   20
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+
+Input data file(s)
+  ./mplus_models/simpview/cfa/sv_final_aux_d7a8dc6038f76e3b88b0c13edc7005e5.dat
+
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns            26
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT
+
+
+           Covariance Coverage
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        1.000
+ WORDACC        0.997         0.997
+ NONWACC        0.996         0.996         0.996
+ NARACOMP       1.000         0.997         0.996         1.000
+ WOLDCOMP       0.852         0.850         0.850         0.852         0.852
+ ETHN_WHI       0.901         0.899         0.897         0.901         0.786
+ M_AGE_BI       0.952         0.949         0.948         0.952         0.821
+ M_HOME_O       0.925         0.923         0.921         0.925         0.803
+ M_EDU_AL       0.916         0.914         0.912         0.916         0.798
+ F8AGE          0.861         0.859         0.858         0.861         0.852
+ F9AGE          1.000         0.997         0.996         1.000         0.852
+
+
+           Covariance Coverage
+              ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL      F8AGE
+              ________      ________      ________      ________      ________
+ ETHN_WHI       0.901
+ M_AGE_BI       0.901         0.952
+ M_HOME_O       0.883         0.925         0.925
+ M_EDU_AL       0.899         0.916         0.897         0.916
+ F8AGE          0.794         0.829         0.811         0.806         0.861
+ F9AGE          0.901         0.952         0.925         0.916         0.861
+
+
+           Covariance Coverage
+              F9AGE
+              ________
+ F9AGE          1.000
+
+
+SAMPLE STATISTICS
+
+
+     ESTIMATED SAMPLE STATISTICS
+
+
+           Means
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+               66.334         7.534         5.229        25.018         7.469
+
+
+           Means
+              ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL      F8AGE
+              ________      ________      ________      ________      ________
+                0.959        29.042         0.818         0.426       103.635
+
+
+           Means
+              F9AGE
+              ________
+              118.643
+
+
+           Covariances
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC      417.180
+ WORDACC       41.945         6.281
+ NONWACC       37.280         4.624         6.264
+ NARACOMP     132.691        13.927        11.756        62.018
+ WOLDCOMP      11.314         1.163         0.902         6.318         3.777
+ ETHN_WHI      -0.098        -0.015        -0.012         0.007        -0.013
+ M_AGE_BI      13.697         1.404         0.926         6.304         0.927
+ M_HOME_O       0.818         0.086         0.061         0.377         0.054
+ M_EDU_AL       2.068         0.212         0.178         1.085         0.164
+ F8AGE         -5.175        -0.540        -0.510        -2.221         0.116
+ F9AGE          2.487         0.075         0.004         0.957        -0.395
+
+
+           Covariances
+              ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL      F8AGE
+              ________      ________      ________      ________      ________
+ ETHN_WHI       0.038
+ M_AGE_BI      -0.009        21.140
+ M_HOME_O       0.007         0.492         0.147
+ M_EDU_AL       0.000         0.628         0.031         0.246
+ F8AGE         -0.041        -1.285        -0.127        -0.129        11.364
+ F9AGE         -0.008        -1.613        -0.135        -0.153         3.270
+
+
+           Covariances
+              F9AGE
+              ________
+ F9AGE         14.907
+
+
+           Correlations
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        1.000
+ WORDACC        0.819         1.000
+ NONWACC        0.729         0.737         1.000
+ NARACOMP       0.825         0.706         0.596         1.000
+ WOLDCOMP       0.285         0.239         0.185         0.413         1.000
+ ETHN_WHI      -0.024        -0.030        -0.025         0.005        -0.033
+ M_AGE_BI       0.146         0.122         0.081         0.174         0.104
+ M_HOME_O       0.105         0.090         0.063         0.125         0.072
+ M_EDU_AL       0.204         0.171         0.143         0.278         0.171
+ F8AGE         -0.075        -0.064        -0.060        -0.084         0.018
+ F9AGE          0.032         0.008         0.000         0.031        -0.053
+
+
+           Correlations
+              ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL      F8AGE
+              ________      ________      ________      ________      ________
+ ETHN_WHI       1.000
+ M_AGE_BI      -0.010         1.000
+ M_HOME_O       0.095         0.279         1.000
+ M_EDU_AL      -0.002         0.275         0.163         1.000
+ F8AGE         -0.062        -0.083        -0.099        -0.077         1.000
+ F9AGE         -0.010        -0.091        -0.091        -0.080         0.251
+
+
+           Correlations
+              F9AGE
+              ________
+ F9AGE          1.000
+
+
+     MAXIMUM LOG-LIKELIHOOD VALUE FOR THE UNRESTRICTED (H1) MODEL IS -72708.707
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     NARAACC              66.334      -0.525       0.000    0.06%      48.000     62.000     69.000
+            3423.000     417.180      -0.469     100.000    0.06%      76.000     86.000
+     WORDACC               7.536      -1.219       0.000    1.93%       6.000      8.000      8.000
+            3414.000       6.273       0.849      10.000   23.58%       9.000     10.000
+     NONWACC               5.239      -0.308       0.000    4.23%       3.000      5.000      5.000
+            3408.000       6.217      -0.688      10.000    1.79%       6.000      8.000
+     NARACOMP             25.018      -0.273       0.000    0.09%      18.000     23.000     25.000
+            3423.000      62.018      -0.237      44.000    0.03%      28.000     32.000
+     WOLDCOMP              7.517       0.082       2.000    0.41%       6.000      7.000      7.000
+            2917.000       3.758       0.190      15.000    0.03%       8.000      9.000
+     ETHN_WHITE            0.960      -4.703       0.000    3.99%       1.000      1.000      1.000
+            3085.000       0.038      20.123       1.000   96.01%       1.000      1.000
+     M_AGE_BIRTH          29.068       0.058      16.000    0.12%      25.000     28.000     29.000
+            3259.000      21.121       0.013      44.000    0.03%      30.000     33.000
+     M_HOME_OWN            0.822      -1.683       0.000   17.81%       1.000      1.000      1.000
+            3167.000       0.146       0.832       1.000   82.19%       1.000      1.000
+     M_EDU_ALEV            0.432       0.275       0.000   56.81%       0.000      0.000      0.000
+            3137.000       0.245      -1.924       1.000   43.19%       1.000      1.000
+     F8AGE               103.533       2.579      94.000    0.03%     102.000    102.000    103.000
+            2947.000      11.227       8.561     126.000    0.03%     103.000    105.000
+     F9AGE               118.643       1.305     105.000    0.03%     116.000    117.000    118.000
+            3423.000      14.907       2.626     139.000    0.06%     119.000    121.000
+
+
+THE MODEL ESTIMATION TERMINATED NORMALLY
+
+     WARNING:  THE LATENT VARIABLE COVARIANCE MATRIX (PSI) IS NOT POSITIVE
+     DEFINITE.  THIS COULD INDICATE A NEGATIVE VARIANCE/RESIDUAL VARIANCE FOR A
+     LATENT VARIABLE, A CORRELATION GREATER OR EQUAL TO ONE BETWEEN TWO LATENT
+     VARIABLES, OR A LINEAR DEPENDENCY AMONG MORE THAN TWO LATENT VARIABLES.
+     CHECK THE TECH4 OUTPUT FOR MORE INFORMATION.
+     PROBLEM INVOLVING VARIABLE M_EDU_AL.
+
+
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                       69
+
+Loglikelihood
+
+          H0 Value                      -73021.023
+          H0 Scaling Correction Factor      1.2696
+            for MLR
+          H1 Value                      -72708.707
+          H1 Scaling Correction Factor      1.2414
+            for MLR
+
+Information Criteria
+
+          Akaike (AIC)                  146180.046
+          Bayesian (BIC)                146603.587
+          Sample-Size Adjusted BIC      146384.342
+            (n* = (n + 2) / 24)
+
+Chi-Square Test of Model Fit
+
+          Value                            625.462*
+          Degrees of Freedom                     8
+          P-Value                           0.0000
+          Scaling Correction Factor         0.9987
+            for MLR
+
+*   The chi-square value for MLM, MLMV, MLR, ULSMV, WLSM and WLSMV cannot be used
+    for chi-square difference testing in the regular way.  MLM, MLR and WLSM
+    chi-square difference testing is described on the Mplus website.  MLMV, WLSMV,
+    and ULSMV difference testing is done using the DIFFTEST option.
+
+RMSEA (Root Mean Square Error Of Approximation)
+
+          Estimate                           0.150
+          90 Percent C.I.                    0.140  0.160
+          Probability RMSEA <= .05           0.000
+
+CFI/TLI
+
+          CFI                                0.947
+          TLI                                0.643
+
+Chi-Square Test of Model Fit for the Baseline Model
+
+          Value                          11723.580
+          Degrees of Freedom                    54
+          P-Value                           0.0000
+
+SRMR (Standardized Root Mean Square Residual)
+
+          Value                              0.023
+
+
+
+MODEL RESULTS
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ READ     BY
+    NARACOMP           1.000      0.000    999.000    999.000
+    NARAACC            2.931      0.030     97.677      0.000
+    WORDACC            0.323      0.005     64.076      0.000
+    NONWACC            0.287      0.005     56.071      0.000
+    WOLDCOMP           0.094      0.006     16.992      0.000
+
+ WORDACC  ON
+    F9AGE              0.128      0.034      3.735      0.000
+
+ NONWACC  ON
+    F9AGE              0.110      0.031      3.561      0.000
+
+ NARAACC  ON
+    F9AGE              1.288      0.306      4.211      0.000
+
+ NARACOMP ON
+    F9AGE              0.447      0.101      4.435      0.000
+
+ WOLDCOMP ON
+    F8AGE              0.037      0.011      3.313      0.001
+
+ F8AGE    WITH
+    READ              -3.228      0.609     -5.301      0.000
+
+ F9AGE    WITH
+    READ              -5.703      1.613     -3.535      0.000
+
+ F8AGE    WITH
+    ETHN_WHITE        -0.040      0.019     -2.060      0.039
+    M_AGE_BIRT        -1.238      0.361     -3.424      0.001
+    M_HOME_OWN        -0.125      0.034     -3.629      0.000
+    M_EDU_ALEV        -0.120      0.034     -3.555      0.000
+
+ F9AGE    WITH
+    ETHN_WHITE        -0.008      0.014     -0.563      0.573
+    M_AGE_BIRT        -1.613      0.316     -5.106      0.000
+    M_HOME_OWN        -0.135      0.030     -4.514      0.000
+    M_EDU_ALEV        -0.153      0.034     -4.486      0.000
+    F8AGE              3.278      0.421      7.787      0.000
+
+ ETHN_WHI WITH
+    M_AGE_BIRT        -0.010      0.018     -0.516      0.606
+    M_HOME_OWN         0.007      0.002      3.737      0.000
+    M_EDU_ALEV         0.000      0.002     -0.055      0.956
+    WOLDCOMP          -0.019      0.008     -2.353      0.019
+    NONWACC           -0.009      0.009     -0.932      0.351
+    WORDACC           -0.013      0.009     -1.533      0.125
+    NARAACC           -0.096      0.071     -1.348      0.178
+    NARACOMP           0.018      0.028      0.636      0.525
+
+ M_AGE_BI WITH
+    M_HOME_OWN         0.489      0.036     13.499      0.000
+    M_EDU_ALEV         0.619      0.039     15.851      0.000
+    WOLDCOMP           0.729      0.177      4.107      0.000
+    NONWACC            1.211      0.211      5.747      0.000
+    WORDACC            1.724      0.217      7.952      0.000
+    NARAACC           15.640      1.771      8.831      0.000
+    NARACOMP           6.733      0.684      9.847      0.000
+
+ M_HOME_O WITH
+    M_EDU_ALEV         0.031      0.003      9.310      0.000
+    WOLDCOMP           0.044      0.015      2.880      0.004
+    NONWACC            0.082      0.018      4.478      0.000
+    WORDACC            0.110      0.020      5.370      0.000
+    NARAACC            0.985      0.159      6.182      0.000
+    NARACOMP           0.421      0.060      6.984      0.000
+
+ WOLDCOMP WITH
+    M_EDU_ALEV         0.124      0.019      6.618      0.000
+
+ NONWACC  WITH
+    M_EDU_ALEV         0.221      0.023      9.712      0.000
+
+ WORDACC  WITH
+    M_EDU_ALEV         0.244      0.023     10.796      0.000
+
+ NARAACC  WITH
+    M_EDU_ALEV         2.239      0.187     11.978      0.000
+
+ NARACOMP WITH
+    M_EDU_ALEV         1.121      0.071     15.738      0.000
+
+ Means
+    ETHN_WHITE         0.959      0.004    262.680      0.000
+    M_AGE_BIRT        29.042      0.081    358.722      0.000
+    M_HOME_OWN         0.818      0.007    118.165      0.000
+    M_EDU_ALEV         0.426      0.009     48.386      0.000
+    F8AGE            103.634      0.068   1533.508      0.000
+    F9AGE            118.643      0.066   1797.819      0.000
+
+ Intercepts
+    NARAACC          -86.516     36.313     -2.383      0.017
+    WORDACC           -7.702      4.081     -1.887      0.059
+    NONWACC           -7.844      3.673     -2.136      0.033
+    NARACOMP         -27.988     11.957     -2.341      0.019
+    WOLDCOMP           3.631      1.160      3.131      0.002
+
+ Variances
+    ETHN_WHITE         0.038      0.003     11.782      0.000
+    M_AGE_BIRT        21.089      0.524     40.238      0.000
+    M_HOME_OWN         0.147      0.004     33.417      0.000
+    M_EDU_ALEV         0.245      0.001    182.004      0.000
+    F8AGE             11.367      0.690     16.484      0.000
+    F9AGE             14.907      0.548     27.201      0.000
+    READ              46.784      1.911     24.478      0.000
+
+ Residual Variances
+    NARAACC           33.472      2.623     12.762      0.000
+    WORDACC            1.637      0.052     31.679      0.000
+    NONWACC            2.578      0.076     33.897      0.000
+    NARACOMP          17.355      0.529     32.795      0.000
+    WOLDCOMP           3.376      0.092     36.702      0.000
+
+
+STANDARDIZED MODEL RESULTS
+
+
+STDYX Standardization
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ READ     BY
+    NARACOMP           0.869      0.013     68.227      0.000
+    NARAACC            0.982      0.014     72.670      0.000
+    WORDACC            0.881      0.013     68.768      0.000
+    NONWACC            0.785      0.013     59.669      0.000
+    WOLDCOMP           0.329      0.018     17.822      0.000
+
+ WORDACC  ON
+    F9AGE              0.198      0.053      3.719      0.000
+
+ NONWACC  ON
+    F9AGE              0.170      0.048      3.542      0.000
+
+ NARAACC  ON
+    F9AGE              0.244      0.058      4.181      0.000
+
+ NARACOMP ON
+    F9AGE              0.219      0.050      4.402      0.000
+
+ WOLDCOMP ON
+    F8AGE              0.064      0.020      3.287      0.001
+
+ F8AGE    WITH
+    READ              -0.140      0.024     -5.786      0.000
+
+ F9AGE    WITH
+    READ              -0.216      0.058     -3.744      0.000
+
+ F8AGE    WITH
+    ETHN_WHITE        -0.060      0.029     -2.093      0.036
+    M_AGE_BIRT        -0.080      0.023     -3.503      0.000
+    M_HOME_OWN        -0.097      0.026     -3.716      0.000
+    M_EDU_ALEV        -0.072      0.020     -3.652      0.000
+
+ F9AGE    WITH
+    ETHN_WHITE        -0.010      0.018     -0.564      0.573
+    M_AGE_BIRT        -0.091      0.018     -5.171      0.000
+    M_HOME_OWN        -0.091      0.020     -4.589      0.000
+    M_EDU_ALEV        -0.080      0.018     -4.524      0.000
+    F8AGE              0.252      0.027      9.395      0.000
+
+ ETHN_WHI WITH
+    M_AGE_BIRT        -0.011      0.021     -0.516      0.606
+    M_HOME_OWN         0.095      0.024      3.906      0.000
+    M_EDU_ALEV        -0.001      0.018     -0.055      0.956
+    WOLDCOMP          -0.052      0.022     -2.390      0.017
+    NONWACC           -0.027      0.029     -0.935      0.350
+    WORDACC           -0.053      0.034     -1.542      0.123
+    NARAACC           -0.085      0.063     -1.354      0.176
+    NARACOMP           0.022      0.034      0.637      0.524
+
+ M_AGE_BI WITH
+    M_HOME_OWN         0.278      0.018     15.063      0.000
+    M_EDU_ALEV         0.272      0.016     16.746      0.000
+    WOLDCOMP           0.086      0.021      4.123      0.000
+    NONWACC            0.164      0.029      5.720      0.000
+    WORDACC            0.293      0.037      8.003      0.000
+    NARAACC            0.589      0.071      8.323      0.000
+    NARACOMP           0.352      0.035      9.956      0.000
+
+ M_HOME_O WITH
+    M_EDU_ALEV         0.161      0.017      9.619      0.000
+    WOLDCOMP           0.063      0.022      2.889      0.004
+    NONWACC            0.133      0.030      4.483      0.000
+    WORDACC            0.224      0.041      5.431      0.000
+    NARAACC            0.444      0.073      6.075      0.000
+    NARACOMP           0.264      0.037      7.096      0.000
+
+ WOLDCOMP WITH
+    M_EDU_ALEV         0.136      0.021      6.632      0.000
+
+ NONWACC  WITH
+    M_EDU_ALEV         0.279      0.029      9.574      0.000
+
+ WORDACC  WITH
+    M_EDU_ALEV         0.385      0.036     10.706      0.000
+
+ NARAACC  WITH
+    M_EDU_ALEV         0.782      0.074     10.625      0.000
+
+ NARACOMP WITH
+    M_EDU_ALEV         0.544      0.035     15.506      0.000
+
+ Means
+    ETHN_WHITE         4.895      0.226     21.635      0.000
+    M_AGE_BIRT         6.324      0.080     79.122      0.000
+    M_HOME_OWN         2.135      0.050     42.736      0.000
+    M_EDU_ALEV         0.860      0.016     54.714      0.000
+    F8AGE             30.738      0.916     33.557      0.000
+    F9AGE             30.729      0.555     55.403      0.000
+
+ Intercepts
+    NARAACC           -4.236      1.777     -2.383      0.017
+    WORDACC           -3.073      1.627     -1.889      0.059
+    NONWACC           -3.135      1.467     -2.137      0.033
+    NARACOMP          -3.554      1.518     -2.342      0.019
+    WOLDCOMP           1.868      0.600      3.115      0.002
+
+ Variances
+    ETHN_WHITE         1.000      0.000    999.000    999.000
+    M_AGE_BIRT         1.000      0.000    999.000    999.000
+    M_HOME_OWN         1.000      0.000    999.000    999.000
+    M_EDU_ALEV         1.000      0.000    999.000    999.000
+    F8AGE              1.000      0.000    999.000    999.000
+    F9AGE              1.000      0.000    999.000    999.000
+    READ               1.000      0.000    999.000    999.000
+
+ Residual Variances
+    NARAACC            0.080      0.007     12.234      0.000
+    WORDACC            0.261      0.010     26.780      0.000
+    NONWACC            0.412      0.013     32.674      0.000
+    NARACOMP           0.280      0.010     28.455      0.000
+    WOLDCOMP           0.893      0.012     74.943      0.000
+
+
+R-SQUARE
+
+    Observed                                        Two-Tailed
+    Variable        Estimate       S.E.  Est./S.E.    P-Value
+
+    NARAACC            0.920      0.007    140.246      0.000
+    WORDACC            0.739      0.010     76.003      0.000
+    NONWACC            0.588      0.013     46.664      0.000
+    NARACOMP           0.720      0.010     73.231      0.000
+    WOLDCOMP           0.107      0.012      8.951      0.000
+
+
+QUALITY OF NUMERICAL RESULTS
+
+     Condition Number for the Information Matrix              0.936E-08
+       (ratio of smallest to largest eigenvalue)
+
+
+MODEL MODIFICATION INDICES
+
+NOTE:  Modification indices for direct effects of observed dependent variables
+regressed on covariates may not be included.  To include these, request
+MODINDICES (ALL).
+
+Minimum M.I. value for printing the modification index    10.000
+
+                                   M.I.     E.P.C.  Std E.P.C.  StdYX E.P.C.
+
+ON Statements
+
+NARAACC  ON WORDACC               52.699    -1.997     -1.997       -0.245
+NARAACC  ON NONWACC               20.428    -0.649     -0.649       -0.080
+NARAACC  ON NARACOMP             206.358     1.131      1.131        0.436
+NARAACC  ON WOLDCOMP              38.171    -0.597     -0.597       -0.057
+NARAACC  ON ETHN_WHI              78.957    94.113     94.113        0.903
+NARAACC  ON M_AGE_BI              42.678     3.073      3.073        0.691
+NARAACC  ON M_HOME_O              19.293    25.311     25.311        0.475
+NARAACC  ON M_EDU_AL              84.646    30.813     30.813        0.747
+WORDACC  ON NARAACC               52.700    -0.098     -0.098       -0.796
+WORDACC  ON NONWACC              305.741     0.302      0.302        0.301
+WORDACC  ON NARACOMP              64.111    -0.065     -0.065       -0.205
+WORDACC  ON WOLDCOMP              18.036    -0.060     -0.060       -0.046
+WORDACC  ON M_AGE_BI             182.207    -0.774     -0.774       -1.419
+WORDACC  ON M_HOME_O              98.884    -7.646     -7.646       -1.169
+WORDACC  ON M_EDU_AL              86.933    -3.494     -3.494       -0.690
+NONWACC  ON NARAACC               20.428    -0.050     -0.050       -0.408
+NONWACC  ON WORDACC              305.741     0.475      0.475        0.476
+NONWACC  ON NARACOMP             133.023    -0.094     -0.094       -0.296
+NONWACC  ON WOLDCOMP              30.366    -0.093     -0.093       -0.072
+NONWACC  ON ETHN_WHI              39.371   -10.147    -10.147       -0.794
+NONWACC  ON M_AGE_BI             128.079    -0.918     -0.918       -1.684
+NONWACC  ON M_HOME_O              62.715    -7.733     -7.733       -1.184
+NONWACC  ON M_EDU_AL             172.331    -4.843     -4.843       -0.958
+NARACOMP ON NARAACC              206.348     0.587      0.587        1.521
+NARACOMP ON WORDACC               64.112    -0.693     -0.693       -0.220
+NARACOMP ON NONWACC              133.025    -0.632     -0.632       -0.201
+NARACOMP ON WOLDCOMP             295.644     0.782      0.782        0.193
+NARACOMP ON ETHN_WHI              59.192   -42.976    -42.976       -1.069
+NARACOMP ON M_AGE_BI             227.890     3.991      3.991        2.327
+NARACOMP ON M_HOME_O              89.282    27.757     27.757        1.350
+NARACOMP ON M_EDU_AL             249.817    39.634     39.634        2.491
+WOLDCOMP ON NARAACC               38.628    -0.061     -0.061       -0.639
+WOLDCOMP ON WORDACC               18.761    -0.126     -0.126       -0.163
+WOLDCOMP ON NONWACC               30.964    -0.123     -0.123       -0.159
+WOLDCOMP ON NARACOMP             301.746     0.154      0.154        0.624
+WOLDCOMP ON ETHN_WHI             294.660    50.255     50.255        5.064
+WOLDCOMP ON M_AGE_BI             281.579     1.491      1.491        3.523
+WOLDCOMP ON M_HOME_O             293.629    26.927     26.927        5.306
+WOLDCOMP ON M_EDU_AL             300.575     7.451      7.451        1.897
+
+WITH Statements
+
+WORDACC  WITH NARAACC             52.700    -3.268     -3.268       -0.442
+NONWACC  WITH NARAACC             20.428    -1.674     -1.674       -0.180
+NONWACC  WITH WORDACC            305.741     0.778      0.778        0.379
+NARACOMP WITH NARAACC            206.356    19.636     19.636        0.815
+NARACOMP WITH WORDACC             64.111    -1.134     -1.134       -0.213
+NARACOMP WITH NONWACC            133.024    -1.629     -1.629       -0.244
+WOLDCOMP WITH NARAACC             38.622    -2.034     -2.034       -0.191
+WOLDCOMP WITH WORDACC             18.759    -0.207     -0.207       -0.088
+WOLDCOMP WITH NONWACC             30.963    -0.318     -0.318       -0.108
+WOLDCOMP WITH NARACOMP           301.752     2.673      2.673        0.349
+
+
+TECHNICAL 1 OUTPUT
+
+
+     PARAMETER SPECIFICATION
+
+
+           NU
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL      F8AGE
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              F9AGE
+              ________
+                  0
+
+
+           LAMBDA
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ ETHN_WHI           0             0             0             0             0
+ M_AGE_BI           0             0             0             0             0
+ M_HOME_O           0             0             0             0             0
+ M_EDU_AL           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           LAMBDA
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ ETHN_WHI           0             0             0             0             0
+ M_AGE_BI           0             0             0             0             0
+ M_HOME_O           0             0             0             0             0
+ M_EDU_AL           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC            0             0
+ WORDACC            0             0
+ NONWACC            0             0
+ NARACOMP           0             0
+ WOLDCOMP           0             0
+ ETHN_WHI           0             0
+ M_AGE_BI           0             0
+ M_HOME_O           0             0
+ M_EDU_AL           0             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           THETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0
+ WORDACC            0             0
+ NONWACC            0             0             0
+ NARACOMP           0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ ETHN_WHI           0             0             0             0             0
+ M_AGE_BI           0             0             0             0             0
+ M_HOME_O           0             0             0             0             0
+ M_EDU_AL           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           THETA
+              ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL      F8AGE
+              ________      ________      ________      ________      ________
+ ETHN_WHI           0
+ M_AGE_BI           0             0
+ M_HOME_O           0             0             0
+ M_EDU_AL           0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           THETA
+              F9AGE
+              ________
+ F9AGE              0
+
+
+           ALPHA
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+                  0             1             2             3             4
+
+
+           ALPHA
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+                  5             6             7             8             9
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+                 10            11
+
+
+           BETA
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+ READ               0             0             0             0             0
+ NARAACC           12             0             0             0             0
+ WORDACC           14             0             0             0             0
+ NONWACC           16             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP          19             0             0             0             0
+ ETHN_WHI           0             0             0             0             0
+ M_AGE_BI           0             0             0             0             0
+ M_HOME_O           0             0             0             0             0
+ M_EDU_AL           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           BETA
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+ READ               0             0             0             0             0
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ ETHN_WHI           0             0             0             0             0
+ M_AGE_BI           0             0             0             0             0
+ M_HOME_O           0             0             0             0             0
+ M_EDU_AL           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ READ               0             0
+ NARAACC            0            13
+ WORDACC            0            15
+ NONWACC            0            17
+ NARACOMP           0            18
+ WOLDCOMP          20             0
+ ETHN_WHI           0             0
+ M_AGE_BI           0             0
+ M_HOME_O           0             0
+ M_EDU_AL           0             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           PSI
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+ READ              21
+ NARAACC            0            22
+ WORDACC            0             0            23
+ NONWACC            0             0             0            24
+ NARACOMP           0             0             0             0            25
+ WOLDCOMP           0             0             0             0             0
+ ETHN_WHI           0            27            28            29            30
+ M_AGE_BI           0            33            34            35            36
+ M_HOME_O           0            40            41            42            43
+ M_EDU_AL           0            48            49            50            51
+ F8AGE             57             0             0             0             0
+ F9AGE             63             0             0             0             0
+
+
+           PSI
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+ WOLDCOMP          26
+ ETHN_WHI          31            32
+ M_AGE_BI          37            38            39
+ M_HOME_O          44            45            46            47
+ M_EDU_AL          52            53            54            55            56
+ F8AGE              0            58            59            60            61
+ F9AGE              0            64            65            66            67
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE             62
+ F9AGE             68            69
+
+
+     STARTING VALUES
+
+
+           NU
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL      F8AGE
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              F9AGE
+              ________
+                0.000
+
+
+           LAMBDA
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+ NARAACC        0.000         1.000         0.000         0.000         0.000
+ WORDACC        0.000         0.000         1.000         0.000         0.000
+ NONWACC        0.000         0.000         0.000         1.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000         1.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ ETHN_WHI       0.000         0.000         0.000         0.000         0.000
+ M_AGE_BI       0.000         0.000         0.000         0.000         0.000
+ M_HOME_O       0.000         0.000         0.000         0.000         0.000
+ M_EDU_AL       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+ NARAACC        0.000         0.000         0.000         0.000         0.000
+ WORDACC        0.000         0.000         0.000         0.000         0.000
+ NONWACC        0.000         0.000         0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       1.000         0.000         0.000         0.000         0.000
+ ETHN_WHI       0.000         1.000         0.000         0.000         0.000
+ M_AGE_BI       0.000         0.000         1.000         0.000         0.000
+ M_HOME_O       0.000         0.000         0.000         1.000         0.000
+ M_EDU_AL       0.000         0.000         0.000         0.000         1.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ ETHN_WHI       0.000         0.000
+ M_AGE_BI       0.000         0.000
+ M_HOME_O       0.000         0.000
+ M_EDU_AL       0.000         0.000
+ F8AGE          1.000         0.000
+ F9AGE          0.000         1.000
+
+
+           THETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ ETHN_WHI       0.000         0.000         0.000         0.000         0.000
+ M_AGE_BI       0.000         0.000         0.000         0.000         0.000
+ M_HOME_O       0.000         0.000         0.000         0.000         0.000
+ M_EDU_AL       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL      F8AGE
+              ________      ________      ________      ________      ________
+ ETHN_WHI       0.000
+ M_AGE_BI       0.000         0.000
+ M_HOME_O       0.000         0.000         0.000
+ M_EDU_AL       0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              F9AGE
+              ________
+ F9AGE          0.000
+
+
+           ALPHA
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+                0.000        66.334         7.536         5.239        25.018
+
+
+           ALPHA
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+                7.517         0.960        29.068         0.822         0.432
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+              103.533       118.643
+
+
+           BETA
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+ READ           0.000         0.000         0.000         0.000         0.000
+ NARAACC        2.979         0.000         0.000         0.000         0.000
+ WORDACC        0.332         0.000         0.000         0.000         0.000
+ NONWACC        0.295         0.000         0.000         0.000         0.000
+ NARACOMP       1.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.109         0.000         0.000         0.000         0.000
+ ETHN_WHI       0.000         0.000         0.000         0.000         0.000
+ M_AGE_BI       0.000         0.000         0.000         0.000         0.000
+ M_HOME_O       0.000         0.000         0.000         0.000         0.000
+ M_EDU_AL       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+ READ           0.000         0.000         0.000         0.000         0.000
+ NARAACC        0.000         0.000         0.000         0.000         0.000
+ WORDACC        0.000         0.000         0.000         0.000         0.000
+ NONWACC        0.000         0.000         0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ ETHN_WHI       0.000         0.000         0.000         0.000         0.000
+ M_AGE_BI       0.000         0.000         0.000         0.000         0.000
+ M_HOME_O       0.000         0.000         0.000         0.000         0.000
+ M_EDU_AL       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ READ           0.000         0.000
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ ETHN_WHI       0.000         0.000
+ M_AGE_BI       0.000         0.000
+ M_HOME_O       0.000         0.000
+ M_EDU_AL       0.000         0.000
+ F8AGE          0.000         0.000
+ F9AGE          0.000         0.000
+
+
+           PSI
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+ READ           0.050
+ NARAACC        0.000       208.590
+ WORDACC        0.000         0.000         3.136
+ NONWACC        0.000         0.000         0.000         3.108
+ NARACOMP       0.000         0.000         0.000         0.000        31.009
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ ETHN_WHI       0.000         0.000         0.000         0.000         0.000
+ M_AGE_BI       0.000         0.000         0.000         0.000         0.000
+ M_HOME_O       0.000         0.000         0.000         0.000         0.000
+ M_EDU_AL       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+ WOLDCOMP       1.879
+ ETHN_WHI       0.000         0.019
+ M_AGE_BI       0.000         0.000        10.560
+ M_HOME_O       0.000         0.000         0.000         0.073
+ M_EDU_AL       0.000         0.000         0.000         0.000         0.123
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          5.613
+ F9AGE          0.000         7.454
+
+
+TECHNICAL 4 OUTPUT
+
+
+     ESTIMATES DERIVED FROM THE MODEL
+
+
+           ESTIMATED MEANS FOR THE LATENT VARIABLES
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+                0.000        66.334         7.534         5.229        25.018
+
+
+           ESTIMATED MEANS FOR THE LATENT VARIABLES
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+                7.478         0.959        29.042         0.818         0.426
+
+
+           ESTIMATED MEANS FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+              103.634       118.643
+
+
+           S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+                0.000         0.349         0.043         0.043         0.135
+
+
+           S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+                0.036         0.004         0.081         0.007         0.009
+
+
+           S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+                0.068         0.066
+
+
+           EST./S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+                0.000       190.010       175.736       122.186       185.863
+
+
+           EST./S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+              209.051       262.680       358.722       118.165        48.386
+
+
+           EST./S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+             1533.508      1797.819
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+                1.000         0.000         0.000         0.000         0.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+                0.000         0.000
+
+
+           ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+ READ          46.784
+ NARAACC      129.799       417.180
+ WORDACC       14.364        42.204         6.281
+ NONWACC       12.812        37.565         4.135         6.259
+ NARACOMP      44.236       130.910        14.397        12.814        62.018
+ WOLDCOMP       4.260        11.956         1.322         1.178         4.075
+ ETHN_WHI       0.000        -0.106        -0.014        -0.009         0.014
+ M_AGE_BI       0.000        13.563         1.517         1.033         6.013
+ M_HOME_O       0.000         0.811         0.093         0.067         0.361
+ M_EDU_AL       0.000         2.042         0.224         0.205         1.053
+ F8AGE         -3.228        -5.239        -0.621        -0.566        -1.763
+ F9AGE         -5.703         2.488         0.074         0.004         0.957
+
+
+           ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+ WOLDCOMP       3.779
+ ETHN_WHI      -0.020         0.038
+ M_AGE_BI       0.683        -0.010        21.089
+ M_HOME_O       0.040         0.007         0.489         0.147
+ M_EDU_AL       0.119         0.000         0.619         0.031         0.245
+ F8AGE          0.120        -0.040        -1.238        -0.125        -0.120
+ F9AGE         -0.412        -0.008        -1.613        -0.135        -0.153
+
+
+           ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE         11.367
+ F9AGE          3.278        14.907
+
+
+           S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+ READ           1.911
+ NARAACC        3.525         8.823
+ WORDACC        0.462         1.217         0.181
+ NONWACC        0.364         0.967         0.135         0.123
+ NARACOMP       1.451         3.458         0.452         0.357         1.407
+ WOLDCOMP       0.296         0.769         0.087         0.077         0.278
+ ETHN_WHI       0.000         0.070         0.008         0.009         0.028
+ M_AGE_BI       0.000         1.666         0.206         0.202         0.646
+ M_HOME_O       0.000         0.149         0.020         0.017         0.057
+ M_EDU_AL       0.000         0.176         0.021         0.022         0.068
+ F8AGE          0.609         1.405         0.157         0.139         0.482
+ F9AGE          1.613         1.424         0.177         0.167         0.551
+
+
+           S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+ WOLDCOMP       0.104
+ ETHN_WHI       0.008         0.003
+ M_AGE_BI       0.178         0.018         0.524
+ M_HOME_O       0.015         0.002         0.036         0.004
+ M_EDU_AL       0.019         0.002         0.039         0.003         0.001
+ F8AGE          0.133         0.019         0.361         0.034         0.034
+ F9AGE          0.147         0.014         0.316         0.030         0.034
+
+
+           S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.690
+ F9AGE          0.421         0.548
+
+
+           EST./S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+ READ          24.478
+ NARAACC       36.824        47.285
+ WORDACC       31.105        34.686        34.639
+ NONWACC       35.175        38.848        30.664        50.743
+ NARACOMP      30.483        37.861        31.831        35.858        44.069
+ WOLDCOMP      14.388        15.540        15.117        15.358        14.665
+ ETHN_WHI       0.000        -1.525        -1.708        -1.041         0.518
+ M_AGE_BI       0.000         8.139         7.365         5.122         9.306
+ M_HOME_O       0.000         5.438         4.731         3.843         6.317
+ M_EDU_AL       0.000        11.612        10.434         9.285        15.471
+ F8AGE         -5.301        -3.728        -3.949        -4.071        -3.659
+ F9AGE         -3.535         1.747         0.419         0.025         1.739
+
+
+           EST./S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+ WOLDCOMP      36.297
+ ETHN_WHI      -2.520        11.782
+ M_AGE_BI       3.847        -0.516        40.238
+ M_HOME_O       2.575         3.737        13.499        33.417
+ M_EDU_AL       6.382        -0.055        15.851         9.310       182.004
+ F8AGE          0.900        -2.060        -3.424        -3.629        -3.555
+ F9AGE         -2.809        -0.563        -5.106        -4.514        -4.486
+
+
+           EST./S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE         16.484
+ F9AGE          7.787        27.201
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+ READ           0.000
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000         0.000
+ NONWACC        0.000         0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ ETHN_WHI       1.000         0.127         0.088         0.298         0.604
+ M_AGE_BI       1.000         0.000         0.000         0.000         0.000
+ M_HOME_O       1.000         0.000         0.000         0.000         0.000
+ M_EDU_AL       1.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.081         0.675         0.980         0.082
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+ WOLDCOMP       0.000
+ ETHN_WHI       0.012         0.000
+ M_AGE_BI       0.000         0.606         0.000
+ M_HOME_O       0.010         0.000         0.000         0.000
+ M_EDU_AL       0.000         0.956         0.000         0.000         0.000
+ F8AGE          0.368         0.039         0.001         0.000         0.000
+ F9AGE          0.005         0.573         0.000         0.000         0.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.000
+ F9AGE          0.000         0.000
+
+
+           ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+ READ           1.000
+ NARAACC        0.929         1.000
+ WORDACC        0.838         0.824         1.000
+ NONWACC        0.749         0.735         0.659         1.000
+ NARACOMP       0.821         0.814         0.729         0.650         1.000
+ WOLDCOMP       0.320         0.301         0.271         0.242         0.266
+ ETHN_WHI       0.000        -0.027        -0.029        -0.019         0.009
+ M_AGE_BI       0.000         0.145         0.132         0.090         0.166
+ M_HOME_O       0.000         0.104         0.096         0.070         0.120
+ M_EDU_AL       0.000         0.202         0.181         0.165         0.270
+ F8AGE         -0.140        -0.076        -0.073        -0.067        -0.066
+ F9AGE         -0.216         0.032         0.008         0.000         0.031
+
+
+           ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+ WOLDCOMP       1.000
+ ETHN_WHI      -0.053         1.000
+ M_AGE_BI       0.077        -0.011         1.000
+ M_HOME_O       0.053         0.095         0.278         1.000
+ M_EDU_AL       0.124        -0.001         0.272         0.161         1.000
+ F8AGE          0.018        -0.060        -0.080        -0.097        -0.072
+ F9AGE         -0.055        -0.010        -0.091        -0.091        -0.080
+
+
+           ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          1.000
+ F9AGE          0.252         1.000
+
+
+           S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+ READ           0.000
+ NARAACC        0.014         0.000
+ WORDACC        0.013         0.006         0.000
+ NONWACC        0.013         0.008         0.010         0.000
+ NARACOMP       0.014         0.007         0.008         0.009         0.000
+ WOLDCOMP       0.018         0.017         0.016         0.014         0.016
+ ETHN_WHI       0.000         0.017         0.017         0.018         0.018
+ M_AGE_BI       0.000         0.017         0.017         0.017         0.017
+ M_HOME_O       0.000         0.019         0.020         0.018         0.018
+ M_EDU_AL       0.000         0.017         0.017         0.017         0.017
+ F8AGE          0.024         0.020         0.018         0.016         0.018
+ F9AGE          0.058         0.018         0.018         0.017         0.018
+
+
+           S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+ WOLDCOMP       0.000
+ ETHN_WHI       0.021         0.000
+ M_AGE_BI       0.020         0.021         0.000
+ M_HOME_O       0.021         0.024         0.018         0.000
+ M_EDU_AL       0.019         0.018         0.016         0.017         0.000
+ F8AGE          0.020         0.029         0.023         0.026         0.020
+ F9AGE          0.019         0.018         0.018         0.020         0.018
+
+
+           S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.000
+ F9AGE          0.027         0.000
+
+
+           EST./S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+ READ         999.000
+ NARAACC       65.884       999.000
+ WORDACC       65.117       144.116       999.000
+ NONWACC       58.177        89.357        66.136       999.000
+ NARACOMP      60.591       119.720        95.113        72.550       999.000
+ WOLDCOMP      17.623        17.501        17.351        17.155        16.872
+ ETHN_WHI       0.000        -1.536        -1.723        -1.044         0.519
+ M_AGE_BI       0.000         8.354         7.553         5.174         9.629
+ M_HOME_O       0.000         5.538         4.830         3.874         6.478
+ M_EDU_AL       0.000        11.885        10.761         9.456        16.136
+ F8AGE         -5.786        -3.781        -4.024        -4.137        -3.718
+ F9AGE         -3.744         1.751         0.419         0.025         1.741
+
+
+           EST./S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+ WOLDCOMP     999.000
+ ETHN_WHI      -2.568       999.000
+ M_AGE_BI       3.876        -0.516       999.000
+ M_HOME_O       2.587         3.906        15.063       999.000
+ M_EDU_AL       6.462        -0.055        16.746         9.619       999.000
+ F8AGE          0.903        -2.093        -3.503        -3.716        -3.652
+ F9AGE         -2.838        -0.564        -5.171        -4.589        -4.524
+
+
+           EST./S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE        999.000
+ F9AGE          9.395       999.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              READ          NARAACC       WORDACC       NONWACC       NARACOMP
+              ________      ________      ________      ________      ________
+ READ           0.000
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000         0.000
+ NONWACC        0.000         0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ ETHN_WHI       1.000         0.125         0.085         0.296         0.604
+ M_AGE_BI       1.000         0.000         0.000         0.000         0.000
+ M_HOME_O       1.000         0.000         0.000         0.000         0.000
+ M_EDU_AL       1.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.080         0.675         0.980         0.082
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              WOLDCOMP      ETHN_WHI      M_AGE_BI      M_HOME_O      M_EDU_AL
+              ________      ________      ________      ________      ________
+ WOLDCOMP       0.000
+ ETHN_WHI       0.010         0.000
+ M_AGE_BI       0.000         0.606         0.000
+ M_HOME_O       0.010         0.000         0.000         0.000
+ M_EDU_AL       0.000         0.956         0.000         0.000         0.000
+ F8AGE          0.366         0.036         0.000         0.000         0.000
+ F9AGE          0.005         0.573         0.000         0.000         0.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.000
+ F9AGE          0.000         0.000
+
+
+SAMPLE STATISTICS FOR ESTIMATED FACTOR SCORES
+
+
+     SAMPLE STATISTICS
+
+
+           Means
+              READ          READ_SE
+              ________      ________
+                0.000         0.102
+
+
+           Covariances
+              READ          READ_SE
+              ________      ________
+ READ          47.852
+ READ_SE       -0.153         0.124
+
+
+           Correlations
+              READ          READ_SE
+              ________      ________
+ READ           1.000
+ READ_SE       -0.063         1.000
+
+
+PLOT INFORMATION
+
+The following plots are available:
+
+  Histograms (sample values, estimated factor scores, estimated values, residuals)
+  Scatterplots (sample values, estimated factor scores, estimated values, residuals)
+  Latent variable distribution plots
+
+     Beginning Time:  09:48:41
+        Ending Time:  09:48:42
+       Elapsed Time:  00:00:01
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2020 Muthen & Muthen

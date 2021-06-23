@@ -1,0 +1,4123 @@
+Mplus VERSION 8.5
+MUTHEN & MUTHEN
+06/23/2021   4:54 PM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+   LPA Model C: 6 classes;
+  DATA:
+  FILE = "mplus_models/simpview/lpa/sv_lpa_mbenchmark_71407e46d98e5016017ad9a2654f310f.dat";
+
+  VARIABLE:
+  NAMES = cidB3153 f8age f9age naraAcc wordAcc nonwAcc naraComp woldComp;
+   MISSING=.;
+    idvariable = cidb3153; classes = c(6);
+  ANALYSIS:
+  estimator = mlr; type = mixture; starts = 500 50;
+                processors = 4(STARTS);
+  MODEL:
+  %OVERALL%
+             f8age; f9age;
+             wordAcc nonwAcc naraAcc naraComp on f9age;
+             woldcomp on f8age;
+   naraComp; naraAcc; wordAcc; nonwAcc; woldComp;
+    naraComp with naraAcc@0;
+    naraComp with wordAcc@0;
+    naraComp with nonwAcc@0;
+    naraComp with woldComp@0;
+    naraAcc with wordAcc@0;
+    naraAcc with nonwAcc@0;
+    naraAcc with woldComp@0;
+    wordAcc with nonWacc@0;
+    wordAcc with woldComp@0;
+    nonwAcc with woldComp@0;
+   %c#1%
+   naraComp; naraAcc; wordAcc; nonwAcc; woldComp;
+   %c#2%
+   naraComp; naraAcc; wordAcc; nonwAcc; woldComp;
+   %c#3%
+   naraComp; naraAcc; wordAcc; nonwAcc; woldComp;
+   %c#4%
+   naraComp; naraAcc; wordAcc; nonwAcc; woldComp;
+   %c#5%
+   naraComp; naraAcc; wordAcc; nonwAcc; woldComp;
+   %c#6%
+   naraComp; naraAcc; wordAcc; nonwAcc; woldComp;
+  OUTPUT:
+  TECH1 TECH8 TECH11;
+  PLOT:
+  TYPE = PLOT3;
+
+
+
+INPUT READING TERMINATED NORMALLY
+
+
+
+
+LPA Model C: 6 classes;
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                        3423
+
+Number of dependent variables                                    5
+Number of independent variables                                  2
+Number of continuous latent variables                            0
+Number of categorical latent variables                           1
+
+Observed dependent variables
+
+  Continuous
+   NARAACC     WORDACC     NONWACC     NARACOMP    WOLDCOMP
+
+Observed independent variables
+   F8AGE       F9AGE
+
+Categorical latent variables
+   C
+
+Variables with special functions
+
+  ID variable           CIDB3153
+
+Estimator                                                      MLR
+Information matrix                                        OBSERVED
+Optimization Specifications for the Quasi-Newton Algorithm for
+Continuous Outcomes
+  Maximum number of iterations                                 100
+  Convergence criterion                                  0.100D-05
+Optimization Specifications for the EM Algorithm
+  Maximum number of iterations                                 500
+  Convergence criteria
+    Loglikelihood change                                 0.100D-06
+    Relative loglikelihood change                        0.100D-06
+    Derivative                                           0.100D-05
+Optimization Specifications for the M step of the EM Algorithm for
+Categorical Latent variables
+  Number of M step iterations                                    1
+  M step convergence criterion                           0.100D-05
+  Basis for M step termination                           ITERATION
+Optimization Specifications for the M step of the EM Algorithm for
+Censored, Binary or Ordered Categorical (Ordinal), Unordered
+Categorical (Nominal) and Count Outcomes
+  Number of M step iterations                                    1
+  M step convergence criterion                           0.100D-05
+  Basis for M step termination                           ITERATION
+  Maximum value for logit thresholds                            15
+  Minimum value for logit thresholds                           -15
+  Minimum expected cell size for chi-square              0.100D-01
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+Optimization algorithm                                         EMA
+Random Starts Specifications
+  Number of initial stage random starts                        500
+  Number of final stage optimizations                           50
+  Number of initial stage iterations                            10
+  Initial stage convergence criterion                    0.100D+01
+  Random starts scale                                    0.500D+01
+  Random seed for generating random starts                       0
+
+Input data file(s)
+  mplus_models/simpview/lpa/sv_lpa_mbenchmark_71407e46d98e5016017ad9a2654f310f.d
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns             7
+     Number of y missing data patterns           7
+     Number of u missing data patterns           0
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT FOR Y
+
+
+           Covariance Coverage
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        1.000
+ WORDACC        0.997         0.997
+ NONWACC        0.996         0.996         0.996
+ NARACOMP       1.000         0.997         0.996         1.000
+ WOLDCOMP       0.852         0.850         0.850         0.852         0.852
+ F8AGE          0.861         0.859         0.858         0.861         0.852
+ F9AGE          1.000         0.997         0.996         1.000         0.852
+
+
+           Covariance Coverage
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.861
+ F9AGE          0.861         1.000
+
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     NARAACC              66.334      -0.525       0.000    0.06%      48.000     62.000     69.000
+            3423.000     417.180      -0.469     100.000    0.06%      76.000     86.000
+     WORDACC               7.536      -1.219       0.000    1.93%       6.000      8.000      8.000
+            3414.000       6.273       0.849      10.000   23.58%       9.000     10.000
+     NONWACC               5.239      -0.308       0.000    4.23%       3.000      5.000      5.000
+            3408.000       6.217      -0.688      10.000    1.79%       6.000      8.000
+     NARACOMP             25.018      -0.273       0.000    0.09%      18.000     23.000     25.000
+            3423.000      62.018      -0.237      44.000    0.03%      28.000     32.000
+     WOLDCOMP              7.517       0.082       2.000    0.41%       6.000      7.000      7.000
+            2917.000       3.758       0.190      15.000    0.03%       8.000      9.000
+     F8AGE               103.533       2.579      94.000    0.03%     102.000    102.000    103.000
+            2947.000      11.227       8.561     126.000    0.03%     103.000    105.000
+     F9AGE               118.643       1.305     105.000    0.03%     116.000    117.000    118.000
+            3423.000      14.907       2.626     139.000    0.06%     119.000    121.000
+
+RANDOM STARTS RESULTS RANKED FROM THE BEST TO THE WORST LOGLIKELIHOOD VALUES
+
+Final stage loglikelihood values at local maxima, seeds, and initial stage start numbers:
+
+
+Unperturbed starting value run did not converge or was rejected in the third stage.
+
+49 perturbed starting value run(s) did not converge or were rejected in the third stage.
+
+
+     THE ESTIMATED COVARIANCE MATRIX FOR THE Y VARIABLES IN CLASS 5 COULD NOT
+     BE INVERTED.  PROBLEM INVOLVING VARIABLE WORDACC.  COMPUTATION COULD
+     NOT BE COMPLETED IN ITERATION 71.  CHANGE YOUR MODEL AND/OR STARTING
+     VALUES.  THIS MAY BE DUE TO A ZERO ESTIMATED VARIANCE, THAT IS, NO WITHIN-CLASS
+     VARIATION FOR THE VARIABLE.
+     THE MODEL ESTIMATION DID NOT TERMINATE NORMALLY.  ESTIMATES CANNOT
+     BE TRUSTED.
+
+
+
+     THE MODEL ESTIMATION DID NOT TERMINATE NORMALLY DUE TO AN ERROR IN THE
+     COMPUTATION.  CHANGE YOUR MODEL AND/OR STARTING VALUES.
+
+
+
+
+
+
+MODEL RESULTS
+
+                    Estimate
+
+Latent Class 1
+
+ WORDACC    ON
+    F9AGE              0.000
+
+ NONWACC    ON
+    F9AGE              0.062
+
+ NARAACC    ON
+    F9AGE              0.378
+
+ NARACOMP   ON
+    F9AGE              0.220
+
+ WOLDCOMP   ON
+    F8AGE              0.035
+
+ NARACOMP WITH
+    NARAACC            0.000
+    WORDACC            0.000
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ NARAACC  WITH
+    WORDACC            0.000
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ WORDACC  WITH
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ NONWACC  WITH
+    WOLDCOMP           0.000
+
+ F9AGE    WITH
+    F8AGE              0.094
+
+ Means
+    F8AGE            103.686
+    F9AGE            118.613
+
+ Intercepts
+    NARAACC          -25.377
+    WORDACC            0.829
+    NONWACC           -6.697
+    NARACOMP         -18.683
+    WOLDCOMP           2.545
+
+ Variances
+    F8AGE              5.732
+    F9AGE             23.472
+
+ Residual Variances
+    NARAACC          117.996
+    WORDACC            2.934
+    NONWACC            1.025
+    NARACOMP          31.485
+    WOLDCOMP           4.800
+
+Latent Class 2
+
+ WORDACC    ON
+    F9AGE              0.000
+
+ NONWACC    ON
+    F9AGE              0.062
+
+ NARAACC    ON
+    F9AGE              0.378
+
+ NARACOMP   ON
+    F9AGE              0.220
+
+ WOLDCOMP   ON
+    F8AGE              0.035
+
+ NARACOMP WITH
+    NARAACC            0.000
+    WORDACC            0.000
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ NARAACC  WITH
+    WORDACC            0.000
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ WORDACC  WITH
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ NONWACC  WITH
+    WOLDCOMP           0.000
+
+ F9AGE    WITH
+    F8AGE              0.094
+
+ Means
+    F8AGE            103.096
+    F9AGE            118.284
+
+ Intercepts
+    NARAACC            1.705
+    WORDACC            5.019
+    NONWACC           -4.470
+    NARACOMP          -9.311
+    WOLDCOMP           3.328
+
+ Variances
+    F8AGE              5.732
+    F9AGE             23.472
+
+ Residual Variances
+    NARAACC           80.445
+    WORDACC            2.572
+    NONWACC            2.488
+    NARACOMP          12.838
+    WOLDCOMP           3.068
+
+Latent Class 3
+
+ WORDACC    ON
+    F9AGE              0.000
+
+ NONWACC    ON
+    F9AGE              0.062
+
+ NARAACC    ON
+    F9AGE              0.378
+
+ NARACOMP   ON
+    F9AGE              0.220
+
+ WOLDCOMP   ON
+    F8AGE              0.035
+
+ NARACOMP WITH
+    NARAACC            0.000
+    WORDACC            0.000
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ NARAACC  WITH
+    WORDACC            0.000
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ WORDACC  WITH
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ NONWACC  WITH
+    WOLDCOMP           0.000
+
+ F9AGE    WITH
+    F8AGE              0.094
+
+ Means
+    F8AGE            102.804
+    F9AGE            118.747
+
+ Intercepts
+    NARAACC           34.422
+    WORDACC            8.322
+    NONWACC           -0.865
+    NARACOMP           4.753
+    WOLDCOMP           4.228
+
+ Variances
+    F8AGE              5.732
+    F9AGE             23.472
+
+ Residual Variances
+    NARAACC          113.349
+    WORDACC            0.894
+    NONWACC            1.223
+    NARACOMP          37.031
+    WOLDCOMP           3.878
+
+Latent Class 4
+
+ WORDACC    ON
+    F9AGE              0.000
+
+ NONWACC    ON
+    F9AGE              0.062
+
+ NARAACC    ON
+    F9AGE              0.378
+
+ NARACOMP   ON
+    F9AGE              0.220
+
+ WOLDCOMP   ON
+    F8AGE              0.035
+
+ NARACOMP WITH
+    NARAACC            0.000
+    WORDACC            0.000
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ NARAACC  WITH
+    WORDACC            0.000
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ WORDACC  WITH
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ NONWACC  WITH
+    WOLDCOMP           0.000
+
+ F9AGE    WITH
+    F8AGE              0.094
+
+ Means
+    F8AGE            103.114
+    F9AGE            118.308
+
+ Intercepts
+    NARAACC           14.474
+    WORDACC            7.364
+    NONWACC           -2.602
+    NARACOMP          -4.317
+    WOLDCOMP           3.495
+
+ Variances
+    F8AGE              5.732
+    F9AGE             23.472
+
+ Residual Variances
+    NARAACC          118.367
+    WORDACC            2.103
+    NONWACC            2.826
+    NARACOMP          37.092
+    WOLDCOMP           3.120
+
+Latent Class 5
+
+ WORDACC    ON
+    F9AGE              0.000
+
+ NONWACC    ON
+    F9AGE              0.062
+
+ NARAACC    ON
+    F9AGE              0.378
+
+ NARACOMP   ON
+    F9AGE              0.220
+
+ WOLDCOMP   ON
+    F8AGE              0.035
+
+ NARACOMP WITH
+    NARAACC            0.000
+    WORDACC            0.000
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ NARAACC  WITH
+    WORDACC            0.000
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ WORDACC  WITH
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ NONWACC  WITH
+    WOLDCOMP           0.000
+
+ F9AGE    WITH
+    F8AGE              0.094
+
+ Means
+    F8AGE            102.715
+    F9AGE            118.780
+
+ Intercepts
+    NARAACC           42.501
+    WORDACC           10.000
+    NONWACC            0.069
+    NARACOMP          10.298
+    WOLDCOMP           7.344
+
+ Variances
+    F8AGE              5.732
+    F9AGE             23.472
+
+ Residual Variances
+    NARAACC           10.219
+    WORDACC            0.000
+    NONWACC            2.796
+    NARACOMP          58.702
+    WOLDCOMP          14.340
+
+Latent Class 6
+
+ WORDACC    ON
+    F9AGE              0.000
+
+ NONWACC    ON
+    F9AGE              0.062
+
+ NARAACC    ON
+    F9AGE              0.378
+
+ NARACOMP   ON
+    F9AGE              0.220
+
+ WOLDCOMP   ON
+    F8AGE              0.035
+
+ NARACOMP WITH
+    NARAACC            0.000
+    WORDACC            0.000
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ NARAACC  WITH
+    WORDACC            0.000
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ WORDACC  WITH
+    NONWACC            0.000
+    WOLDCOMP           0.000
+
+ NONWACC  WITH
+    WOLDCOMP           0.000
+
+ F9AGE    WITH
+    F8AGE              0.094
+
+ Means
+    F8AGE            115.298
+    F9AGE            124.492
+
+ Intercepts
+    NARAACC           16.758
+    WORDACC            7.827
+    NONWACC           -2.382
+    NARACOMP          -2.649
+    WOLDCOMP           3.726
+
+ Variances
+    F8AGE              5.732
+    F9AGE             23.472
+
+ Residual Variances
+    NARAACC          386.918
+    WORDACC            6.164
+    NONWACC            5.419
+    NARACOMP          53.080
+    WOLDCOMP           4.157
+
+Categorical Latent Variables
+
+ Means
+    C#1                0.156
+    C#2                1.068
+    C#3                1.866
+    C#4                1.742
+    C#5                1.065
+
+
+MODEL COMMAND WITH FINAL ESTIMATES USED AS STARTING VALUES
+
+     %OVERALL%
+
+     wordacc ON f9age;
+     nonwacc ON f9age;
+     naraacc ON f9age;
+     naracomp ON f9age;
+     woldcomp ON f8age;
+
+     [ c#1*0.15640 ];
+     [ c#2*1.06769 ];
+     [ c#3*1.86562 ];
+     [ c#4*1.74238 ];
+     [ c#5*1.06455 ];
+
+     %C#1%
+
+     wordacc ON f9age*0.00000 (9);
+     nonwacc ON f9age*0.06166 (10);
+     naraacc ON f9age*0.37829 (8);
+     naracomp ON f9age*0.22032 (11);
+     woldcomp ON f8age*0.03490 (12);
+
+     naracomp WITH naraacc@0;
+     naracomp WITH wordacc@0;
+     naracomp WITH nonwacc@0;
+     naracomp WITH woldcomp@0;
+     naraacc WITH wordacc@0;
+     naraacc WITH nonwacc@0;
+     naraacc WITH woldcomp@0;
+     wordacc WITH nonwacc@0;
+     wordacc WITH woldcomp@0;
+     nonwacc WITH woldcomp@0;
+     f9age WITH f8age*0.09375 (19);
+
+     [ naraacc*-25.37704 ];
+     [ wordacc*0.82857 ];
+     [ nonwacc*-6.69682 ];
+     [ naracomp*-18.68290 ];
+     [ woldcomp*2.54498 ];
+     [ f8age*103.68552 ];
+     [ f9age*118.61262 ];
+
+     naraacc*117.99638;
+     wordacc*2.93421;
+     nonwacc*1.02532;
+     naracomp*31.48514;
+     woldcomp*4.79994;
+     f8age*5.73202 (18);
+     f9age*23.47243 (20);
+
+     %C#2%
+
+     wordacc ON f9age*0.00000 (9);
+     nonwacc ON f9age*0.06166 (10);
+     naraacc ON f9age*0.37829 (8);
+     naracomp ON f9age*0.22032 (11);
+     woldcomp ON f8age*0.03490 (12);
+
+     naracomp WITH naraacc@0;
+     naracomp WITH wordacc@0;
+     naracomp WITH nonwacc@0;
+     naracomp WITH woldcomp@0;
+     naraacc WITH wordacc@0;
+     naraacc WITH nonwacc@0;
+     naraacc WITH woldcomp@0;
+     wordacc WITH nonwacc@0;
+     wordacc WITH woldcomp@0;
+     nonwacc WITH woldcomp@0;
+     f9age WITH f8age*0.09375 (19);
+
+     [ naraacc*1.70508 ];
+     [ wordacc*5.01910 ];
+     [ nonwacc*-4.47033 ];
+     [ naracomp*-9.31111 ];
+     [ woldcomp*3.32796 ];
+     [ f8age*103.09560 ];
+     [ f9age*118.28400 ];
+
+     naraacc*80.44504;
+     wordacc*2.57194;
+     nonwacc*2.48803;
+     naracomp*12.83828;
+     woldcomp*3.06785;
+     f8age*5.73202 (18);
+     f9age*23.47243 (20);
+
+     %C#3%
+
+     wordacc ON f9age*0.00000 (9);
+     nonwacc ON f9age*0.06166 (10);
+     naraacc ON f9age*0.37829 (8);
+     naracomp ON f9age*0.22032 (11);
+     woldcomp ON f8age*0.03490 (12);
+
+     naracomp WITH naraacc@0;
+     naracomp WITH wordacc@0;
+     naracomp WITH nonwacc@0;
+     naracomp WITH woldcomp@0;
+     naraacc WITH wordacc@0;
+     naraacc WITH nonwacc@0;
+     naraacc WITH woldcomp@0;
+     wordacc WITH nonwacc@0;
+     wordacc WITH woldcomp@0;
+     nonwacc WITH woldcomp@0;
+     f9age WITH f8age*0.09375 (19);
+
+     [ naraacc*34.42208 ];
+     [ wordacc*8.32234 ];
+     [ nonwacc*-0.86483 ];
+     [ naracomp*4.75281 ];
+     [ woldcomp*4.22827 ];
+     [ f8age*102.80446 ];
+     [ f9age*118.74707 ];
+
+     naraacc*113.34896;
+     wordacc*0.89406;
+     nonwacc*1.22252;
+     naracomp*37.03085;
+     woldcomp*3.87839;
+     f8age*5.73202 (18);
+     f9age*23.47243 (20);
+
+     %C#4%
+
+     wordacc ON f9age*0.00000 (9);
+     nonwacc ON f9age*0.06166 (10);
+     naraacc ON f9age*0.37829 (8);
+     naracomp ON f9age*0.22032 (11);
+     woldcomp ON f8age*0.03490 (12);
+
+     naracomp WITH naraacc@0;
+     naracomp WITH wordacc@0;
+     naracomp WITH nonwacc@0;
+     naracomp WITH woldcomp@0;
+     naraacc WITH wordacc@0;
+     naraacc WITH nonwacc@0;
+     naraacc WITH woldcomp@0;
+     wordacc WITH nonwacc@0;
+     wordacc WITH woldcomp@0;
+     nonwacc WITH woldcomp@0;
+     f9age WITH f8age*0.09375 (19);
+
+     [ naraacc*14.47408 ];
+     [ wordacc*7.36413 ];
+     [ nonwacc*-2.60188 ];
+     [ naracomp*-4.31684 ];
+     [ woldcomp*3.49459 ];
+     [ f8age*103.11412 ];
+     [ f9age*118.30775 ];
+
+     naraacc*118.36725;
+     wordacc*2.10304;
+     nonwacc*2.82574;
+     naracomp*37.09156;
+     woldcomp*3.11967;
+     f8age*5.73202 (18);
+     f9age*23.47243 (20);
+
+     %C#5%
+
+     wordacc ON f9age*0.00000 (9);
+     nonwacc ON f9age*0.06166 (10);
+     naraacc ON f9age*0.37829 (8);
+     naracomp ON f9age*0.22032 (11);
+     woldcomp ON f8age*0.03490 (12);
+
+     naracomp WITH naraacc@0;
+     naracomp WITH wordacc@0;
+     naracomp WITH nonwacc@0;
+     naracomp WITH woldcomp@0;
+     naraacc WITH wordacc@0;
+     naraacc WITH nonwacc@0;
+     naraacc WITH woldcomp@0;
+     wordacc WITH nonwacc@0;
+     wordacc WITH woldcomp@0;
+     nonwacc WITH woldcomp@0;
+     f9age WITH f8age*0.09375 (19);
+
+     [ naraacc*42.50138 ];
+     [ wordacc*9.99975 ];
+     [ nonwacc*0.06905 ];
+     [ naracomp*10.29810 ];
+     [ woldcomp*7.34354 ];
+     [ f8age*102.71533 ];
+     [ f9age*118.78000 ];
+
+     naraacc*10.21937;
+     wordacc*0.00000;
+     nonwacc*2.79579;
+     naracomp*58.70216;
+     woldcomp*14.33969;
+     f8age*5.73202 (18);
+     f9age*23.47243 (20);
+
+     %C#6%
+
+     wordacc ON f9age*0.00000 (9);
+     nonwacc ON f9age*0.06166 (10);
+     naraacc ON f9age*0.37829 (8);
+     naracomp ON f9age*0.22032 (11);
+     woldcomp ON f8age*0.03490 (12);
+
+     naracomp WITH naraacc@0;
+     naracomp WITH wordacc@0;
+     naracomp WITH nonwacc@0;
+     naracomp WITH woldcomp@0;
+     naraacc WITH wordacc@0;
+     naraacc WITH nonwacc@0;
+     naraacc WITH woldcomp@0;
+     wordacc WITH nonwacc@0;
+     wordacc WITH woldcomp@0;
+     nonwacc WITH woldcomp@0;
+     f9age WITH f8age*0.09375 (19);
+
+     [ naraacc*16.75813 ];
+     [ wordacc*7.82717 ];
+     [ nonwacc*-2.38198 ];
+     [ naracomp*-2.64945 ];
+     [ woldcomp*3.72569 ];
+     [ f8age*115.29832 ];
+     [ f9age*124.49181 ];
+
+     naraacc*386.91757;
+     wordacc*6.16413;
+     nonwacc*5.41883;
+     naracomp*53.08012;
+     woldcomp*4.15714;
+     f8age*5.73202 (18);
+     f9age*23.47243 (20);
+
+
+
+TECHNICAL 1 OUTPUT
+
+
+     PARAMETER SPECIFICATION FOR LATENT CLASS 1
+
+
+           NU
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                    0             0             0             0             0
+
+
+           NU
+              F8AGE         F9AGE
+              ________      ________
+                    0             0
+
+
+           LAMBDA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC            0             0
+ WORDACC            0             0
+ NONWACC            0             0
+ NARACOMP           0             0
+ WOLDCOMP           0             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           THETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0
+ WORDACC            0             0
+ NONWACC            0             0             0
+ NARACOMP           0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           THETA
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE              0
+ F9AGE              0             0
+
+
+           ALPHA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                    1             2             3             4             5
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+                    6             7
+
+
+           BETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC            0             8
+ WORDACC            0             9
+ NONWACC            0            10
+ NARACOMP           0            11
+ WOLDCOMP          12             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           PSI
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC           13
+ WORDACC            0            14
+ NONWACC            0             0            15
+ NARACOMP           0             0             0            16
+ WOLDCOMP           0             0             0             0            17
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE             18
+ F9AGE             19            20
+
+
+     PARAMETER SPECIFICATION FOR LATENT CLASS 2
+
+
+           NU
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                    0             0             0             0             0
+
+
+           NU
+              F8AGE         F9AGE
+              ________      ________
+                    0             0
+
+
+           LAMBDA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC            0             0
+ WORDACC            0             0
+ NONWACC            0             0
+ NARACOMP           0             0
+ WOLDCOMP           0             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           THETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0
+ WORDACC            0             0
+ NONWACC            0             0             0
+ NARACOMP           0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           THETA
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE              0
+ F9AGE              0             0
+
+
+           ALPHA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                   21            22            23            24            25
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+                   26            27
+
+
+           BETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC            0             8
+ WORDACC            0             9
+ NONWACC            0            10
+ NARACOMP           0            11
+ WOLDCOMP          12             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           PSI
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC           28
+ WORDACC            0            29
+ NONWACC            0             0            30
+ NARACOMP           0             0             0            31
+ WOLDCOMP           0             0             0             0            32
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE             18
+ F9AGE             19            20
+
+
+     PARAMETER SPECIFICATION FOR LATENT CLASS 3
+
+
+           NU
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                    0             0             0             0             0
+
+
+           NU
+              F8AGE         F9AGE
+              ________      ________
+                    0             0
+
+
+           LAMBDA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC            0             0
+ WORDACC            0             0
+ NONWACC            0             0
+ NARACOMP           0             0
+ WOLDCOMP           0             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           THETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0
+ WORDACC            0             0
+ NONWACC            0             0             0
+ NARACOMP           0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           THETA
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE              0
+ F9AGE              0             0
+
+
+           ALPHA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                   33            34            35            36            37
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+                   38            39
+
+
+           BETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC            0             8
+ WORDACC            0             9
+ NONWACC            0            10
+ NARACOMP           0            11
+ WOLDCOMP          12             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           PSI
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC           40
+ WORDACC            0            41
+ NONWACC            0             0            42
+ NARACOMP           0             0             0            43
+ WOLDCOMP           0             0             0             0            44
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE             18
+ F9AGE             19            20
+
+
+     PARAMETER SPECIFICATION FOR LATENT CLASS 4
+
+
+           NU
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                    0             0             0             0             0
+
+
+           NU
+              F8AGE         F9AGE
+              ________      ________
+                    0             0
+
+
+           LAMBDA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC            0             0
+ WORDACC            0             0
+ NONWACC            0             0
+ NARACOMP           0             0
+ WOLDCOMP           0             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           THETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0
+ WORDACC            0             0
+ NONWACC            0             0             0
+ NARACOMP           0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           THETA
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE              0
+ F9AGE              0             0
+
+
+           ALPHA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                   45            46            47            48            49
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+                   50            51
+
+
+           BETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC            0             8
+ WORDACC            0             9
+ NONWACC            0            10
+ NARACOMP           0            11
+ WOLDCOMP          12             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           PSI
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC           52
+ WORDACC            0            53
+ NONWACC            0             0            54
+ NARACOMP           0             0             0            55
+ WOLDCOMP           0             0             0             0            56
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE             18
+ F9AGE             19            20
+
+
+     PARAMETER SPECIFICATION FOR LATENT CLASS 5
+
+
+           NU
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                    0             0             0             0             0
+
+
+           NU
+              F8AGE         F9AGE
+              ________      ________
+                    0             0
+
+
+           LAMBDA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC            0             0
+ WORDACC            0             0
+ NONWACC            0             0
+ NARACOMP           0             0
+ WOLDCOMP           0             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           THETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0
+ WORDACC            0             0
+ NONWACC            0             0             0
+ NARACOMP           0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           THETA
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE              0
+ F9AGE              0             0
+
+
+           ALPHA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                   57            58            59            60            61
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+                   62            63
+
+
+           BETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC            0             8
+ WORDACC            0             9
+ NONWACC            0            10
+ NARACOMP           0            11
+ WOLDCOMP          12             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           PSI
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC           64
+ WORDACC            0            65
+ NONWACC            0             0            66
+ NARACOMP           0             0             0            67
+ WOLDCOMP           0             0             0             0            68
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE             18
+ F9AGE             19            20
+
+
+     PARAMETER SPECIFICATION FOR LATENT CLASS 6
+
+
+           NU
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                    0             0             0             0             0
+
+
+           NU
+              F8AGE         F9AGE
+              ________      ________
+                    0             0
+
+
+           LAMBDA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC            0             0
+ WORDACC            0             0
+ NONWACC            0             0
+ NARACOMP           0             0
+ WOLDCOMP           0             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           THETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0
+ WORDACC            0             0
+ NONWACC            0             0             0
+ NARACOMP           0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           THETA
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE              0
+ F9AGE              0             0
+
+
+           ALPHA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                   69            70            71            72            73
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+                   74            75
+
+
+           BETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC            0             0             0             0             0
+ WORDACC            0             0             0             0             0
+ NONWACC            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC            0             8
+ WORDACC            0             9
+ NONWACC            0            10
+ NARACOMP           0            11
+ WOLDCOMP          12             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           PSI
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC           76
+ WORDACC            0            77
+ NONWACC            0             0            78
+ NARACOMP           0             0             0            79
+ WOLDCOMP           0             0             0             0            80
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE             18
+ F9AGE             19            20
+
+
+     PARAMETER SPECIFICATION FOR LATENT CLASS REGRESSION MODEL PART
+
+
+           ALPHA(C)
+              C#1           C#2           C#3           C#4           C#5
+              ________      ________      ________      ________      ________
+                   81            82            83            84            85
+
+
+           ALPHA(C)
+              C#6
+              ________
+                    0
+
+
+     STARTING VALUES FOR LATENT CLASS 1
+
+
+           NU
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              F8AGE         F9AGE
+              ________      ________
+                0.000         0.000
+
+
+           LAMBDA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        1.000         0.000         0.000         0.000         0.000
+ WORDACC        0.000         1.000         0.000         0.000         0.000
+ NONWACC        0.000         0.000         1.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         1.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         1.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ F8AGE          1.000         0.000
+ F9AGE          0.000         1.000
+
+
+           THETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.000
+ F9AGE          0.000         0.000
+
+
+           ALPHA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+               25.484         2.527         0.253         9.268         3.640
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+               96.832       110.921
+
+
+           BETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        0.000         0.000         0.000         0.000         0.000
+ WORDACC        0.000         0.000         0.000         0.000         0.000
+ NONWACC        0.000         0.000         0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ F8AGE          0.000         0.000
+ F9AGE          0.000         0.000
+
+
+           PSI
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC      208.590
+ WORDACC        0.000         3.136
+ NONWACC        0.000         0.000         3.108
+ NARACOMP       0.000         0.000         0.000        31.009
+ WOLDCOMP       0.000         0.000         0.000         0.000         1.879
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          5.613
+ F9AGE          0.000         7.454
+
+
+     STARTING VALUES FOR LATENT CLASS 2
+
+
+           NU
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              F8AGE         F9AGE
+              ________      ________
+                0.000         0.000
+
+
+           LAMBDA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        1.000         0.000         0.000         0.000         0.000
+ WORDACC        0.000         1.000         0.000         0.000         0.000
+ NONWACC        0.000         0.000         1.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         1.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         1.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ F8AGE          1.000         0.000
+ F9AGE          0.000         1.000
+
+
+           THETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.000
+ F9AGE          0.000         0.000
+
+
+           ALPHA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+               45.909         5.031         2.746        17.143         5.578
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+              100.183       114.782
+
+
+           BETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        0.000         0.000         0.000         0.000         0.000
+ WORDACC        0.000         0.000         0.000         0.000         0.000
+ NONWACC        0.000         0.000         0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ F8AGE          0.000         0.000
+ F9AGE          0.000         0.000
+
+
+           PSI
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC      208.590
+ WORDACC        0.000         3.136
+ NONWACC        0.000         0.000         3.108
+ NARACOMP       0.000         0.000         0.000        31.009
+ WOLDCOMP       0.000         0.000         0.000         0.000         1.879
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          5.613
+ F9AGE          0.000         7.454
+
+
+     STARTING VALUES FOR LATENT CLASS 3
+
+
+           NU
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              F8AGE         F9AGE
+              ________      ________
+                0.000         0.000
+
+
+           LAMBDA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        1.000         0.000         0.000         0.000         0.000
+ WORDACC        0.000         1.000         0.000         0.000         0.000
+ NONWACC        0.000         0.000         1.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         1.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         1.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ F8AGE          1.000         0.000
+ F9AGE          0.000         1.000
+
+
+           THETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.000
+ F9AGE          0.000         0.000
+
+
+           ALPHA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+               66.334         7.536         5.239        25.018         7.517
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+              103.533       118.643
+
+
+           BETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        0.000         0.000         0.000         0.000         0.000
+ WORDACC        0.000         0.000         0.000         0.000         0.000
+ NONWACC        0.000         0.000         0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ F8AGE          0.000         0.000
+ F9AGE          0.000         0.000
+
+
+           PSI
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC      208.590
+ WORDACC        0.000         3.136
+ NONWACC        0.000         0.000         3.108
+ NARACOMP       0.000         0.000         0.000        31.009
+ WOLDCOMP       0.000         0.000         0.000         0.000         1.879
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          5.613
+ F9AGE          0.000         7.454
+
+
+     STARTING VALUES FOR LATENT CLASS 4
+
+
+           NU
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              F8AGE         F9AGE
+              ________      ________
+                0.000         0.000
+
+
+           LAMBDA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        1.000         0.000         0.000         0.000         0.000
+ WORDACC        0.000         1.000         0.000         0.000         0.000
+ NONWACC        0.000         0.000         1.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         1.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         1.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ F8AGE          1.000         0.000
+ F9AGE          0.000         1.000
+
+
+           THETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.000
+ F9AGE          0.000         0.000
+
+
+           ALPHA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+               66.334         7.536         5.239        25.018         7.517
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+              103.533       118.643
+
+
+           BETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        0.000         0.000         0.000         0.000         0.000
+ WORDACC        0.000         0.000         0.000         0.000         0.000
+ NONWACC        0.000         0.000         0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ F8AGE          0.000         0.000
+ F9AGE          0.000         0.000
+
+
+           PSI
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC      208.590
+ WORDACC        0.000         3.136
+ NONWACC        0.000         0.000         3.108
+ NARACOMP       0.000         0.000         0.000        31.009
+ WOLDCOMP       0.000         0.000         0.000         0.000         1.879
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          5.613
+ F9AGE          0.000         7.454
+
+
+     STARTING VALUES FOR LATENT CLASS 5
+
+
+           NU
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              F8AGE         F9AGE
+              ________      ________
+                0.000         0.000
+
+
+           LAMBDA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        1.000         0.000         0.000         0.000         0.000
+ WORDACC        0.000         1.000         0.000         0.000         0.000
+ NONWACC        0.000         0.000         1.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         1.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         1.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ F8AGE          1.000         0.000
+ F9AGE          0.000         1.000
+
+
+           THETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.000
+ F9AGE          0.000         0.000
+
+
+           ALPHA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+               86.759        10.040         7.733        32.893         9.456
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+              106.884       122.504
+
+
+           BETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        0.000         0.000         0.000         0.000         0.000
+ WORDACC        0.000         0.000         0.000         0.000         0.000
+ NONWACC        0.000         0.000         0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ F8AGE          0.000         0.000
+ F9AGE          0.000         0.000
+
+
+           PSI
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC      208.590
+ WORDACC        0.000         3.136
+ NONWACC        0.000         0.000         3.108
+ NARACOMP       0.000         0.000         0.000        31.009
+ WOLDCOMP       0.000         0.000         0.000         0.000         1.879
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          5.613
+ F9AGE          0.000         7.454
+
+
+     STARTING VALUES FOR LATENT CLASS 6
+
+
+           NU
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              F8AGE         F9AGE
+              ________      ________
+                0.000         0.000
+
+
+           LAMBDA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        1.000         0.000         0.000         0.000         0.000
+ WORDACC        0.000         1.000         0.000         0.000         0.000
+ NONWACC        0.000         0.000         1.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         1.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         1.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ F8AGE          1.000         0.000
+ F9AGE          0.000         1.000
+
+
+           THETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.000
+ F9AGE          0.000         0.000
+
+
+           ALPHA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+              107.184        12.545        10.226        40.768        11.394
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+              110.235       126.365
+
+
+           BETA
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC        0.000         0.000         0.000         0.000         0.000
+ WORDACC        0.000         0.000         0.000         0.000         0.000
+ NONWACC        0.000         0.000         0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ NARAACC        0.000         0.000
+ WORDACC        0.000         0.000
+ NONWACC        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ F8AGE          0.000         0.000
+ F9AGE          0.000         0.000
+
+
+           PSI
+              NARAACC       WORDACC       NONWACC       NARACOMP      WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARAACC      208.590
+ WORDACC        0.000         3.136
+ NONWACC        0.000         0.000         3.108
+ NARACOMP       0.000         0.000         0.000        31.009
+ WOLDCOMP       0.000         0.000         0.000         0.000         1.879
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          5.613
+ F9AGE          0.000         7.454
+
+
+     STARTING VALUES FOR LATENT CLASS REGRESSION MODEL PART
+
+
+           ALPHA(C)
+              C#1           C#2           C#3           C#4           C#5
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           ALPHA(C)
+              C#6
+              ________
+                0.000
+
+
+TECHNICAL 11 OUTPUT
+
+     Random Starts Specifications for the k-1 Class Analysis Model
+        Number of initial stage random starts                 500
+        Number of final stage optimizations                    50
+
+
+
+TECHNICAL 8 OUTPUT
+
+
+  INITIAL STAGE ITERATIONS
+
+
+  TECHNICAL 8 OUTPUT FOR UNPERTURBED STARTING VALUE SET
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.67117366D+05    0.0000000    0.0000000  EM
+              2 -0.61156974D+05 5960.3919421    0.0888055  EM
+              3 -0.60321053D+05  835.9208440    0.0136684  EM
+              4 -0.60087050D+05  234.0029820    0.0038793  EM
+              5 -0.59939502D+05  147.5482617    0.0024556  EM
+              6 -0.59793554D+05  145.9485971    0.0024349  EM
+              7 -0.59698118D+05   95.4351041    0.0015961  EM
+              8 -0.59632986D+05   65.1325609    0.0010910  EM
+              9 -0.59601097D+05   31.8883794    0.0005347  EM
+             10 -0.59574368D+05   26.7296939    0.0004485  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 1
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 2
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23801666D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721681  EM
+              3 -0.66244534D+05    0.0059530    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 3
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23795287D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721606  EM
+              3 -0.66244534D+05    0.0059361    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 4
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 5
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23807784D+07    0.0000000    0.0000000  EM
+              2 -0.66341433D+05 ************    0.9721346  EM
+              3 -0.66058927D+05  282.5060508    0.0042584  EM
+              4 -0.64769055D+05 1289.8723836    0.0195261  EM
+              5 -0.62559240D+05 2209.8151717    0.0341184  EM
+              6 -0.61422771D+05 1136.4691794    0.0181663  EM
+              7 -0.60738580D+05  684.1903844    0.0111390  EM
+              8 -0.60448216D+05  290.3642550    0.0047806  EM
+              9 -0.60311559D+05  136.6572718    0.0022607  EM
+             10 -0.60224179D+05   87.3796285    0.0014488  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 6
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23795378D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721608  EM
+              3 -0.66244534D+05    0.0056883    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 7
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 8
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23803434D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721702  EM
+              3 -0.66244526D+05    0.0137006    0.0000002  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 9
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23803083D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721698  EM
+              3 -0.66244534D+05    0.0059531    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 10
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23798667D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721646  EM
+              3 -0.66244534D+05    0.0059526    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 11
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 12
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23804428D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721713  EM
+              3 -0.66244534D+05    0.0059531    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 13
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 14
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 15
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 16
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 17
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 18
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23786562D+07    0.0000000    0.0000000  EM
+              2 -0.66242576D+05 ************    0.9721513  EM
+              3 -0.66193049D+05   49.5269888    0.0007477  EM
+              4 -0.65431602D+05  761.4470808    0.0115034  EM
+              5 -0.63344936D+05 2086.6661029    0.0318908  EM
+              6 -0.63292280D+05   52.6559118    0.0008313  EM
+              7 -0.63260819D+05   31.4613062    0.0004971  EM
+              8 -0.63230557D+05   30.2617630    0.0004784  EM
+              9 -0.63200518D+05   30.0385214    0.0004751  EM
+             10 -0.63170232D+05   30.2865398    0.0004792  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 19
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23806700D+07    0.0000000    0.0000000  EM
+              2 -0.66780299D+05 ************    0.9719489  EM
+              3 -0.66672844D+05  107.4553100    0.0016091  EM
+              4 -0.65376121D+05 1296.7235464    0.0194491  EM
+              5 -0.63297496D+05 2078.6246335    0.0317949  EM
+              6 -0.63201856D+05   95.6403727    0.0015110  EM
+              7 -0.63137658D+05   64.1978001    0.0010158  EM
+              8 -0.63089473D+05   48.1845199    0.0007632  EM
+              9 -0.63051430D+05   38.0433114    0.0006030  EM
+             10 -0.63020109D+05   31.3214626    0.0004968  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 20
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 21
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 22
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23794664D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721599  EM
+              3 -0.66244527D+05    0.0123832    0.0000002  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 23
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23796663D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721623  EM
+              3 -0.66244534D+05    0.0059530    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 24
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 25
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 26
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 27
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 28
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 29
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 30
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 31
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 32
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23804859D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721718  EM
+              3 -0.66244526D+05    0.0136679    0.0000002  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 33
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 34
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 35
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 36
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 37
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23797362D+07    0.0000000    0.0000000  EM
+              2 -0.66244456D+05 ************    0.9721631  EM
+              3 -0.66242232D+05    2.2236018    0.0000336  EM
+              4 -0.66185234D+05   56.9981999    0.0008605  EM
+              5 -0.65346322D+05  838.9118362    0.0126752  EM
+              6 -0.63224036D+05 2122.2866621    0.0324775  EM
+              7 -0.63174409D+05   49.6269756    0.0007849  EM
+              8 -0.63146659D+05   27.7494072    0.0004393  EM
+              9 -0.63119112D+05   27.5473128    0.0004362  EM
+             10 -0.63089965D+05   29.1464033    0.0004618  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 38
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 39
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 40
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 41
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23807392D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721748  EM
+              3 -0.66244538D+05    0.0017492    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 42
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 43
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66405359D+05 ************    0.9721081  EM
+              3 -0.65885859D+05  519.5001671    0.0078232  EM
+              4 -0.64103639D+05 1782.2201120    0.0270501  EM
+              5 -0.63918739D+05  184.8994674    0.0028844  EM
+              6 -0.63769687D+05  149.0519509    0.0023319  EM
+              7 -0.63652439D+05  117.2479614    0.0018386  EM
+              8 -0.63559974D+05   92.4655051    0.0014527  EM
+              9 -0.63485536D+05   74.4380242    0.0011711  EM
+             10 -0.63423850D+05   61.6858394    0.0009717  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 44
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 45
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 46
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23807885D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721754  EM
+              3 -0.66244538D+05    0.0017490    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 47
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23805414D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721725  EM
+              3 -0.66244534D+05    0.0059532    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 48
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23798845D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721648  EM
+              3 -0.66244534D+05    0.0059530    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 49
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23804181D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721710  EM
+              3 -0.66244534D+05    0.0059528    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 50
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23783531D+07    0.0000000    0.0000000  EM
+              2 -0.66242210D+05 ************    0.9721479  EM
+              3 -0.66183160D+05   59.0502549    0.0008914  EM
+              4 -0.65341477D+05  841.6825390    0.0127175  EM
+              5 -0.63243597D+05 2097.8807857    0.0321064  EM
+              6 -0.63191566D+05   52.0300535    0.0008227  EM
+              7 -0.63163552D+05   28.0147420    0.0004433  EM
+              8 -0.63136247D+05   27.3049685    0.0004323  EM
+              9 -0.63108047D+05   28.1995058    0.0004466  EM
+             10 -0.63077777D+05   30.2702374    0.0004797  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 51
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23799526D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721656  EM
+              3 -0.66244534D+05    0.0059700    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 52
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23801509D+07    0.0000000    0.0000000  EM
+              2 -0.66242278D+05 ************    0.9721689  EM
+              3 -0.66184832D+05   57.4459406    0.0008672  EM
+              4 -0.65355012D+05  829.8198000    0.0125379  EM
+              5 -0.63256812D+05 2098.2001167    0.0321047  EM
+              6 -0.63205876D+05   50.9358699    0.0008052  EM
+              7 -0.63177703D+05   28.1731965    0.0004457  EM
+              8 -0.63150334D+05   27.3693617    0.0004332  EM
+              9 -0.63122266D+05   28.0675427    0.0004445  EM
+             10 -0.63092353D+05   29.9134806    0.0004739  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 53
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23797582D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721633  EM
+              3 -0.66244526D+05    0.0136796    0.0000002  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 54
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 55
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23795469D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721609  EM
+              3 -0.66244534D+05    0.0059533    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 56
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 57
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 58
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23802112D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721686  EM
+              3 -0.66244534D+05    0.0059535    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 59
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23773816D+07    0.0000000    0.0000000  EM
+              2 -0.66243642D+05 ************    0.9721359  EM
+              3 -0.66222797D+05   20.8457448    0.0003147  EM
+              4 -0.65831294D+05  391.5025324    0.0059119  EM
+              5 -0.63957427D+05 1873.8673146    0.0284647  EM
+              6 -0.63873063D+05   84.3637558    0.0013191  EM
+              7 -0.63806471D+05   66.5924411    0.0010426  EM
+              8 -0.63750714D+05   55.7561539    0.0008738  EM
+              9 -0.63702007D+05   48.7075862    0.0007640  EM
+             10 -0.63658069D+05   43.9378054    0.0006897  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 60
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 61
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 62
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23806152D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721734  EM
+              3 -0.66244538D+05    0.0017491    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 63
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 64
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 65
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 66
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23771641D+07    0.0000000    0.0000000  EM
+              2 -0.66242211D+05 ************    0.9721339  EM
+              3 -0.66183166D+05   59.0445833    0.0008913  EM
+              4 -0.65341527D+05  841.6391989    0.0127168  EM
+              5 -0.63243813D+05 2097.7138713    0.0321038  EM
+              6 -0.63192996D+05   50.8167665    0.0008035  EM
+              7 -0.63165043D+05   27.9529358    0.0004423  EM
+              8 -0.63137793D+05   27.2497246    0.0004314  EM
+              9 -0.63109642D+05   28.1510422    0.0004459  EM
+             10 -0.63079413D+05   30.2298697    0.0004790  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 67
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 68
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 69
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 70
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 71
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 72
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23800664D+07    0.0000000    0.0000000  EM
+              2 -0.66711654D+05 ************    0.9719707  EM
+              3 -0.66658130D+05   53.5237234    0.0008023  EM
+              4 -0.65553198D+05 1104.9321077    0.0165761  EM
+              5 -0.63449178D+05 2104.0201697    0.0320964  EM
+              6 -0.63365056D+05   84.1213673    0.0013258  EM
+              7 -0.63299678D+05   65.3781888    0.0010318  EM
+              8 -0.63244274D+05   55.4040585    0.0008753  EM
+              9 -0.63195503D+05   48.7706069    0.0007711  EM
+             10 -0.63151496D+05   44.0074779    0.0006964  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 73
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 74
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 75
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23796229D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721617  EM
+              3 -0.66244526D+05    0.0137051    0.0000002  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 76
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 77
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23748099D+07    0.0000000    0.0000000  EM
+              2 -0.66244476D+05 ************    0.9721054  EM
+              3 -0.66242649D+05    1.8271924    0.0000276  EM
+              4 -0.66196073D+05   46.5758391    0.0007031  EM
+              5 -0.65452564D+05  743.5085727    0.0112319  EM
+              6 -0.63347825D+05 2104.7396670    0.0321567  EM
+              7 -0.63295495D+05   52.3292377    0.0008261  EM
+              8 -0.63263637D+05   31.8587640    0.0005033  EM
+              9 -0.63232775D+05   30.8618140    0.0004878  EM
+             10 -0.63201890D+05   30.8846489    0.0004884  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 78
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 79
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 80
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23799875D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721660  EM
+              3 -0.66244534D+05    0.0059535    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 81
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 82
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 83
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 84
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 85
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 86
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23807513D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721749  EM
+              3 -0.66244538D+05    0.0017486    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 87
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23793368D+07    0.0000000    0.0000000  EM
+              2 -0.66244476D+05 ************    0.9721584  EM
+              3 -0.66242648D+05    1.8275622    0.0000276  EM
+              4 -0.66196066D+05   46.5826368    0.0007032  EM
+              5 -0.65452403D+05  743.6622579    0.0112342  EM
+              6 -0.63347510D+05 2104.8933449    0.0321591  EM
+              7 -0.63294847D+05   52.6627750    0.0008313  EM
+              8 -0.63263129D+05   31.7184154    0.0005011  EM
+              9 -0.63232413D+05   30.7153217    0.0004855  EM
+             10 -0.63201679D+05   30.7341839    0.0004861  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 88
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 89
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 90
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 91
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23807229D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721746  EM
+              3 -0.66244538D+05    0.0017490    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 92
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23784604D+07    0.0000000    0.0000000  EM
+              2 -0.66242278D+05 ************    0.9721491  EM
+              3 -0.66184830D+05   57.4479381    0.0008672  EM
+              4 -0.65354994D+05  829.8357617    0.0125382  EM
+              5 -0.63256793D+05 2098.2017935    0.0321047  EM
+              6 -0.63206473D+05   50.3197983    0.0007955  EM
+              7 -0.63178285D+05   28.1876673    0.0004460  EM
+              8 -0.63150896D+05   27.3895071    0.0004335  EM
+              9 -0.63122806D+05   28.0898656    0.0004448  EM
+             10 -0.63092867D+05   29.9385324    0.0004743  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 93
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 94
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 95
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23800843D+07    0.0000000    0.0000000  EM
+              2 -0.66859362D+05 ************    0.9719088  EM
+              3 -0.66783698D+05   75.6635874    0.0011317  EM
+              4 -0.65186245D+05 1597.4537018    0.0239198  EM
+              5 -0.62961273D+05 2224.9714648    0.0341325  EM
+              6 -0.62886463D+05   74.8104660    0.0011882  EM
+              7 -0.62823910D+05   62.5528827    0.0009947  EM
+              8 -0.62766781D+05   57.1285297    0.0009093  EM
+              9 -0.62714183D+05   52.5987035    0.0008380  EM
+             10 -0.62665205D+05   48.9774576    0.0007810  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 96
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 97
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244838D+05 ************    0.9721755  EM
+              3 -0.66243565D+05    1.2737120    0.0000192  EM
+              4 -0.66224327D+05   19.2379374    0.0002904  EM
+              5 -0.65920129D+05  304.1975778    0.0045934  EM
+              6 -0.64225453D+05 1694.6759132    0.0257080  EM
+              7 -0.62008613D+05 2216.8397549    0.0345165  EM
+              8 -0.61949321D+05   59.2921087    0.0009562  EM
+              9 -0.61904248D+05   45.0737227    0.0007276  EM
+             10 -0.61865613D+05   38.6347915    0.0006241  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 98
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 99
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 100
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23806644D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721739  EM
+              3 -0.66244538D+05    0.0017490    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 101
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23801430D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721678  EM
+              3 -0.66244534D+05    0.0059531    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 102
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23799573D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721657  EM
+              3 -0.66244534D+05    0.0059534    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 103
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 104
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 105
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 106
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 107
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 108
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808019D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721755  EM
+              3 -0.66244538D+05    0.0017488    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 109
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23807160D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721745  EM
+              3 -0.66244538D+05    0.0017491    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 110
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 111
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 112
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 113
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 114
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 115
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 116
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 117
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23807667D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721751  EM
+              3 -0.66244538D+05    0.0012807    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 118
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 119
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 120
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23799171D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721652  EM
+              3 -0.66244534D+05    0.0059531    0.0000001  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 121
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 122
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23795054D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721604  EM
+              3 -0.66244526D+05    0.0137056    0.0000002  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 123
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 124
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23808119D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721757  EM
+              3 -0.66244540D+05    0.0000000    0.0000000  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 125
+
+
+   E STEP  ITER  LOGLIKELIHOOD    ABS CHANGE   REL CHANGE  ALGORITHM
+              1 -0.23803776D+07    0.0000000    0.0000000  EM
+              2 -0.66244540D+05 ************    0.9721706  EM
+              3 -0.66244534D+05    0.0059532    0.0000001  EM
+
+
+  FINAL STAGE ITERATIONS
+
+
+  TECHNICAL 8 OUTPUT FOR UNPERTURBED STARTING VALUE SET
+
+
+             10 -0.59574368D+05   26.7296939    0.0004485  EM
+             11 -0.59556466D+05   17.9013323    0.0003005  EM
+             12 -0.59548568D+05    7.8989285    0.0001326  EM
+             13 -0.59542113D+05    6.4543145    0.0001084  EM
+             14 -0.59535263D+05    6.8499735    0.0001150  EM
+             15 -0.59531426D+05    3.8371184    0.0000645  EM
+             16 -0.59528558D+05    2.8678472    0.0000482  EM
+             17 -0.59525461D+05    3.0976264    0.0000520  EM
+             18 -0.59522770D+05    2.6906794    0.0000452  EM
+             19 -0.59521286D+05    1.4838728    0.0000249  EM
+             20 -0.59520396D+05    0.8901470    0.0000150  EM
+             21 -0.59519732D+05    0.6635351    0.0000111  EM
+             22 -0.59519176D+05    0.5561911    0.0000093  EM
+             23 -0.59518686D+05    0.4905294    0.0000082  EM
+             24 -0.59518244D+05    0.4418536    0.0000074  EM
+             25 -0.59517842D+05    0.4019220    0.0000068  EM
+             26 -0.59517474D+05    0.3676020    0.0000062  EM
+             27 -0.59517137D+05    0.3374423    0.0000057  EM
+             28 -0.59516826D+05    0.3106175    0.0000052  EM
+             29 -0.59516540D+05    0.2865757    0.0000048  EM
+             30 -0.59516275D+05    0.2649112    0.0000045  EM
+             31 -0.59516029D+05    0.2453056    0.0000041  EM
+             32 -0.59515802D+05    0.2275017    0.0000038  EM
+             33 -0.59515591D+05    0.2112866    0.0000036  EM
+             34 -0.59515394D+05    0.1964812    0.0000033  EM
+             35 -0.59515211D+05    0.1829329    0.0000031  EM
+             36 -0.59515041D+05    0.1705106    0.0000029  EM
+             37 -0.59514882D+05    0.1591009    0.0000027  EM
+             38 -0.59514733D+05    0.1486041    0.0000025  EM
+             39 -0.59514594D+05    0.1389343    0.0000023  EM
+             40 -0.59514464D+05    0.1300161    0.0000022  EM
+             41 -0.59514342D+05    0.1217868    0.0000020  EM
+             42 -0.59514228D+05    0.1141992    0.0000019  EM
+             43 -0.59514121D+05    0.1072337    0.0000018  EM
+             44 -0.59514020D+05    0.1009288    0.0000017  EM
+             45 -0.59513924D+05    0.0954579    0.0000016  EM
+             46 -0.59513833D+05    0.0913252    0.0000015  EM
+             47 -0.59513743D+05    0.0898532    0.0000015  EM
+             48 -0.59513649D+05    0.0944033    0.0000016  EM
+             49 -0.59513535D+05    0.1134284    0.0000019  EM
+             50 -0.59513367D+05    0.1680664    0.0000028  EM
+             51 -0.59513057D+05    0.3108577    0.0000052  EM
+             52 -0.59512386D+05    0.6706607    0.0000113  EM
+             53 -0.59510833D+05    1.5531409    0.0000261  EM
+             54 -0.59507208D+05    3.6251113    0.0000609  EM
+             55 -0.59499146D+05    8.0616695    0.0001355  EM
+             56 -0.59483221D+05   15.9253334    0.0002677  EM
+             57 -0.59457590D+05   25.6305865    0.0004309  EM
+             58 -0.59426549D+05   31.0407657    0.0005221  EM
+             59 -0.59399113D+05   27.4367417    0.0004617  EM
+             60 -0.59380239D+05   18.8732387    0.0003177  EM
+             61 -0.59368257D+05   11.9822000    0.0002018  EM
+             62 -0.59359834D+05    8.4230421    0.0001419  EM
+             63 -0.59352918D+05    6.9160316    0.0001165  EM
+             64 -0.59346595D+05    6.3227206    0.0001065  EM
+             65 -0.59340461D+05    6.1340871    0.0001034  EM
+             66 -0.59334301D+05    6.1599134    0.0001038  EM
+             67 -0.59327978D+05    6.3236437    0.0001066  EM
+             68 -0.59321388D+05    6.5900302    0.0001111  EM
+             69 -0.59314457D+05    6.9310891    0.0001168  EM
+             70 -0.58230423D+05 1084.0336154    0.0182760  QN
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 5
+
+
+             10 -0.60224179D+05   87.3796285    0.0014488  EM
+             11 -0.60157713D+05   66.4661237    0.0011036  EM
+             12 -0.60094937D+05   62.7753943    0.0010435  EM
+             13 -0.60027354D+05   67.5834376    0.0011246  EM
+             14 -0.59958882D+05   68.4719293    0.0011407  EM
+             15 -0.59898972D+05   59.9103092    0.0009992  EM
+             16 -0.59851403D+05   47.5685736    0.0007941  EM
+             17 -0.59814173D+05   37.2302047    0.0006220  EM
+             18 -0.59784489D+05   29.6839015    0.0004963  EM
+             19 -0.59760110D+05   24.3786297    0.0004078  EM
+             20 -0.59739237D+05   20.8738475    0.0003493  EM
+             21 -0.59720565D+05   18.6713066    0.0003125  EM
+             22 -0.59703234D+05   17.3314826    0.0002902  EM
+             23 -0.59686656D+05   16.5779312    0.0002777  EM
+             24 -0.59670407D+05   16.2492744    0.0002722  EM
+             25 -0.59654147D+05   16.2596107    0.0002725  EM
+             26 -0.59637499D+05   16.6478216    0.0002791  EM
+             27 -0.59619602D+05   17.8972536    0.0003001  EM
+             28 -0.59596876D+05   22.7260262    0.0003812  EM
+             29 -0.59547477D+05   49.3991822    0.0008289  EM
+             30 -0.59306417D+05  241.0593289    0.0040482  EM
+             31 -0.56676852D+05 2629.5657888    0.0443386  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 97
+
+
+             10 -0.61865613D+05   38.6347915    0.0006241  EM
+             11 -0.61829506D+05   36.1069919    0.0005836  EM
+             12 -0.61794243D+05   35.2630642    0.0005703  EM
+             13 -0.61759114D+05   35.1289617    0.0005685  EM
+             14 -0.61723698D+05   35.4159413    0.0005735  EM
+             15 -0.61687313D+05   36.3846081    0.0005895  EM
+             16 -0.61648814D+05   38.4989319    0.0006241  EM
+             17 -0.60816700D+05  832.1139059    0.0134976  EM
+             18 -0.60409759D+05  406.9415818    0.0066913  EM
+             19 -0.60274326D+05  135.4324042    0.0022419  EM
+             20 -0.60199813D+05   74.5134842    0.0012362  EM
+             21 -0.60141638D+05   58.1751484    0.0009664  EM
+             22 -0.60086136D+05   55.5012677    0.0009228  EM
+             23 -0.60029920D+05   56.2162534    0.0009356  EM
+             24 -0.59979389D+05   50.5313706    0.0008418  EM
+             25 -0.59941280D+05   38.1087704    0.0006354  EM
+             26 -0.59915484D+05   25.7961246    0.0004304  EM
+             27 -0.59898357D+05   17.1266074    0.0002858  EM
+             28 -0.59885555D+05   12.8019313    0.0002137  EM
+             29 -0.59873504D+05   12.0518586    0.0002012  EM
+             30 -0.59859184D+05   14.3198010    0.0002392  EM
+             31 -0.59839415D+05   19.7687074    0.0003303  EM
+             32 -0.59811837D+05   27.5777299    0.0004609  EM
+             33 -0.59777844D+05   33.9931162    0.0005683  EM
+             34 -0.59743599D+05   34.2456485    0.0005729  EM
+             35 -0.59714834D+05   28.7644180    0.0004815  EM
+             36 -0.59692325D+05   22.5094394    0.0003769  EM
+             37 -0.59673952D+05   18.3725824    0.0003078  EM
+             38 -0.59657794D+05   16.1576302    0.0002708  EM
+             39 -0.59642920D+05   14.8747116    0.0002493  EM
+             40 -0.59628976D+05   13.9440455    0.0002338  EM
+             41 -0.59615803D+05   13.1726315    0.0002209  EM
+             42 -0.59603224D+05   12.5794375    0.0002110  EM
+             43 -0.59590787D+05   12.4364334    0.0002087  EM
+             44 -0.59576971D+05   13.8163073    0.0002319  EM
+             45 -0.59555144D+05   21.8268693    0.0003664  EM
+             46 -0.59481750D+05   73.3937384    0.0012324  EM
+             47 -0.59037423D+05  444.3269851    0.0074700  EM
+             48 -0.53564932D+05 5472.4913769    0.0926953  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 95
+
+
+             10 -0.62665205D+05   48.9774576    0.0007810  EM
+             11 -0.62618893D+05   46.3119427    0.0007390  EM
+             12 -0.62574385D+05   44.5081732    0.0007108  EM
+             13 -0.62530987D+05   43.3977475    0.0006935  EM
+             14 -0.62488195D+05   42.7924592    0.0006843  EM
+             15 -0.62445679D+05   42.5159499    0.0006804  EM
+             16 -0.62403261D+05   42.4174493    0.0006793  EM
+             17 -0.62360886D+05   42.3752110    0.0006791  EM
+             18 -0.62318588D+05   42.2981006    0.0006783  EM
+             19 -0.62276448D+05   42.1402811    0.0006762  EM
+             20 -0.62234470D+05   41.9778240    0.0006741  EM
+             21 -0.62192236D+05   42.2337600    0.0006786  EM
+             22 -0.62148628D+05   43.6085622    0.0007012  EM
+             23 -0.62102790D+05   45.8377329    0.0007376  EM
+             24 -0.62055091D+05   47.6987826    0.0007681  EM
+             25 -0.62006388D+05   48.7029793    0.0007848  EM
+             26 -0.61957282D+05   49.1061176    0.0007920  EM
+             27 -0.61037265D+05  920.0168500    0.0148492  EM
+             28 -0.60578699D+05  458.5664035    0.0075129  EM
+             29 -0.60397324D+05  181.3749767    0.0029940  EM
+             30 -0.60294832D+05  102.4913500    0.0016970  EM
+             31 -0.60214384D+05   80.4486184    0.0013343  EM
+             32 -0.60136999D+05   77.3848670    0.0012852  EM
+             33 -0.60070552D+05   66.4472189    0.0011049  EM
+             34 -0.60019194D+05   51.3573647    0.0008550  EM
+             35 -0.59977727D+05   41.4673279    0.0006909  EM
+             36 -0.59943333D+05   34.3943891    0.0005735  EM
+             37 -0.59915294D+05   28.0383378    0.0004677  EM
+             38 -0.59877305D+05   37.9892261    0.0006340  FS
+             39 -0.59799187D+05   78.1177819    0.0013046  EM
+             40 -0.59780450D+05   18.7375119    0.0003133  EM
+             41 -0.59766189D+05   14.2603084    0.0002385  EM
+             42 -0.59753379D+05   12.8100934    0.0002143  EM
+             43 -0.59741292D+05   12.0873112    0.0002023  EM
+             44 -0.59729590D+05   11.7023703    0.0001959  EM
+             45 -0.59718025D+05   11.5648740    0.0001936  EM
+             46 -0.59706371D+05   11.6538929    0.0001951  EM
+             47 -0.59694384D+05   11.9872955    0.0002008  EM
+             48 -0.59681784D+05   12.5993302    0.0002111  EM
+             49 -0.59668252D+05   13.5326622    0.0002267  EM
+             50 -0.59653127D+05   15.1248278    0.0002535  EM
+             51 -0.59633994D+05   19.1330820    0.0003207  EM
+             52 -0.59599319D+05   34.6743159    0.0005815  EM
+             53 -0.59467436D+05  131.8837063    0.0022128  EM
+             54 -0.58589711D+05  877.7247504    0.0147598  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 19
+
+
+             10 -0.63020109D+05   31.3214626    0.0004968  EM
+             11 -0.62993388D+05   26.7210058    0.0004240  EM
+             12 -0.62969904D+05   23.4831787    0.0003728  EM
+             13 -0.62948754D+05   21.1500999    0.0003359  EM
+             14 -0.62929316D+05   19.4384990    0.0003088  EM
+             15 -0.62911147D+05   18.1692394    0.0002887  EM
+             16 -0.62893919D+05   17.2271831    0.0002738  EM
+             17 -0.62877381D+05   16.5379654    0.0002630  EM
+             18 -0.62861327D+05   16.0544256    0.0002553  EM
+             19 -0.62845578D+05   15.7487542    0.0002505  EM
+             20 -0.62829970D+05   15.6082174    0.0002484  EM
+             21 -0.62814337D+05   15.6333243    0.0002488  EM
+             22 -0.62798499D+05   15.8378776    0.0002521  EM
+             23 -0.62782248D+05   16.2506617    0.0002588  EM
+             24 -0.62765330D+05   16.9186029    0.0002695  EM
+             25 -0.62747419D+05   17.9109785    0.0002854  EM
+             26 -0.62728095D+05   19.3233083    0.0003080  EM
+             27 -0.62706818D+05   21.2773484    0.0003392  EM
+             28 -0.62682908D+05   23.9094219    0.0003813  EM
+             29 -0.62655575D+05   27.3335430    0.0004361  EM
+             30 -0.62624012D+05   31.5632822    0.0005038  EM
+             31 -0.62587618D+05   36.3932108    0.0005811  EM
+             32 -0.62546304D+05   41.3141504    0.0006601  EM
+             33 -0.62500553D+05   45.7511872    0.0007315  EM
+             34 -0.62450480D+05   50.0732884    0.0008012  EM
+             35 -0.61574693D+05  875.7863190    0.0140237  EM
+             36 -0.61134718D+05  439.9749765    0.0071454  EM
+             37 -0.60850946D+05  283.7728272    0.0046418  EM
+             38 -0.60621093D+05  229.8522636    0.0037773  EM
+             39 -0.60405485D+05  215.6087080    0.0035567  EM
+             40 -0.60260627D+05  144.8577476    0.0023981  EM
+             41 -0.60106669D+05  153.9580585    0.0025549  EM
+             42 -0.59874758D+05  231.9105923    0.0038583  EM
+             43 -0.59718752D+05  156.0060568    0.0026055  EM
+             44 -0.59614452D+05  104.3005723    0.0017465  EM
+             45 -0.59551959D+05   62.4922149    0.0010483  EM
+             46 -0.59506864D+05   45.0954824    0.0007572  EM
+             47 -0.59472531D+05   34.3333424    0.0005770  EM
+             48 -0.59449310D+05   23.2209174    0.0003904  EM
+             49 -0.59429707D+05   19.6027124    0.0003297  EM
+             50 -0.59415929D+05   13.7784868    0.0002318  EM
+             51 -0.59404890D+05   11.0384953    0.0001858  EM
+             52 -0.59398026D+05    6.8639683    0.0001155  EM
+             53 -0.59394858D+05    3.1675751    0.0000533  EM
+             54 -0.59393042D+05    1.8160400    0.0000306  EM
+             55 -0.59391728D+05    1.3144835    0.0000221  EM
+             56 -0.59390633D+05    1.0952792    0.0000184  EM
+             57 -0.59389651D+05    0.9817049    0.0000165  EM
+             58 -0.59388732D+05    0.9189747    0.0000155  EM
+             59 -0.59387846D+05    0.8859027    0.0000149  EM
+             60 -0.59386974D+05    0.8724180    0.0000147  EM
+             61 -0.59386101D+05    0.8728715    0.0000147  EM
+             62 -0.59385217D+05    0.8835995    0.0000149  EM
+             63 -0.59384315D+05    0.9018940    0.0000152  EM
+             64 -0.59383390D+05    0.9255355    0.0000156  EM
+             65 -0.59382437D+05    0.9525825    0.0000160  EM
+             66 -0.59381456D+05    0.9812937    0.0000165  EM
+             67 -0.59380446D+05    1.0101294    0.0000170  EM
+             68 -0.59379408D+05    1.0377847    0.0000175  EM
+             69 -0.59378345D+05    1.0632263    0.0000179  EM
+             70 -0.59377259D+05    1.0857110    0.0000183  EM
+             71 -0.59376154D+05    1.1047771    0.0000186  EM
+             72 -0.59375034D+05    1.1202133    0.0000189  EM
+             73 -0.59359917D+05   15.1171382    0.0002546  QN
+             74 -0.59341463D+05   18.4535064    0.0003109  EM
+             75 -0.59336666D+05    4.7969013    0.0000808  EM
+             76 -0.59332656D+05    4.0104912    0.0000676  EM
+             77 -0.59328553D+05    4.1032233    0.0000692  EM
+             78 -0.59324042D+05    4.5112434    0.0000760  EM
+             79 -0.59318975D+05    5.0661504    0.0000854  EM
+             80 -0.59313330D+05    5.6452200    0.0000952  EM
+             81 -0.59307197D+05    6.1336210    0.0001034  EM
+             82 -0.59300709D+05    6.4874692    0.0001094  EM
+             83 -0.59293933D+05    6.7762834    0.0001143  EM
+             84 -0.59286778D+05    7.1551324    0.0001207  EM
+             85 -0.59065325D+05  221.4523605    0.0037353  QN
+             86 -0.52435264D+05 6630.0612551    0.1122496  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 50
+
+
+             10 -0.63077777D+05   30.2702374    0.0004797  EM
+             11 -0.63044498D+05   33.2787934    0.0005276  EM
+             12 -0.63007787D+05   36.7116513    0.0005823  EM
+             13 -0.62339918D+05  667.8688097    0.0105998  EM
+             14 -0.62263494D+05   76.4233869    0.0012259  EM
+             15 -0.62185974D+05   77.5205216    0.0012450  EM
+             16 -0.61992619D+05  193.3544884    0.0031093  EM
+             17 -0.61495599D+05  497.0208209    0.0080174  EM
+             18 -0.60958939D+05  536.6599387    0.0087268  EM
+             19 -0.60712979D+05  245.9593009    0.0040348  EM
+             20 -0.60563122D+05  149.8573301    0.0024683  EM
+             21 -0.60443772D+05  119.3496011    0.0019707  EM
+             22 -0.60354285D+05   89.4878492    0.0014805  EM
+             23 -0.60291653D+05   62.6310586    0.0010377  EM
+             24 -0.60248837D+05   42.8161838    0.0007102  EM
+             25 -0.60218626D+05   30.2115942    0.0005014  EM
+             26 -0.60195857D+05   22.7683582    0.0003781  EM
+             27 -0.60176790D+05   19.0670808    0.0003168  EM
+             28 -0.60157418D+05   19.3726945    0.0003219  EM
+             29 -0.60132322D+05   25.0950392    0.0004172  EM
+             30 -0.60096284D+05   36.0380763    0.0005993  EM
+             31 -0.60050844D+05   45.4407123    0.0007561  EM
+             32 -0.60008686D+05   42.1577749    0.0007020  EM
+             33 -0.59981443D+05   27.2431864    0.0004540  EM
+             34 -0.59967413D+05   14.0301401    0.0002339  EM
+             35 -0.59959659D+05    7.7536052    0.0001293  EM
+             36 -0.59954027D+05    5.6323328    0.0000939  EM
+             37 -0.59948815D+05    5.2116919    0.0000869  EM
+             38 -0.59943035D+05    5.7798634    0.0000964  EM
+             39 -0.59935511D+05    7.5240317    0.0001255  EM
+             40 -0.59924507D+05   11.0042232    0.0001836  EM
+             41 -0.59907817D+05   16.6900588    0.0002785  EM
+             42 -0.59883742D+05   24.0752084    0.0004019  EM
+             43 -0.59852956D+05   30.7851136    0.0005141  EM
+             44 -0.59819285D+05   33.6717141    0.0005626  EM
+             45 -0.59786256D+05   33.0284426    0.0005521  EM
+             46 -0.59751208D+05   35.0479696    0.0005862  EM
+             47 -0.59689923D+05   61.2849549    0.0010257  EM
+             48 -0.59440212D+05  249.7115015    0.0041835  EM
+             49 -0.57086692D+05 2353.5195497    0.0395947  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 66
+
+
+             10 -0.63079413D+05   30.2298697    0.0004790  EM
+             11 -0.63046169D+05   33.2439664    0.0005270  EM
+             12 -0.63009491D+05   36.6779466    0.0005818  EM
+             13 -0.62341577D+05  667.9139428    0.0106002  EM
+             14 -0.62271629D+05   69.9481337    0.0011220  EM
+             15 -0.62228674D+05   42.9545459    0.0006898  EM
+             16 -0.62193866D+05   34.8075422    0.0005593  EM
+             17 -0.62146091D+05   47.7759386    0.0007682  EM
+             18 -0.61999386D+05  146.7042738    0.0023606  EM
+             19 -0.61568146D+05  431.2405134    0.0069556  EM
+             20 -0.61119394D+05  448.7518220    0.0072887  EM
+             21 -0.60989722D+05  129.6718639    0.0021216  EM
+             22 -0.60947758D+05   41.9644788    0.0006881  EM
+             23 -0.60920892D+05   26.8655925    0.0004408  EM
+             24 -0.60900721D+05   20.1712417    0.0003311  EM
+             25 -0.60884945D+05   15.7759887    0.0002590  EM
+             26 -0.60872240D+05   12.7049477    0.0002087  EM
+             27 -0.60861538D+05   10.7018925    0.0001758  EM
+             28 -0.60851621D+05    9.9170166    0.0001629  EM
+             29 -0.60840297D+05   11.3235268    0.0001861  EM
+             30 -0.60822442D+05   17.8549342    0.0002935  EM
+             31 -0.60786107D+05   36.3352978    0.0005974  EM
+             32 -0.60710042D+05   76.0646788    0.0012513  EM
+             33 -0.60580263D+05  129.7790065    0.0021377  EM
+             34 -0.60427544D+05  152.7191343    0.0025209  EM
+             35 -0.60303107D+05  124.4370326    0.0020593  EM
+             36 -0.60215264D+05   87.8437700    0.0014567  EM
+             37 -0.60146747D+05   68.5164127    0.0011379  EM
+             38 -0.60086078D+05   60.6688872    0.0010087  EM
+             39 -0.60032727D+05   53.3512249    0.0008879  EM
+             40 -0.59989997D+05   42.7298195    0.0007118  EM
+             41 -0.59958659D+05   31.3382564    0.0005224  EM
+             42 -0.59935777D+05   22.8815909    0.0003816  EM
+             43 -0.59917385D+05   18.3923643    0.0003069  EM
+             44 -0.59900645D+05   16.7395569    0.0002794  EM
+             45 -0.59883961D+05   16.6844992    0.0002785  EM
+             46 -0.59866543D+05   17.4179528    0.0002909  EM
+             47 -0.59848002D+05   18.5406835    0.0003097  EM
+             48 -0.59828102D+05   19.8999348    0.0003325  EM
+             49 -0.59806745D+05   21.3574242    0.0003570  EM
+             50 -0.59784112D+05   22.6333620    0.0003784  EM
+             51 -0.59760765D+05   23.3465074    0.0003905  EM
+             52 -0.59737496D+05   23.2694836    0.0003894  EM
+             53 -0.59714971D+05   22.5241420    0.0003771  EM
+             54 -0.59693564D+05   21.4071515    0.0003585  EM
+             55 -0.59673507D+05   20.0572434    0.0003360  EM
+             56 -0.59655083D+05   18.4241811    0.0003087  EM
+             57 -0.59638539D+05   16.5441363    0.0002773  EM
+             58 -0.59623938D+05   14.6003826    0.0002448  EM
+             59 -0.59611156D+05   12.7821588    0.0002144  EM
+             60 -0.59599880D+05   11.2757393    0.0001892  EM
+             61 -0.59589768D+05   10.1123015    0.0001697  EM
+             62 -0.59580834D+05    8.9341598    0.0001499  EM
+             63 -0.59572759D+05    8.0749280    0.0001355  EM
+             64 -0.59564191D+05    8.5679635    0.0001438  EM
+             65 -0.59550813D+05   13.3782223    0.0002246  EM
+             66 -0.59507875D+05   42.9377564    0.0007210  EM
+             67 -0.59245874D+05  262.0007851    0.0044028  EM
+             68 -0.57201823D+05 2044.0517779    0.0345012  QN
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 37
+
+
+             10 -0.63089965D+05   29.1464033    0.0004618  EM
+             11 -0.63058139D+05   31.8263362    0.0005045  EM
+             12 -0.63023004D+05   35.1347976    0.0005572  EM
+             13 -0.62358193D+05  664.8114701    0.0105487  EM
+             14 -0.62274410D+05   83.7824011    0.0013436  EM
+             15 -0.62231566D+05   42.8444019    0.0006880  EM
+             16 -0.62201426D+05   30.1397380    0.0004843  EM
+             17 -0.62180620D+05   20.8061873    0.0003345  EM
+             18 -0.62166412D+05   14.2083408    0.0002285  EM
+             19 -0.62156730D+05    9.6822864    0.0001557  EM
+             20 -0.62150121D+05    6.6084170    0.0001063  EM
+             21 -0.62145370D+05    4.7507097    0.0000764  EM
+             22 -0.62140534D+05    4.8360683    0.0000778  EM
+             23 -0.62128819D+05   11.7149119    0.0001885  EM
+             24 -0.62079382D+05   49.4370096    0.0007957  EM
+             25 -0.61876557D+05  202.8250695    0.0032672  EM
+             26 -0.61406475D+05  470.0824860    0.0075971  EM
+             27 -0.61041074D+05  365.4004065    0.0059505  EM
+             28 -0.60877678D+05  163.3964180    0.0026768  EM
+             29 -0.60743064D+05  134.6144720    0.0022112  EM
+             30 -0.60610153D+05  132.9100735    0.0021881  EM
+             31 -0.60488718D+05  121.4358241    0.0020036  EM
+             32 -0.60385123D+05  103.5949108    0.0017126  EM
+             33 -0.60297943D+05   87.1800083    0.0014437  EM
+             34 -0.60222742D+05   75.2009010    0.0012472  EM
+             35 -0.60150748D+05   71.9936057    0.0011955  EM
+             36 -0.60054582D+05   96.1667318    0.0015988  EM
+             37 -0.59788456D+05  266.1255074    0.0044314  EM
+             38 -0.57887263D+05 1901.1925113    0.0317987  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 52
+
+
+             10 -0.63092353D+05   29.9134806    0.0004739  EM
+             11 -0.63059578D+05   32.7748013    0.0005195  EM
+             12 -0.63023412D+05   36.1660875    0.0005735  EM
+             13 -0.62360208D+05  663.2040494    0.0105231  EM
+             14 -0.62276018D+05   84.1896990    0.0013501  EM
+             15 -0.62232705D+05   43.3136831    0.0006955  EM
+             16 -0.62202215D+05   30.4895880    0.0004899  EM
+             17 -0.62181158D+05   21.0573385    0.0003385  EM
+             18 -0.62166780D+05   14.3778000    0.0002312  EM
+             19 -0.62156993D+05    9.7864344    0.0001574  EM
+             20 -0.62150372D+05    6.6212515    0.0001065  EM
+             21 -0.62145911D+05    4.4610217    0.0000718  EM
+             22 -0.62142780D+05    3.1313962    0.0000504  EM
+             23 -0.62139803D+05    2.9769891    0.0000479  EM
+             24 -0.62133227D+05    6.5759333    0.0001058  EM
+             25 -0.62106142D+05   27.0843416    0.0004359  EM
+             26 -0.61987319D+05  118.8234327    0.0019132  EM
+             27 -0.61621458D+05  365.8615255    0.0059022  EM
+             28 -0.61160880D+05  460.5775018    0.0074743  EM
+             29 -0.60939874D+05  221.0060461    0.0036135  EM
+             30 -0.60817476D+05  122.3974685    0.0020085  EM
+             31 -0.60704625D+05  112.8519336    0.0018556  EM
+             32 -0.60590741D+05  113.8831140    0.0018760  EM
+             33 -0.60479709D+05  111.0326771    0.0018325  EM
+             34 -0.60368408D+05  111.3012588    0.0018403  EM
+             35 -0.60216189D+05  152.2184123    0.0025215  EM
+             36 -0.59762119D+05  454.0702548    0.0075407  EM
+             37 -0.53777384D+05 5984.7346125    0.1001426  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 92
+
+
+             10 -0.63092867D+05   29.9385324    0.0004743  EM
+             11 -0.63060065D+05   32.8025647    0.0005199  EM
+             12 -0.63023869D+05   36.1961810    0.0005740  EM
+             13 -0.62360296D+05  663.5722266    0.0105289  EM
+             14 -0.62276063D+05   84.2329472    0.0013507  EM
+             15 -0.62232730D+05   43.3329767    0.0006958  EM
+             16 -0.62202198D+05   30.5324959    0.0004906  EM
+             17 -0.62180961D+05   21.2372959    0.0003414  EM
+             18 -0.62165686D+05   15.2745583    0.0002456  EM
+             19 -0.62151345D+05   14.3410737    0.0002307  EM
+             20 -0.62122022D+05   29.3230755    0.0004718  EM
+             21 -0.62014106D+05  107.9156595    0.0017372  EM
+             22 -0.61673468D+05  340.6385421    0.0054929  EM
+             23 -0.61174977D+05  498.4903831    0.0080827  EM
+             24 -0.60892052D+05  282.9252791    0.0046249  EM
+             25 -0.60742669D+05  149.3828392    0.0024532  EM
+             26 -0.60624129D+05  118.5403708    0.0019515  EM
+             27 -0.60521907D+05  102.2221480    0.0016862  EM
+             28 -0.60431960D+05   89.9466897    0.0014862  EM
+             29 -0.60341533D+05   90.4274146    0.0014964  EM
+             30 -0.60213715D+05  127.8180097    0.0021182  EM
+             31 -0.59863222D+05  350.4925264    0.0058208  EM
+             32 -0.56853612D+05 3009.6100753    0.0502748  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 72
+
+
+             10 -0.63151496D+05   44.0074779    0.0006964  EM
+             11 -0.63111104D+05   40.3915748    0.0006396  EM
+             12 -0.63073512D+05   37.5926319    0.0005957  EM
+             13 -0.63038029D+05   35.4824824    0.0005626  EM
+             14 -0.63004072D+05   33.9569045    0.0005387  EM
+             15 -0.62971138D+05   32.9346437    0.0005227  EM
+             16 -0.62938776D+05   32.3622526    0.0005139  EM
+             17 -0.62906571D+05   32.2046283    0.0005117  EM
+             18 -0.62874134D+05   32.4370022    0.0005156  EM
+             19 -0.62841096D+05   33.0375969    0.0005255  EM
+             20 -0.62807116D+05   33.9807142    0.0005407  EM
+             21 -0.62771884D+05   35.2311168    0.0005609  EM
+             22 -0.62735143D+05   36.7418420    0.0005853  EM
+             23 -0.62696684D+05   38.4590285    0.0006130  EM
+             24 -0.62656345D+05   40.3386262    0.0006434  EM
+             25 -0.62613966D+05   42.3790675    0.0006764  EM
+             26 -0.62569309D+05   44.6566248    0.0007132  EM
+             27 -0.62522029D+05   47.2798702    0.0007556  EM
+             28 -0.62471850D+05   50.1794158    0.0008026  EM
+             29 -0.62418843D+05   53.0070087    0.0008485  EM
+             30 -0.62363506D+05   55.3365027    0.0008865  EM
+             31 -0.62306563D+05   56.9439225    0.0009131  EM
+             32 -0.62248560D+05   58.0022821    0.0009309  EM
+             33 -0.62189703D+05   58.8568206    0.0009455  EM
+             34 -0.62130004D+05   59.6999249    0.0009600  EM
+             35 -0.62069446D+05   60.5574911    0.0009747  EM
+             36 -0.62008063D+05   61.3829057    0.0009889  EM
+             37 -0.61945950D+05   62.1134816    0.0010017  EM
+             38 -0.60968558D+05  977.3916056    0.0157781  EM
+             39 -0.60550350D+05  418.2080059    0.0068594  EM
+             40 -0.60307666D+05  242.6836681    0.0040080  EM
+             41 -0.60172719D+05  134.9468963    0.0022376  EM
+             42 -0.60096461D+05   76.2585600    0.0012673  EM
+             43 -0.60052744D+05   43.7165632    0.0007274  EM
+             44 -0.60025150D+05   27.5939324    0.0004595  EM
+             45 -0.60005592D+05   19.5585934    0.0003258  EM
+             46 -0.59990954D+05   14.6375097    0.0002439  EM
+             47 -0.59979439D+05   11.5149607    0.0001919  EM
+             48 -0.59969536D+05    9.9032423    0.0001651  EM
+             49 -0.59959864D+05    9.6724495    0.0001613  EM
+             50 -0.59949233D+05   10.6301721    0.0001773  EM
+             51 -0.59937287D+05   11.9466552    0.0001993  EM
+             52 -0.59924408D+05   12.8786220    0.0002149  EM
+             53 -0.59910841D+05   13.5675421    0.0002264  EM
+             54 -0.59895928D+05   14.9127401    0.0002489  EM
+             55 -0.59877980D+05   17.9479473    0.0002997  EM
+             56 -0.59855820D+05   22.1598794    0.0003701  EM
+             57 -0.59832024D+05   23.7965382    0.0003976  EM
+             58 -0.59811243D+05   20.7806637    0.0003473  EM
+             59 -0.59793616D+05   17.6271595    0.0002947  EM
+             60 -0.59777030D+05   16.5862229    0.0002774  EM
+             61 -0.59758690D+05   18.3393158    0.0003068  EM
+             62 -0.59731513D+05   27.1775930    0.0004548  EM
+             63 -0.59658807D+05   72.7055273    0.0012172  EM
+             64 -0.59296125D+05  362.6817082    0.0060793  EM
+             65 -0.54376744D+05 4919.3817414    0.0829630  EM
+             66 -0.54376744D+05    0.0000000    0.0000000  QN
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 18
+
+
+             10 -0.63170232D+05   30.2865398    0.0004792  EM
+             11 -0.63138756D+05   31.4758037    0.0004983  EM
+             12 -0.63104948D+05   33.8084901    0.0005355  EM
+             13 -0.63068001D+05   36.9470255    0.0005855  EM
+             14 -0.63027649D+05   40.3511514    0.0006398  EM
+             15 -0.62322334D+05  705.3158623    0.0111906  EM
+             16 -0.62194964D+05  127.3693641    0.0020437  EM
+             17 -0.61940182D+05  254.7826135    0.0040965  EM
+             18 -0.61511465D+05  428.7165863    0.0069215  EM
+             19 -0.61171897D+05  339.5676731    0.0055204  EM
+             20 -0.60992410D+05  179.4870661    0.0029341  EM
+             21 -0.60901271D+05   91.1392350    0.0014943  EM
+             22 -0.60855783D+05   45.4880370    0.0007469  EM
+             23 -0.60832945D+05   22.8384090    0.0003753  EM
+             24 -0.60821091D+05   11.8537145    0.0001949  EM
+             25 -0.60814272D+05    6.8187946    0.0001121  EM
+             26 -0.60808705D+05    5.5670362    0.0000915  EM
+             27 -0.60799464D+05    9.2408698    0.0001520  EM
+             28 -0.60775017D+05   24.4471077    0.0004021  EM
+             29 -0.60710904D+05   64.1126273    0.0010549  EM
+             30 -0.60586636D+05  124.2688124    0.0020469  EM
+             31 -0.60439579D+05  147.0565686    0.0024272  EM
+             32 -0.60320600D+05  118.9793694    0.0019686  EM
+             33 -0.60192658D+05  127.9416375    0.0021210  EM
+             34 -0.59848791D+05  343.8666728    0.0057128  EM
+             35 -0.55694688D+05 4154.1035379    0.0694100  EM
+
+
+  TECHNICAL 8 OUTPUT FOR STARTING VALUE SET 87
+
+
+             10 -0.63201679D+05   30.7341839    0.0004861  EM
+             11 -0.63170328D+05   31.3515545    0.0004961  EM
+             12 -0.63137320D+05   33.0082247    0.0005225  EM
+             13 -0.63101559D+05   35.7601163    0.0005664  EM
+             14 -0.63062369D+05   39.1903864    0.0006211  EM
+             15 -0.63019605D+05   42.7637170    0.0006781  EM
+             16 -0.62308279D+05  711.3266522    0.0112874  EM
+             17 -0.62143782D+05  164.4965978    0.0026400  EM
+             18 -0.61742439D+05  401.3427208    0.0064583  EM
+             19 -0.61159916D+05  582.5230640    0.0094347  EM
+             20 -0.60923812D+05  236.1045110    0.0038604  EM
+             21 -0.60871427D+05   52.3850159    0.0008598  EM
+             22 -0.60849599D+05   21.8280740    0.0003586  EM
+             23 -0.60837546D+05   12.0531008    0.0001981  EM
+             24 -0.60830198D+05    7.3475796    0.0001208  EM
+             25 -0.60825263D+05    4.9347421    0.0000811  EM
+             26 -0.60821580D+05    3.6832101    0.0000606  EM
+             27 -0.60818458D+05    3.1224421    0.0000513  EM
+             28 -0.60815219D+05    3.2390138    0.0000533  EM
+             29 -0.60810619D+05    4.5996542    0.0000756  EM
+             30 -0.60801699D+05    8.9198617    0.0001467  EM
+             31 -0.60781627D+05   20.0717358    0.0003301  EM
+             32 -0.60738232D+05   43.3954533    0.0007140  EM
+             33 -0.60661958D+05   76.2733649    0.0012558  EM
+             34 -0.60565173D+05   96.7851411    0.0015955  EM
+             35 -0.60476541D+05   88.6319906    0.0014634  EM
+             36 -0.60407213D+05   69.3282669    0.0011464  EM
+             37 -0.60347569D+05   59.6437620    0.0009874  EM
+             38 -0.60284765D+05   62.8046161    0.0010407  EM
+             39 -0.60213061D+05   71.7040694    0.0011894  EM
+             40 -0.60138140D+05   74.9201751    0.0012443  EM
+             41 -0.60069864D+05   68.2767885    0.0011353  EM
+             42 -0.60010341D+05   59.5222062    0.0009909  EM
+             43 -0.59955854D+05   54.4878478    0.0009080  EM
+             44 -0.59902971D+05   52.8826062    0.0008820  EM
+             45 -0.59851473D+05   51.4978577    0.0008597  EM
+             46 -0.59804389D+05   47.0844543    0.0007867  EM
+             47 -0.59764999D+05   39.3895969    0.0006586  EM
+             48 -0.59733889D+05   31.1102137    0.0005205  EM
+             49 -0.59709037D+05   24.8517753    0.0004160  EM
+             50 -0.59687919D+05   21.1176934    0.0003537  EM
+             51 -0.59668953D+05   18.9666034    0.0003178  EM
+             52 -0.59651613D+05   17.3396416    0.0002906  EM
+             53 -0.59635837D+05   15.7760820    0.0002645  EM
+             54 -0.59621347D+05   14.4904795    0.0002430  EM
+             55 -0.59607966D+05   13.3808919    0.0002244  EM
+             56 -0.59596466D+05   11.4998158    0.0001929  EM
+             57 -0.59586958D+05    9.5076764    0.0001595  EM
+             58 -0.59579062D+05    7.8959323    0.0001325  EM
+             59 -0.59572519D+05    6.5436423    0.0001098  EM
+             60 -0.59567135D+05    5.3832677    0.0000904  EM
+             61 -0.59562765D+05    4.3702744    0.0000734  EM
+             62 -0.59559274D+05    3.4910608    0.0000586  EM
+             63 -0.59556516D+05    2.7575924    0.0000463  EM
+             64 -0.59554340D+05    2.1765836    0.0000365  EM
+             65 -0.59552604D+05    1.7362897    0.0000292  EM
+             66 -0.59551187D+05    1.4166019    0.0000238  EM
+             67 -0.59549986D+05    1.2009151    0.0000202  EM
+             68 -0.59548902D+05    1.0839099    0.0000182  EM
+             69 -0.59547821D+05    1.0812966    0.0000182  EM
+             70 -0.59546566D+05    1.2548367    0.0000211  EM
+             71 -0.59544772D+05    1.7944349    0.0000301  EM
+             72 -0.58990183D+05  554.5885514    0.0093138  QN
+
+
+     Beginning Time:  16:54:37
+        Ending Time:  16:56:10
+       Elapsed Time:  00:01:33
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2020 Muthen & Muthen

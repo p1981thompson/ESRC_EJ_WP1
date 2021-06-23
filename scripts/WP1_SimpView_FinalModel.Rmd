@@ -30,25 +30,26 @@ Read in selected model file that contains class assignment data, and data file o
 
 ```{r read-data}
 # Read in and extract class data
-final_mod <- readModels(target = "./mplus_models/fmm", filefilter = "a_rerun_3class")  # final model file
+final_mod <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "d_rerun_5class")  # final model file
 class_data <- as.data.frame(final_mod$savedata) %>% 
   rename_all(tolower) %>% 
-  select(yp_no, acc:c, f8age, f9age)  # keep age data for additional checking during merge
+  select(cidb3153, naraacc:c, f8age, f9age) %>%   # keep age data for additional checking during merge
+  rename(cidB3153 = cidb3153)
 
 # Read in and extract relevant variables from data file
-# ppt_data <- read.csv("../data/processed/WP1_data.csv") %>% 
-#   select(yp_id, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8,
-#          nara_comp_std_f9, nara_acc_std_f9)
+ppt_data <- read.csv("../data/processed/WP1_data_subA.csv") %>%
+  select(cidB3153, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8,
+         nara_comp_std_f9, nara_acc_std_f9)
 
 ### ... simulated version for testing
-ppt_data <- read.csv("../data/simulated/WP1_SimpView_sim_raw_n1000_k3.csv") %>%
-  select(yp_id, yp_no, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8) %>% 
-  mutate(nara_comp_std_f9 = round(rnorm(n(), 100, 15)), # Create dummy variables for now
-         nara_acc_std_f9 = round(rnorm(n(), 100, 15)))  
+# ppt_data <- read.csv("../data/simulated/WP1_SimpView_sim_raw_n1000_k3.csv") %>%
+#   select(yp_id, yp_no, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8) %>% 
+#   mutate(nara_comp_std_f9 = round(rnorm(n(), 100, 15)), # Create dummy variables for now
+#          nara_acc_std_f9 = round(rnorm(n(), 100, 15)))  
 
 # Merge
 ppt_classes <- ppt_data %>% 
-  full_join(class_data, by = c("yp_no",
+  full_join(class_data, by = c("cidB3153",
                              "age_m_f8" = "f8age",
                              "age_m_f9" = "f9age"))
 ```
@@ -144,7 +145,7 @@ class_averages_std
 
 # Summarise for plotting
 plot_data <- std_data %>% 
-  select(yp_id, c, read_nonw_bstd_f9, read_word_bstd_f9, nara_acc_std_f9, nara_comp_std_f9, wold_comp_bstd_f8) %>% 
+  select(cidB3153, c, read_nonw_bstd_f9, read_word_bstd_f9, nara_acc_std_f9, nara_comp_std_f9, wold_comp_bstd_f8) %>% 
   pivot_longer(cols = c(read_nonw_bstd_f9, read_word_bstd_f9, nara_acc_std_f9, nara_comp_std_f9, wold_comp_bstd_f8),
                names_to = "task",
                values_to = "score") %>% 
