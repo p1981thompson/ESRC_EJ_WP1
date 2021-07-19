@@ -319,10 +319,22 @@ mm_extract_data <- function(orig_mods = NA,        # list of original models (in
 # plotMixtures_simpView: plot standardised class means for task variables ----
 ### currently makes use of standard plotMixtures function, but could be extract manually for more flexibility (link saved in slack)
 plotMixtures_simpView <- function(output = NA){
-  plotMixtures(output, variables = c("Combacc","Naraacc", "Naracomp", "Woldcomp"),
+
+  # Title
+  plot_title <- deparse(substitute(output))
+  
+  # Plot
+  fig <- plotMixtures(output, variables = c("Combacc","Naraacc", "Naracomp", "Woldcomp"),
                coefficients = "stdyx.standardized") +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-    scale_x_discrete(limits = c("Combacc","Naraacc", "Naracomp", "Woldcomp"))
+    scale_x_discrete(limits = c("Combacc","Naraacc", "Naracomp", "Woldcomp")) + 
+    ggtitle(plot_title)
+  print(fig)  
+  
+  # Save out for clearer inspection
+  plot_title <- substr(plot_title, 5, 6)
+  filename <- paste0("../output/figures/SimpView_", plot_title, "candidateProfs.tiff")
+  ggsave(filename, plot = fig, dpi = 600, height = 9, width = 10)
 }
 
 # plotMixtures_compProf: plot standardised class means for task variables ----
