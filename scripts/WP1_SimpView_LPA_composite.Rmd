@@ -16,7 +16,7 @@ This script is used for running the latent profile models. This script (rather t
 
 ```{r libraries, message = FALSE, warning = FALSE}
 # Specify packages
-pkgs <- c("tidyverse", "MplusAutomation", "texreg", "DiagrammeR", "kableExtra", "ggalluvial", "scales")
+pkgs <- c("tidyverse", "MplusAutomation", "texreg", "DiagrammeR", "kableExtra", "ggalluvial", "scales", "rlist")
 
 # Use groundhog package to load correct package versions
 # if (!require("groundhog")) install.packages("groundhog")
@@ -142,7 +142,7 @@ m_lpa_benchmark <- update(m_lpa_base,
 # mplusModeler(m_lpa_benchmark, "./mplus_models/simpview/lpa_comp/sv_lpa_mbench.dat", run = TRUE)
 
 # Extract parameters for the benchmark model
-lpa_benchmark <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "mbenchmark") %>% 
+lpa_benchmark <- readModels(target = "./mplus_models/simpview/lpa_comp", filefilter = "mbench") %>% 
   mixtureSummaryTable(keepCols = c("Parameters", "Observations", "LL", "BIC")) %>% 
   mutate(CAIC = -2*LL + Parameters*(log(Observations) + 1),
            AWE = -2*LL + Parameters*(log(Observations) + 1.5)) %>% 
@@ -218,7 +218,7 @@ Step 6) View classification diagnostics for candidate models. Can also inspect h
 # Extract participant level data
 lpa_a_rerun <- mm_extract_data(orig_mods = m_lpa_a, orig_output = lpa_a_out, 
                                candidate_mods = c(),                           # change models to best candidates
-                               filepath = "mplus_models/simpview/lpa",
+                               filepath = "mplus_models/simpview/lpa_comp",
                                rerun = TRUE, optseed = TRUE,          
                                one_fit = TRUE)
 
@@ -321,8 +321,8 @@ Step 6) View classification diagnostics for candidate models.
 # Extract participant level data
 lpa_b_rerun <- mm_extract_data(orig_mods = m_lpa_b, orig_output = lpa_b_out, 
                                candidate_mods = c(),                           # change models to best candidates
-                               filepath = "mplus_models/simpview/lpa",
-                               rerun = FALSE, optseed = TRUE,          
+                               filepath = "mplus_models/simpview/lpa_comp",
+                               rerun = TRUE, optseed = TRUE,          
                                one_fit = TRUE)
 
 # Print table, and append bLRT values to main output 
@@ -383,7 +383,7 @@ m_lpa_c <- lapply(1:10, function(k) {
  })
 
 # # Read in output
-# lpa_c_out <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "sv_lpa_c")
+# lpa_c_out <- readModels(target = "./mplus_models/simpview/lpa_comp", filefilter = "sv_lpa_c")
 # 
 # # Check warnings
 # for (model in 1:length(lpa_c_out)){
@@ -449,7 +449,7 @@ Step 6) View classification diagnostics for candidate models.
 # Extract participant level data
 lpa_c_rerun <- mm_extract_data(orig_mods = m_lpa_c, orig_output = lpa_c_out, 
                                candidate_mods = c(),                           # change models to best candidates
-                               filepath = "mplus_models/simpview/lpa",
+                               filepath = "mplus_models/simpview/lpa_comp",
                                rerun = TRUE, optseed = TRUE,          
                                one_fit = TRUE)
 
@@ -576,8 +576,8 @@ Step 6) View classification diagnostics for candidate models.
 # Extract participant level data
 lpa_d_rerun <- mm_extract_data(orig_mods = m_lpa_d, orig_output = lpa_d_out, 
                                candidate_mods = c(),                           # change models to best candidates
-                               filepath = "mplus_models/simpview/lpa",
-                               rerun = FALSE, optseed = TRUE,          
+                               filepath = "mplus_models/simpview/lpa_comp",
+                               rerun = TRUE, optseed = TRUE,          
                                one_fit = TRUE)
 
 # Print table, and append bLRT values to main output 
@@ -702,13 +702,14 @@ Step 6) View classification diagnostics for candidate models.
 # Extract participant level data
 lpa_e_rerun <- mm_extract_data(orig_mods = m_lpa_e, orig_output = lpa_e_out, 
                                candidate_mods = c(),                           # change models to best candidates
-                               filepath = "mplus_models/simpview/lpa",
-                               rerun = FALSE, optseed = TRUE,          
+                               filepath = "mplus_models/simpview/lpa_comp",
+                               rerun = TRUE, optseed = TRUE,          
                                one_fit = TRUE)
 
 # Print table, and append bLRT values to main output 
 lpa_enum_table(lpa_e_rerun)
 lpa_e_summary <- add_bLRT(lpa_e_rerun, lpa_e_summary)
+lpa_e_summary
 
 # Compute classification diagnostics
 class_diag(lpa_e_rerun)

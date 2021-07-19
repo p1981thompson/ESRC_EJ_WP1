@@ -96,6 +96,11 @@ fmm_enum_table <- function(output = NA){
 # add_bLRT: add bLRT from model re-runs to summary table ----
 ### takes argument of output from the rerun (including bLRTs) plus the original summary table
 add_bLRT <- function(rerun_output = NA, orig_summary = NA){
+  
+  if ("bLRT_p" %in% names(orig_summary)) {
+    orig_summary <- select(orig_summary, -bLRT_p)
+  }
+  
   mm_summaries <- mixtureSummaryTable(rerun_output, keepCols = c("Title", "Classes", "Parameters",
                                                                  "LL", "BLRT_PValue")) %>%
     rename(Specification = Title, 
@@ -252,6 +257,9 @@ mm_extract_data <- function(orig_mods = NA,        # list of original models (in
                             optseed = TRUE,        # vector of corresponding optseed values (manually identified from output)
                             one_fit = TRUE) {      # whether a one-class model was fitted (if not, adjusts selection from list)
   
+  # Make sure output ordered by class number
+  orig_output <- list.sort(orig_output, summaries$NLatentClasses)
+  
   # Adjust index of model if one-class model not fitted 
   if (one_fit == FALSE){
     candidate_mods = candidate_mods-1
@@ -311,10 +319,10 @@ mm_extract_data <- function(orig_mods = NA,        # list of original models (in
 # plotMixtures_simpView: plot standardised class means for task variables ----
 ### currently makes use of standard plotMixtures function, but could be extract manually for more flexibility (link saved in slack)
 plotMixtures_simpView <- function(output = NA){
-  plotMixtures(output, variables = c("Nonwacc", "Wordacc","Naraacc", "Naracomp", "Woldcomp"),
+  plotMixtures(output, variables = c("Combacc","Naraacc", "Naracomp", "Woldcomp"),
                coefficients = "stdyx.standardized") +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-    scale_x_discrete(limits = c("Nonwacc", "Wordacc","Naraacc", "Naracomp", "Woldcomp"))
+    scale_x_discrete(limits = c("Combacc","Naraacc", "Naracomp", "Woldcomp"))
 }
 
 # plotMixtures_compProf: plot standardised class means for task variables ----
@@ -502,7 +510,7 @@ extract_classes <- function(output = NULL, type = NULL){
   #summarise transitions
   class_trans <- all_classes %>%
     mutate_at(1:length(output), as.factor) %>% 
-    group_by(.[[1]], .[[2]], .[[3]]) %>%
+    group_by(.[[1]], .[[2]], .[[3]], .[[4]]) %>%
     summarise(n = n(), mean_comp = mean(NARACOMP))
   
   # if two
@@ -521,8 +529,16 @@ extract_classes <- function(output = NULL, type = NULL){
       group_by(.[[1]], .[[2]], .[[3]]) %>%
       summarise(n = n(), mean_comp = mean(NARACOMP)) %>% 
       ggplot(aes(y = n, axis1 = .[[1]], axis2 = .[[2]], axis3 = .[[3]], fill = mean_comp))
-    
+  } 
+  # if four
+  if (length(output) == 4){
+    plot_base <- all_classes %>%
+      mutate_at(1:length(output), as.factor) %>% 
+      group_by(.[[1]], .[[2]], .[[3]], .[[4]]) %>%
+      summarise(n = n(), mean_comp = mean(NARACOMP)) %>% 
+      ggplot(aes(y = n, axis1 = .[[1]], axis2 = .[[2]], axis3 = .[[3]], axis4 = .[[4]], fill = mean_comp))  
   }
+
   
   plot_title <- paste0("Group transitions for Model ", toupper(substr(type, nchar(type), nchar(type))), " Candidate Models")
   
