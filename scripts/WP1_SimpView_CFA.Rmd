@@ -187,6 +187,7 @@ cfa_models$sv_cfa2.out$warnings
 #SummaryTable(cfa_models, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR")) %>% 
 #  kable()
 ```
+
 A number of solutions were tried to resolve the issues with the two-factor model, including freeing the factor loadings, and rescaling the variables. However, the naracomp and woldcomp variables do not sit will together as a comprehension factor (and whereas naracomp sits better amongst the other reading variables).
 
 On this basis, we will proceed with a Latent Profile Analysis. 

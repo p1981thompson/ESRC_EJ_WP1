@@ -1,0 +1,271 @@
+---
+title: 'WP1: Simple View - Cut-off selection'
+output: html_document
+---
+
+This script is used to extract poor comprehenders from the whole sample, ahead of looking at RQ2 (cognitive profiles). It uses sample-standardised scores to select a group with below average reading comprehension scores (< 85), at least average range reading accuracy scores (item acuracy >= 85), and a 10-point discrepancy between the two. 
+
+# Set-up
+
+```{r libraries}
+# Specify packages
+pkgs <- c("tidyverse", "ggnewscale", "correlation")
+
+# Use groundhog package to load correct package versions
+# if (!require("groundhog")) install.packages("groundhog")
+# groundhog.day <- "2021-03-01"
+# groundhog::groundhog.library(pkgs, groundhog.day)
+
+# Or if not using groundhog package - load currently installed package versions separately (reproducibility not guaranteed)
+invisible(lapply(pkgs, library, character.only = TRUE))
+```
+
+Read in data, and create combined item accuracy score. 
+
+```{r read-data}
+ppt_data <- read.csv("../data/processed/WP1_data_all.csv") %>%
+  mutate(read_comb_raw_f9 = (read_word_raw_f9 + read_nonw_raw_f9))
+```
+
+# Standardisation
+
+The NARA comes with test-normed standardised scores, but the others have raw score only (bespoke tests and/or only subset of items). Compute sample-standardised scores for consistency, accounting for age variability.
+
+```{r standardise}
+sample_std <- function(test_scores = NA, age = NA, data = NA, reverse = FALSE){
+  
+  # Create row references
+  data <- data %>% 
+    rownames_to_column("rowno_id")
+  
+  # For each variable in list
+  for (test in test_scores){
+    
+      # Create new variable name
+      var_name = str_replace(test, "raw", "bstd")   # for bespoke standard
+    
+      # Regress out age
+      lm_age <- lm(get(test) ~ get(age), data = data)
+      
+      # Extract standardised residuals
+      ppt_resid <- rstandard(lm_age)
+      
+      # If variables need reversing (i.e., lower score better), multiply by -1
+      if (reverse == TRUE) {
+        ppt_resid <- ppt_resid*-1
+      }
+      
+      # Convert to standardised score (M = 100, SD = 15)
+      std_score <- round(ppt_resid*15 + 100)
+
+      # Convert new standardised score to data frame
+      append_score <- data.frame(std_score) %>%
+        set_names(var_name) %>%
+        rownames_to_column("rowno_id")
+
+      # Merge score by row reference
+      data <- data %>%
+        left_join(append_score, by = "rowno_id") 
+  }
+  
+  # Remove row reference from final output
+  data <- data %>% 
+    select(-rowno_id)
+}
+
+# Standardise the reading scores relevant for selection
+# std_data <- sample_std(data = ppt_data, test_scores = c("read_comb_raw_f9", "nara_comp_raw_f9"), age = "age_m_f9")
+```
+
+```{r cog-standardise}
+# Age 8 tasks
+f8_tasks <- names(ppt_data)[str_detect(names(ppt_data), "raw_f8")]
+f8_revtasks <- names(ppt_data)[str_detect(names(ppt_data), "teach")]  # list TEACh separately as reverse scored
+f8_tasks <- setdiff(f8_tasks, f8_revtasks)  # separate reverse-scored tasks from rest
+std_data <- sample_std(data = ppt_data, test_scores = f8_tasks, age = "age_m_f8")
+std_data <- sample_std(data = std_data, test_scores = f8_revtasks, age = "age_m_f8", reverse = TRUE) %>% 
+  rename(teach_ctr_diff_f8 = teach_ctr_diff_f8.x,
+         teach_ctr_bstd_f8 = teach_ctr_diff_f8.y) 
+
+# Age 9 tasks
+f9_tasks <- names(ppt_data)[str_detect(names(ppt_data), "raw_f9")]
+std_data <- sample_std(data = std_data, test_scores = f9_tasks, age = "age_m_f9")
+
+# Age 10 tasks
+f10_tasks <- names(ppt_data)[str_detect(names(ppt_data), "raw_f10")]
+std_data <- sample_std(data = std_data, test_scores = f10_tasks, age = "age_m_f10")
+```
+
+# Select poor comprehender group
+
+```{r extract-PCs}
+pc_cutoff <- std_data %>% 
+  filter(nara_comp_bstd_f9 < 85 & read_comb_bstd_f9 >= 85 & (read_comb_bstd_f9 - nara_comp_bstd_f9 >= 10)) 
+
+pc_cutoff %>% 
+  summarise(n = n(), nara_comp = mean(nara_comp_std_f9), nara_acc = mean(nara_acc_std_f9))
+
+#write.csv(pc_cutoff, "../data/processed/WP1_data_PCcutoff.csv", row.names = FALSE)
+```
+
+# Plot scores on things
+
+```{r plot}
+# Format data for plotting
+long_data <- std_data %>% 
+  select(cidB3153, yp_id,
+         nara_comp_bstd_f9, nara_acc_bstd_f9, read_comb_bstd_f9, wold_comp_bstd_f8,
+         nara_rate_bstd_f9,
+         wold_vcb_bstd_f8, wisc_vcb_bstd_f8,
+         wisc_pcmp_bstd_f8, wisc_code_bstd_f8, wisc_parr_bstd_f8, wisc_bloc_bstd_f8, wisc_obja_bstd_f8,
+         wisc_bwsp_bstd_f8, cntsp_span_bstd_f10,
+         teach_slct_bstd_f8, teach_divd_bstd_f8, teach_ctr_bstd_f8,
+         sdq_hyp_prnt_ku) %>% 
+  pivot_longer(cols = 3:20,
+               names_to = "task",
+               values_to = "score") %>% 
+  mutate(domain = fct_collapse(task, 
+                               decoding = c("read_comb_bstd_f9", "nara_acc_bstd_f9"),
+                               comprehension = c("nara_comp_bstd_f9", "wold_comp_bstd_f8"),
+                               fluency = "nara_rate_bstd_f9",
+                               vocabulary = c("wold_vcb_bstd_f8", "wisc_vcb_bstd_f8"),
+                               nonverbal = c("wisc_pcmp_bstd_f8", "wisc_code_bstd_f8", "wisc_parr_bstd_f8", "wisc_bloc_bstd_f8", "wisc_obja_bstd_f8"),
+                               execfun = c("wisc_bwsp_bstd_f8", "cntsp_span_bstd_f10", 
+                                           "teach_slct_bstd_f8", "teach_divd_bstd_f8", "teach_ctr_bstd_f8"),
+                               hyperactivity = "sdq_hyp_prnt_ku")) %>% 
+  mutate(domain = factor(domain, levels = c("decoding", "fluency", "comprehension", "vocabulary",
+                                            "execfun", "hyperactivity", "nonverbal"))) %>% 
+  mutate(score = ifelse(score < 0, 0,
+                        ifelse(score > 200, 200, score))) %>% 
+  mutate(pc_group = as.factor(ifelse(cidB3153 %in% pc_cutoff$cidB3153, 1, 0)))
+
+long_pc <- long_data %>% 
+  filter(pc_group == 1)
+
+group_summary <- long_data %>%
+  filter(task != "sdq_hyp_prnt_ku") %>% 
+  group_by(pc_group, domain, task) %>% 
+  summarise(sd = sd(score, na.rm = TRUE), score = mean(score, na.rm = TRUE))
+```
+
+```{r raincloud}
+long_data %>% 
+  filter(task != "sdq_hyp_prnt_ku") %>% 
+  ggplot(aes(task, score)) + 
+  theme_bw() + 
+  see::geom_violinhalf(aes(fill = pc_group, colour = pc_group), 
+                       position = position_nudge(x = .2, y = 0), alpha = 0.4, 
+                       scale = "width"
+                       # scale = "count"   #if proportional
+                       ) + 
+  scale_colour_manual(values = c("grey23", "darkblue"), 
+                      labels = c("General population", "Poor comprehenders")) +
+  scale_fill_manual(values = c("lightgrey", "blue"), 
+                    labels = c("General population", "Poor comprehenders")) +
+  new_scale_color() +  
+  coord_flip() + 
+  geom_jitter(aes(fill = pc_group, colour = pc_group), width = 0.15, alpha = 0.1, size = 0.1) + 
+  scale_colour_manual(values = c("lightgrey", "blue"), 
+                      labels = c("General population", "Poor comprehenders")) + 
+  new_scale_color() +
+  geom_hline(yintercept = 100, linetype = "longdash") +
+  geom_point(data = group_summary, aes(x = task, y = score, colour = pc_group),  
+             position = position_dodge(width = 0.2)) + 
+  geom_errorbar(data = group_summary, aes(ymin = score-sd, ymax = score+sd, colour = pc_group), 
+                width = 0, position = position_dodge(width = 0.2)) + 
+  scale_colour_manual(values = c("grey23", "darkblue"), 
+                      labels = c("General population", "Poor comprehenders")) + 
+  scale_x_discrete(name = "", labels = c("read_comb_bstd_f9" = "Item accuracy", 
+                              "nara_acc_bstd_f9" = "NARA Passage accuracy",
+                              "nara_rate_bstd_f9" = "NARA Rate", 
+                              "wold_comp_bstd_f8" = "WOLD Listening comprehension", 
+                              "nara_comp_bstd_f9" = "NARA Reading comprehension", 
+                              "wold_vcb_bstd_f8" = "WOLD Vocabulary", 
+                              "wisc_vcb_bstd_f8" = "WISC Vocabulary", 
+                              "wisc_bwsp_bstd_f8" = "WISC Backward span", 
+                              "teach_slct_bstd_f8" = "TEACh Selective attention", 
+                              "teach_divd_bstd_f8" = "TEACh Divided attention", 
+                              "teach_ctr_bstd_f8" = "TEACh Attentional control", 
+                              "cntsp_span_bstd_f10" = "Counting span", 
+                              "wisc_pcmp_bstd_f8" = "WISC Picture completion", 
+                              "wisc_parr_bstd_f8" = "WISC Picture arrangement", 
+                              "wisc_obja_bstd_f8" = "WISC Object assembly", 
+                              "wisc_code_bstd_f8" = "WISC Coding", 
+                              "wisc_bloc_bstd_f8" = "WISC Block design")) +
+  facet_grid(rows = vars(domain), scales = "free_y", space = "free_y") +
+  theme(plot.margin = unit(c(1, 1, 1, 1), "cm"),
+        legend.position = "top",
+        legend.title = element_blank()) 
+
+ggsave(filename = "../output/figures/cutoff_alltasks.tiff", dpi = 600, height = 10, width = 8)
+
+```
+
+*Still to do - increase plot space at top of facet; reorder tasks (WM together)*
+
+```{r table}
+table <- long_data %>%
+  group_by(pc_group, domain, task) %>% 
+  summarise(mean = mean(score, na.rm = TRUE), sd = sd(score, na.rm = TRUE)) %>% 
+  pivot_wider(names_from = pc_group, values_from = c(mean, sd)) %>% 
+  rename(GP_m = mean_0, GP_sd = sd_0,
+         PC_m = mean_1, PC_sd = sd_1) %>% 
+  mutate_at(vars(3:6), round, 2)
+
+write.csv(table, "../output/tables/group_summary.csv", row.names = FALSE)
+```
+
+```{r correlations}
+# Label wide data with PC groupings
+std_data <- std_data %>% 
+  mutate(pc_group = as.factor(ifelse(cidB3153 %in% pc_cutoff$cidB3153, 1, 0)))
+
+# Full correlation table by group
+corr_table <- std_data %>% 
+  select(pc_group,
+         nara_comp_bstd_f9, nara_acc_bstd_f9, read_comb_bstd_f9, wold_comp_bstd_f8,
+         nara_rate_bstd_f9,
+         wold_vcb_bstd_f8, wisc_vcb_bstd_f8,
+         wisc_pcmp_bstd_f8, wisc_code_bstd_f8, wisc_parr_bstd_f8, wisc_bloc_bstd_f8, wisc_obja_bstd_f8,
+         wisc_bwsp_bstd_f8, cntsp_span_bstd_f10,
+         teach_slct_bstd_f8, teach_divd_bstd_f8, teach_ctr_bstd_f8,
+         sdq_hyp_prnt_ku) %>% 
+  group_by(pc_group) %>% 
+  correlation() %>% 
+  mutate_at(vars(c(4, 6:8, 10)), round, 2)
+
+write.csv(corr_table, "../output/tables/group_correlations_full.csv", row.names = FALSE)
+
+# Simplified correlation table
+task_domains <- long_data %>% 
+  select(domain, task) %>% 
+  distinct()
+
+corr_simp <- corr_table %>% 
+  select(Group, Parameter1, Parameter2, r) %>% 
+  pivot_wider(names_from = Group, values_from = r) %>% 
+  set_names(c("Task1", "Task2", "GP", "PC")) %>% 
+  left_join(task_domains, by = c("Task1" = "task")) %>% 
+  rename(c("Domain1" = "domain")) %>% 
+  left_join(task_domains, by = c("Task2" = "task")) %>% 
+  rename(c("Domain2" = "domain")) %>% 
+  relocate(c("Domain1", "Domain2")) %>% 
+  arrange(Domain1, Domain2, Task1)
+  
+write.csv(corr_simp, "../output/tables/group_correlations_compare.csv", row.names = FALSE)
+```
+
+# How many in CIF?
+
+```{r}
+# Read in CIF inclusion
+cif <- data.table::fread("../data/raw/B3153/Nation_19May21.csv") %>%  # ALSPAC data
+  select(cidB3153, qlet, in_cif) %>% 
+  mutate(yp_id = paste0(cidB3153, qlet))
+
+pc_cutoff %>% 
+  select(yp_id) %>% 
+  left_join(cif, by = "yp_id") %>% 
+  group_by(in_cif) %>% 
+  count()
+```

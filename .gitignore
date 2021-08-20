@@ -6,4 +6,4 @@
 data/raw/
 data/processed/
 
-scripts/mplus_models/*/*.dat
+scripts/mplus_models/*/*/*.dat
