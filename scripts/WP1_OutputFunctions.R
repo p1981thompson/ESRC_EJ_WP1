@@ -1,42 +1,85 @@
 
-if (!require("here")) install.packages("here")
+if (!require("here")) install.packages("here", quiet = TRUE)
 
 # lpa_enum_table: summarise output from class enumeration process ----
 ### function takes single argument of type mplus.model.list (created by readModels function)
 ### must also have MplusAutomation package loaded, and scientific notation turned off
 
-lpa_enum_table <- function(output = NA){
+# lpa_enum_table <- function(output = NA){
+# 
+#   # Extract initial summary table from model output
+#   mm_summaries <- mixtureSummaryTable(output, keepCols = c("Title", "Classes", "Parameters", "Observations", 
+#    "LL", "AIC", "BIC", "aBIC", "T11_VLMR_PValue", "T11_LMR_PValue")) %>%
+# 
+#     # Exclude duplicates (e.g., if re-run to extract individual level data)
+#     #distinct(Title, .keep_all = TRUE) %>%
+# 
+#     # Order by number of classes
+#     arrange(Classes) %>%
+# 
+#     # Create information indices
+#     mutate(CAIC = -2*LL + Parameters*(log(Observations) + 1),
+#            AWE = -2*LL + Parameters*(log(Observations) + 1.5),
+#            SIC = -0.5*BIC,
+#            BF = round(exp(SIC-lag(SIC)), 3)) 
+# 
+#   # Use SIC to compute approximate correct model probability out of k-class models
+#     max_sic <- max(mm_summaries$SIC, na.rm = TRUE)
+# 
+#     # Step 1 of cmP computation (top half of equation)
+#     mm_summaries <- mm_summaries %>%
+#       mutate(cmp_top = exp(SIC - max_sic))
+# 
+#     cmp_bottom <- sum(mm_summaries$cmp_top, na.rm = TRUE)
+# 
+#   # Add cmP_k to table output, and format for output
+#   mm_summaries <- mm_summaries %>%
+#     mutate(cmP_k = round(cmp_top/cmp_bottom, 2)) %>% 
+#     select(Title, Classes, LL, Parameters, BIC, CAIC, AWE, T11_VLMR_PValue,
+#            T11_LMR_PValue, BF, cmP_k) %>%
+#     rename(Specification = Title,
+#            VLMR_p = T11_VLMR_PValue,
+#            LMR_p = T11_LMR_PValue) %>%
+#     mutate(across(where(is.numeric), round, 2)) %>%
+#     mutate(VLMR_p = pvalue(VLMR_p, accuracy = 0.01),
+#            LMR_p = pvalue(LMR_p, accuracy = 0.01),
+#            BF = ifelse(BF == 0.00, "<0.01",
+#                        ifelse(BF > 100, ">100", BF)))
+# 
+#   mm_summaries
+# }
 
+
+#### EDITED FOR K-1 CHECK
+lpa_enum_table <- function(output = NA, LMR_warn = FALSE){
+  
   # Extract initial summary table from model output
   mm_summaries <- mixtureSummaryTable(output, keepCols = c("Title", "Classes", "Parameters", "Observations", 
-   "LL", "AIC", "BIC", "aBIC", "T11_VLMR_PValue", "T11_LMR_PValue")) %>%
-
-    # Exclude duplicates (e.g., if re-run to extract individual level data)
-    distinct(Title, .keep_all = TRUE) %>%
-
+                                                           "LL", "AIC", "BIC", "aBIC", "T11_VLMR_PValue", "T11_LMR_PValue", "T11_KM1LL")) %>%
+    
     # Order by number of classes
     arrange(Classes) %>%
-
+    
     # Create information indices
     mutate(CAIC = -2*LL + Parameters*(log(Observations) + 1),
            AWE = -2*LL + Parameters*(log(Observations) + 1.5),
            SIC = -0.5*BIC,
            BF = round(exp(SIC-lag(SIC)), 3)) 
-
+  
   # Use SIC to compute approximate correct model probability out of k-class models
-    max_sic <- max(mm_summaries$SIC, na.rm = TRUE)
-
-    # Step 1 of cmP computation (top half of equation)
-    mm_summaries <- mm_summaries %>%
-      mutate(cmp_top = exp(SIC - max_sic))
-
-    cmp_bottom <- sum(mm_summaries$cmp_top, na.rm = TRUE)
-
+  max_sic <- max(mm_summaries$SIC, na.rm = TRUE)
+  
+  # Step 1 of cmP computation (top half of equation)
+  mm_summaries <- mm_summaries %>%
+    mutate(cmp_top = exp(SIC - max_sic))
+  
+  cmp_bottom <- sum(mm_summaries$cmp_top, na.rm = TRUE)
+  
   # Add cmP_k to table output, and format for output
   mm_summaries <- mm_summaries %>%
     mutate(cmP_k = round(cmp_top/cmp_bottom, 2)) %>% 
     select(Title, Classes, LL, Parameters, BIC, CAIC, AWE, T11_VLMR_PValue,
-           T11_LMR_PValue, BF, cmP_k) %>%
+           T11_LMR_PValue, T11_KM1LL, BF, cmP_k) %>%
     rename(Specification = Title,
            VLMR_p = T11_VLMR_PValue,
            LMR_p = T11_LMR_PValue) %>%
@@ -44,8 +87,15 @@ lpa_enum_table <- function(output = NA){
     mutate(VLMR_p = pvalue(VLMR_p, accuracy = 0.01),
            LMR_p = pvalue(LMR_p, accuracy = 0.01),
            BF = ifelse(BF == 0.00, "<0.01",
-                       ifelse(BF > 100, ">100", BF)))
-
+                       ifelse(BF > 100, ">100", BF))) %>% 
+    mutate(LMR_check = ifelse(T11_KM1LL < lag(LL), "Re-run LMR",
+                              ifelse(T11_KM1LL > lag(LL), "Re-run initial model", ""))) %>% 
+    select(-T11_KM1LL)
+  
+  if (LMR_warn == FALSE){
+    mm_summaries <- mm_summaries %>% 
+    select(-LMR_check)
+  }
   mm_summaries
 }
 
@@ -53,14 +103,53 @@ lpa_enum_table <- function(output = NA){
 # fmm_enum_table: summarise output from class enumeration process ----
 ### function takes single argument of type mplus.model.list (created by readModels function)
 ### must also have MplusAutomation package loaded, and scientific notation turned off
-fmm_enum_table <- function(output = NA){
+# fmm_enum_table <- function(output = NA){
+#   
+#   # Extract initial summary table from model output
+#   mm_summaries <- mixtureSummaryTable(output, keepCols = c("Title", "Classes", "Parameters", "Observations", 
+#                                                            "LL", "AIC", "BIC", "aBIC", "T11_VLMR_PValue", "T11_LMR_PValue")) %>% 
+#     
+#     # Exclude duplicates (e.g., if re-run to extract individual level data)
+#     distinct(Title, .keep_all = TRUE) %>% 
+#     
+#     # Order by number of classes
+#     arrange(Classes) %>% 
+#     
+#     # Create information indices
+#     mutate(SIC = -0.5*BIC,
+#            BF = round(exp(SIC-lag(SIC)), 3))               
+#   
+#   # Use SIC to compute approximate correct model probability out of k-class models
+#   max_sic <- max(mm_summaries$SIC, na.rm = TRUE) 
+#   
+#   # Step 1 of cmP computation (top half of equation)
+#   mm_summaries <- mm_summaries %>% 
+#     mutate(cmp_top = exp(SIC - max_sic))
+#   
+#   cmp_bottom <- sum(mm_summaries$cmp_top, na.rm = TRUE)
+#   
+#   # Add cmP_k to table output, and format for output
+#   mm_summaries <- mm_summaries %>% 
+#     mutate(cmP_k = round(cmp_top/cmp_bottom, 2)) %>% 
+#     select(Title, Classes, LL, Parameters, AIC, BIC, aBIC, T11_VLMR_PValue, 
+#            T11_LMR_PValue) %>% 
+#     rename(Specification = Title, 
+#            VLMR_p = T11_VLMR_PValue,
+#            LMR_p = T11_LMR_PValue) %>% 
+#     mutate(across(where(is.numeric), round, 2)) %>% 
+#     mutate(VLMR_p = pvalue(VLMR_p, accuracy = 0.01), 
+#            LMR_p = pvalue(LMR_p, accuracy = 0.01))
+#   
+#   mm_summaries
+# }
+
+# EDITED FOR K-1 STARTS
+fmm_enum_table <- function(output = NA, LMR_warn = FALSE){
   
   # Extract initial summary table from model output
   mm_summaries <- mixtureSummaryTable(output, keepCols = c("Title", "Classes", "Parameters", "Observations", 
-                                                           "LL", "AIC", "BIC", "aBIC", "T11_VLMR_PValue", "T11_LMR_PValue")) %>% 
+                                                           "LL", "AIC", "BIC", "aBIC", "T11_VLMR_PValue", "T11_LMR_PValue", "T11_KM1LL")) %>% 
     
-    # Exclude duplicates (e.g., if re-run to extract individual level data)
-    distinct(Title, .keep_all = TRUE) %>% 
     
     # Order by number of classes
     arrange(Classes) %>% 
@@ -82,16 +171,25 @@ fmm_enum_table <- function(output = NA){
   mm_summaries <- mm_summaries %>% 
     mutate(cmP_k = round(cmp_top/cmp_bottom, 2)) %>% 
     select(Title, Classes, LL, Parameters, AIC, BIC, aBIC, T11_VLMR_PValue, 
-           T11_LMR_PValue) %>% 
+           T11_LMR_PValue, T11_KM1LL) %>% 
     rename(Specification = Title, 
            VLMR_p = T11_VLMR_PValue,
            LMR_p = T11_LMR_PValue) %>% 
     mutate(across(where(is.numeric), round, 2)) %>% 
     mutate(VLMR_p = pvalue(VLMR_p, accuracy = 0.01), 
-           LMR_p = pvalue(LMR_p, accuracy = 0.01))
+           LMR_p = pvalue(LMR_p, accuracy = 0.01)) %>% 
+    mutate(LMR_check = ifelse(T11_KM1LL < lag(LL), "Re-run LMR",
+                              ifelse(T11_KM1LL > lag(LL), "Re-run initial model", ""))) %>% 
+    select(-T11_KM1LL)
+  
+  if (LMR_warn == FALSE){
+    mm_summaries <- mm_summaries %>% 
+      select(-LMR_check)
+  }
   
   mm_summaries
 }
+
 
 # add_bLRT: add bLRT from model re-runs to summary table ----
 ### takes argument of output from the rerun (including bLRTs) plus the original summary table
@@ -313,6 +411,57 @@ mm_extract_data <- function(orig_mods = NA,        # list of original models (in
   
 }
 
+# Re-compute LMR values for models that did not use the best LL for k-1 model
+recomp_LMR <- function(orig_mods = NA,        # list of original models (in environment)
+                       orig_output = NA, 
+                       mods = NA, # models that need LMR re-computing 
+                       filepath = NA,         # folder to save models to
+                       analysis_id = "sv",
+                       rerun = TRUE,          # whether to re-run models to extract data, set to false if just loading 
+                       kstarts = "20 4",
+                       one_fit = TRUE) {      # whether a one-class model was fitted (if not, adjusts selection from list)
+  
+  # Make sure output ordered by class number
+  orig_output <- list.sort(orig_output, summaries$NLatentClasses)
+  
+  # Adjust index of model if one-class model not fitted 
+  if (one_fit == FALSE){
+    mods = mods-1
+  }
+  
+  # Extract file name
+  model_name <- str_remove(deparse(substitute(orig_mods)), "m_")
+  
+  # Update scripts 
+  if (rerun == TRUE){
+    
+    for (model in mods){
+      
+      
+      # Adjust name to reflect class n (if necessary)
+      n_classes <- ifelse(one_fit == TRUE, model, model+1) 
+      
+        
+        # Extract filename from original output, extract optseed
+        mod_file <- names(orig_output)[[model]]
+        optseed_path <- paste0(here::here(), "/scripts/", filepath, "/", mod_file)
+        optseed_val <- get_optseed(optseed_path)
+        
+        body <- update(orig_mods[[model]],
+                       ANALYSIS = as.formula(sprintf("~ 'estimator = mlr; type = mixture; 
+                                                   starts = 0;
+                                                   optseed = %d;
+                                                   k-1starts = %s;'", optseed_val, kstarts)),
+                       OUTPUT = ~ "TECH7 TECH11;")
+      
+      mplusModeler(body, sprintf("%s/%s_%s_lmr_%dclass.dat", filepath, analysis_id, model_name, n_classes), run = TRUE)
+    }
+  }
+  
+  filefilter = paste0(model_name, "_lmr")
+  t11_mods <- readModels(target = filepath, filefilter = filefilter)
+  t11_mods
+}
 
 
 
@@ -336,6 +485,28 @@ plotMixtures_simpView <- function(output = NA){
   filename <- paste0("../output/figures/SimpView_", plot_title, "candidateProfs.tiff")
   ggsave(filename, plot = fig, dpi = 600, height = 9, width = 10)
 }
+
+# plotMixtures_simpViewVcb: plot standardised class means for task variables ----
+### currently makes use of standard plotMixtures function, but could be extract manually for more flexibility (link saved in slack)
+plotMixtures_simpViewVcb <- function(output = NA){
+  
+  # Title
+  plot_title <- deparse(substitute(output))
+  
+  # Plot
+  fig <- plotMixtures(output, variables = c("Combacc","Naraacc", "Naracomp", "Woldcomp", "Woldvcb", "Wiscvcb"),
+                      coefficients = "stdyx.standardized") +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+    scale_x_discrete(limits = c("Combacc","Naraacc", "Naracomp", "Woldcomp", "Woldvcb", "Wiscvcb")) + 
+    ggtitle(plot_title)
+  print(fig)  
+  
+  # Save out for clearer inspection
+  plot_title <- substr(plot_title, 5, 6)
+  filename <- paste0("../output/figures/SimpView_Vcb_", plot_title, "candidateProfs.tiff")
+  ggsave(filename, plot = fig, dpi = 600, height = 9, width = 10)
+}
+
 
 # plotMixtures_compProf: plot standardised class means for task variables ----
 ### currently makes use of standard plotMixtures function, but could be extract manually for more flexibility
@@ -435,19 +606,70 @@ plotMixtures_compProf <- function(output = NA, select_model = NA){
 # classification_diagnostics ---- 
 ### not formatted in easy-to-read way, could maybe be improved
 class_diag <- function(output = NA){
-  {
-    for (model in 1:length(output)) {
+  
+    if (class(output)[1] == "mplus.model.list"){
       
+      for (model in 1:length(output)) {
+        
+        # Print model title 
+        print(paste0("CLASSIFICATION DIAGNOSTICS FOR ", toupper(output[[model]]$input$title)))
+        
+        # Entropy
+        print(paste0("Entropy: ", output[[model]]$summaries$Entropy))
+        cat("\n")
+        
+        # Average posterior class probability
+        print("Average posterior class probability:") 
+        ave_pp <- (diag(output[[model]][["class_counts"]][["classificationProbs.mostLikely"]]))
+        print(ave_pp)
+        
+        ### Print additional warning if do not meet rule of thumb
+        if(any(ave_pp < 0.7)){
+          print("Class assignment accuracy potentially inadequate (Nagin, 2005)")
+        }
+        
+        cat("\n")
+        
+        # Odds of correct classification ratio 
+        est_prop <- output[[model]][["class_counts"]][["modelEstimated"]][["proportion"]]
+        occ <- round(ave_pp/(1-ave_pp)/(est_prop/(1-est_prop)))
+        
+        print("Odds of correct classification ratio:")
+        print(occ)
+        
+        ### Print additional interpretation
+        if(all(occ > 5)){
+          print("Good class separation and assignment accuracy (Nagin, 2005)")
+        }
+        
+        cat("\n")
+        
+        # Modal class assignment proportion
+        print("Model estimated proportion for each class:")
+        print(est_prop)
+        
+        cat("\n")
+        
+        print("Proportion modally assigned to each class:")
+        mcap <- output[[model]][["class_counts"]][["mostLikely"]][["proportion"]]
+        print(mcap)
+        
+        cat("\n")
+        print("--------------------------------------------")
+        cat("\n")
+      }} 
+  
+    if (class(output)[1] == "mplus.model"){
       # Print model title 
-      print(paste0("CLASSIFICATION DIAGNOSTICS FOR ", toupper(output[[model]]$input$title)))
+      print(paste0("CLASSIFICATION DIAGNOSTICS FOR ", toupper(output$input$title)))
       
       # Entropy
-      print(paste0("Entropy: ", output[[model]]$summaries$Entropy))
+      print(paste0("Entropy: ", output$summaries$Entropy))
       cat("\n")
       
       # Average posterior class probability
       print("Average posterior class probability:") 
-      ave_pp <- (diag(output[[model]][["class_counts"]][["classificationProbs.mostLikely"]]))
+      ave_pp <- (diag(output[["class_counts"]][["classificationProbs.mostLikely"]]))
       print(ave_pp)
       
       ### Print additional warning if do not meet rule of thumb
@@ -458,12 +680,12 @@ class_diag <- function(output = NA){
       cat("\n")
       
       # Odds of correct classification ratio 
-      est_prop <- output[[model]][["class_counts"]][["modelEstimated"]][["proportion"]]
+      est_prop <- output[["class_counts"]][["modelEstimated"]][["proportion"]]
       occ <- round(ave_pp/(1-ave_pp)/(est_prop/(1-est_prop)))
       
       print("Odds of correct classification ratio:")
       print(occ)
-              
+      
       ### Print additional interpretation
       if(all(occ > 5)){
         print("Good class separation and assignment accuracy (Nagin, 2005)")
@@ -478,15 +700,22 @@ class_diag <- function(output = NA){
       cat("\n")
       
       print("Proportion modally assigned to each class:")
-      mcap <- output[[model]][["class_counts"]][["mostLikely"]][["proportion"]]
+      mcap <- output[["class_counts"]][["mostLikely"]][["proportion"]]
       print(mcap)
       
       cat("\n")
       print("--------------------------------------------")
       cat("\n")
-    }}
-  
-}
+    }
+      
+      
+      
+    }
+    
+    
+    
+
+
 
 
 # extract_classes: 
@@ -568,6 +797,9 @@ extract_classes <- function(output = NULL, type = NULL){
   
   print(plot)
 }
+
+
+# Extract parameters from script
 
 
 

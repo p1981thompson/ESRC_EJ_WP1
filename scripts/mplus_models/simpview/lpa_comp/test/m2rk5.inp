@@ -1,0 +1,53 @@
+TITLE:
+Model 2R - LPA with additional factor score
+DATA:
+FILE = "./mplus_models/simpview/lpa_comp/test/m4k5_bb9a5bff83ef4ab3cec68d3db42cc56e.dat";
+ 
+VARIABLE:
+NAMES = NARAACC NARACOMP WOLDCOMP COMBACC F8AGE F9AGE F1 CIDB3153; 
+ MISSING=.;
+ idvariable = cidB3153; classes = c(5);
+ANALYSIS:
+estimator = mlr; type = mixture; starts = 4000 1000; 
+              processors = 4(STARTS);
+MODEL:
+%OVERALL% 
+           f8age; f9age;
+           combAcc naraAcc naraComp on f9age;
+           woldcomp on f8age;
+  naraComp with naraAcc@0;
+  naraComp with combAcc@0; 
+  naraComp with woldComp@0; 
+  naraAcc with combAcc@0; 
+  naraAcc with woldComp@0; 
+  combAcc with woldComp@0;
+  F1 with naraComp@0;
+  F1 with naraAcc@0;
+  F1 with combAcc@0;
+  F1 with woldComp@0;
+ %c#1% 
+ 
+ F1 naraComp naraAcc combAcc woldComp;
+ [F1 naraComp naraAcc combAcc woldComp];
+ %c#2% 
+ 
+ F1 naraComp naraAcc combAcc woldComp;
+ [F1 naraComp naraAcc combAcc woldComp];
+ %c#3% 
+ 
+ F1 naraComp naraAcc combAcc woldComp;
+ [F1 naraComp naraAcc combAcc woldComp];
+ %c#4% 
+ 
+ F1 naraComp naraAcc combAcc woldComp;
+ [F1 naraComp naraAcc combAcc woldComp];
+ %c#5% 
+ 
+ F1 naraComp naraAcc combAcc woldComp;
+ [F1 naraComp naraAcc combAcc woldComp];
+OUTPUT:
+TECH1 TECH8 stdyx CINTERVAL ENTROPY;
+SAVEDATA:
+FILE IS shape_m2r_c5.dat; SAVE = cprobabilities;
+PLOT:
+TYPE = PLOT3;

@@ -146,7 +146,7 @@ m_lpa_benchmark <- update(m_lpa_base,
      VARIABLE = ~ "idvariable = cidB3153; classes = c(1);",
      MODEL = as.formula(sprintf("~ . + '%%OVERALL%% \n %s \n %s'", lpa_vars, lpa_covars)))
 
-mplusModeler(m_lpa_benchmark, "./mplus_models/simpview/lpa/sv_lpa_mbenchmark.dat", run = FALSE)
+mplusModeler(m_lpa_benchmark, "./mplus_models/simpview/lpa/sv_lpa_mbenchmark.dat", run = TRUE)
 
 # Extract parameters for the benchmark model
 lpa_benchmark <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "mbenchmark") %>% 
@@ -189,15 +189,15 @@ for (model in 1:length(lpa_a_out)){
 }
 
 ### >> Rerun 5- and 6-class models with increased starts
-m_lpa_a_starts <- lapply(5:6, function(k) {
+m_lpa_a_starts <- lapply(5, function(k) {
    body <- update(m_lpa_base,
      TITLE = as.formula(sprintf("~ 'LPA Model A: %d classes;'", k)),
      VARIABLE = as.formula(sprintf("~ 'idvariable = cidb3153; classes = c(%d);'", k)),
      MODEL = as.formula(sprintf("~ . + '%s %s'", lpa_vars, no_covars)),
-     ANALYSIS = ~ "estimator = mlr; type = mixture; starts = 4000 1000; 
+     ANALYSIS = ~ "estimator = mlr; type = mixture; starts = 2000 200; 
               processors = 4(STARTS);")
    
-   mplusModeler(body, sprintf("mplus_models/simpview/lpa/sv_lpa_a_%dclass.dat", k), run = FALSE)
+   mplusModeler(body, sprintf("mplus_models/simpview/lpa/sv_lpa_a_%dclass.dat", k), run = TRUE)
 })
  
 # Re-read in output 
@@ -214,12 +214,16 @@ for (model in 5:6){
 lpa_a_summary <- lpa_enum_table(output = lpa_a_out)
 lpa_a_summary
 
+# ?? Remove values for problematic models 
+lpa_a_summary[5, 3] <- NA
+lpa_a_summary[5, 5:11] <- NA
+
 # Elbow plots for information criteria
 lpa_enum_elbow(lpa_a_summary, benchmark_stats = lpa_benchmark)
 ```
 
 Best model for:
-**a) Absolute fit (fewest classes with better LL than benchmark):** 5-class
+**a) Absolute fit (fewest classes with better LL than benchmark):** 6-class
 **b) Information heuristics (diminishing gains from elbow plots):**  3-class
 **c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 6-class / NA
 **d) Approximate BF (fewest classes with moderate-strong evidence compared to previous model)**: 6-class / NA
@@ -230,9 +234,9 @@ Step 6) View classification diagnostics for candidate models. Can also inspect h
 ```{r lpa-a-candidates}
 # Extract participant level data
 lpa_a_rerun <- mm_extract_data(orig_mods = m_lpa_a, orig_output = lpa_a_out, 
-                               candidate_mods = 5:6,                           # change models to best candidates
+                               candidate_mods = c(3, 4, 6),                           # change models to best candidates
                                filepath = "mplus_models/simpview/lpa",
-                               rerun = TRUE, optseed = TRUE,          
+                               rerun = FALSE, optseed = TRUE,          
                                one_fit = TRUE)
 
 # Print table, and append bLRT values to main output 
@@ -251,13 +255,14 @@ extract_classes(lpa_a_rerun, type = "lpa")
 ```
 
 Comments:
-**Classification diagnostics:** All reasonable; fewer classes better
-**Interpretability:** 5-class (additional classes very small, not well-distinguished)
+**Classification diagnostics:** All reasonable; even 6-class has good assignment probability
+**Interpretability:** Higher classes less well distinguished, but maybe more variation beyond skill.
+Only 6-class model shows better absolute fit above, and good overall classification diagnostics.
 
 Step 7) Select final model in class enumeration process, for model specification A. 
 ```{r lpa-a-selected}
-lpa_a_final_nclass <- 3            # change model to best candidate
-lpa_a_final_m <- lpa_a_rerun[1]    # change model to best candidate
+lpa_a_final_nclass <- 6            # change model to best candidate
+lpa_a_final_m <- lpa_a_rerun[3]    # change model to best candidate
 ```
 
 ### LPA Model B: Class-invariant, unrestricted
@@ -429,15 +434,49 @@ for (model in 1:length(lpa_c_out)){
 
 
 # Print table 
-lpa_c_summary <- lpa_enum_table(output = lpa_c_out[1:5])   # STILL TO CHANGE
+lpa_c_summary <- lpa_enum_table(output = lpa_c_out)   
 lpa_c_summary
+
 
 # Elbow plots for information criteria
 lpa_enum_elbow(lpa_c_summary, benchmark_stats = lpa_benchmark)
 ```
 
+```{r lpa-c-test}
+sv_data2 <- sv_data %>% 
+  mutate(wordAcc = ifelse(wordAcc < 5, 1,
+                          ifelse(wordAcc >= 5 & wordAcc <= 6, 2, 
+                                 ifelse(wordAcc >= 7 & wordAcc <= 8, 3,
+                                        ifelse(wordAcc == 9, 4,
+                                               ifelse(wordAcc == 10, 5, NA))))))
+
+### >> Rerun 5-class model with increased starts
+m_lpa_c_6 <- update(m_lpa_base,
+              MODEL = as.formula(sprintf("~ . + '%s %s'", lpa_vars, no_covars)))
+
+  # Create class-level specifications (to include variances only)
+  class_spec <- paste0("%c#1% \n ", lpa_vars)
+  for (i in 2:6){
+     class_spec <- paste0(class_spec, "\n %c#", i, "% \n ", lpa_vars)
+    }
+  
+  m_lpa_c_6 <- update(m_lpa_c_6,
+     TITLE = as.formula(sprintf("~ 'LPA Model C: %d classes;'", 6)),
+     VARIABLE = as.formula(sprintf("~ 'idvariable = cidb3153; classes = c(%d);
+                                   categorical = wordAcc;'", 6)),
+     MODEL = as.formula(sprintf("~ . + '%s'", class_spec)),
+     ANALYSIS = ~ "estimator = mlr; type = mixture; starts = 500 50; 
+              processors = 4(STARTS);",
+     #DEFINE = ~ "wordAcc = IF (wordAcc EQ 0) THEN wordAcc = 1;", 
+     rdata = sv_data2)
+ mplusModeler(m_lpa_c_6, sprintf("mplus_models/simpview/lpa/c_6/sv_lpa_c_%dclass.dat", 6), run = FALSE)
+ ## manual edit to remove inappropriate variances
+
+ runModels(target = "./mplus_models/simpview/lpa/c_6/", recursive = TRUE)
+```
+
 Best model for:
-**a) Absolute fit (fewest classes with better LL than benchmark):** 5-class
+**a) Absolute fit (fewest classes with better LL than benchmark):** 4-class
 **b) Information heuristics (diminishing gains from elbow plots):**   3-class ???
 **c) Adjusted LRTs (fewest classes not sig improved by additional classes):** 5-class/+
 **d) Approximate BF (fewest classes with moderate-strong evidence compared to next model)**: 5-class/+
@@ -449,7 +488,7 @@ Step 6) View classification diagnostics for candidate models.
 ```{r lpa-c-candidates}
 # Extract participant level data
 lpa_c_rerun <- mm_extract_data(orig_mods = m_lpa_c, orig_output = lpa_c_out, 
-                               candidate_mods = 5:6,                           # change models to best candidates
+                               candidate_mods = 4:5,                           # change models to best candidates
                                filepath = "mplus_models/simpview/lpa",
                                rerun = TRUE, optseed = TRUE,          
                                one_fit = TRUE)
@@ -476,8 +515,8 @@ Comments:
 Step 7) Select final model in class enumeration process, for model specification C.
 
 ```{r lpa-c-selected}
-# lpa_c_final_nclass <- 5           # change to best model
-# lpa_c_final_m <- lpa_c_rerun[1]   # change to best model
+lpa_c_final_nclass <- 5           # change to best model
+lpa_c_final_m <- lpa_c_rerun[2]   # change to best model
 ```
 
 ### LPA Model D 
@@ -661,8 +700,9 @@ m_lpa_e_7 <- update(m_lpa_base,
 lpa_e_out <- readModels(target = "./mplus_models/simpview/lpa", filefilter = "sv_lpa_e")
 
 # Print table 
-lpa_e_summary <- lpa_enum_table(output = lpa_e_out[1:5]) ## TO FIX
+lpa_e_summary <- lpa_enum_table(output = lpa_e_out) 
 lpa_e_summary
+lpa_e_summary[6, 2] <- 6
 
 # Elbow plots for information criteria
 lpa_enum_elbow(lpa_e_summary, benchmark_stats = lpa_benchmark)
@@ -706,8 +746,8 @@ Comments:
 Step 7) Select final model in class enumeration process, for model specification E.
 
 ```{r lpa-e-selected}
-# lpa_e_final_nclass <-  4          # change to best model
-# lpa_e_final_m <- lpa_e_rerun[1]   # change to best model
+lpa_e_final_nclass <-  5          # change to best model
+lpa_e_final_m <- lpa_e_rerun[2]   # change to best model
 ```
 
 ### All LPA models: Summary output & final selection
@@ -732,7 +772,7 @@ best_cmP <- best_summaries %>%
 class_diag(best_fits)
 
 # Plot class means
-plotMixtures_simpView(best_fits)
+# plotMixtures_simpView(best_fits)  # TO FIX
 ```
 
 ```{r lpa-all-table}
@@ -741,7 +781,7 @@ lpa_all_summaries <- rbind(lpa_a_summary, lpa_b_summary, lpa_c_summary,
                            lpa_d_summary, lpa_e_summary) 
 
 # Extract number of classes modelled in class enumeration process
-k_classes_modelled <- max(lpa_all_summaries$Classes)
+k_classes_modelled <- max(lpa_all_summaries$Classes, na.rm = TRUE)
 
 # Specify table row for selected models for each spec
 a_row <- lpa_a_final_nclass

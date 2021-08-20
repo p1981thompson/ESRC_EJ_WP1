@@ -1,0 +1,274 @@
+---
+title: 'WP1: Simple View - Final Class Model'
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_dir = "../output/analysis/") })
+---
+
+This script is used for extracting descriptive statistics for the final class model (LPA or FMM).
+
+# Set-up
+
+```{r libraries}
+# Specify packages
+pkgs <- c("tidyverse", "MplusAutomation", "texreg", "kableExtra")
+
+# Use groundhog package to load correct package versions
+# if (!require("groundhog")) install.packages("groundhog")
+# groundhog.day <- "2021-03-01"
+# groundhog::groundhog.library(pkgs, groundhog.day)
+
+# Or if not using groundhog package - load currently installed package versions separately (reproducibility not guaranteed)
+invisible(lapply(pkgs, library, character.only = TRUE))
+```
+
+Read in selected model file that contains class assignment data, and data file of descriptive statistics. Merge and check. 
+
+```{r read-data}
+# Read in and extract class data
+final_mod <- readModels(target = "./mplus_models/simpview/shape", filefilter = "lpa4_rerun_5")  # final model file
+class_data <- as.data.frame(final_mod$savedata) %>% 
+  rename_all(tolower) %>% 
+  select(cidb3153, naraacc:c, f8age, f9age) %>%   # keep age data for additional checking during merge
+  rename(cidB3153 = cidb3153)
+
+# Read in and extract relevant variables from data file
+ppt_data <- read.csv("../data/processed/WP1_data_subA.csv") %>%
+  select(cidB3153, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8,
+         nara_comp_std_f9, nara_acc_std_f9) %>% 
+  mutate(read_comb_raw_f9 = (read_word_raw_f9 + read_nonw_raw_f9))
+
+### ... simulated version for testing
+# ppt_data <- read.csv("../data/simulated/WP1_SimpView_sim_raw_n1000_k3.csv") %>%
+#   select(yp_id, yp_no, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8) %>% 
+#   mutate(nara_comp_std_f9 = round(rnorm(n(), 100, 15)), # Create dummy variables for now
+#          nara_acc_std_f9 = round(rnorm(n(), 100, 15)))  
+
+# Merge
+ppt_classes <- ppt_data %>% 
+  full_join(class_data, by = c("cidB3153",
+                             "age_m_f8" = "f8age",
+                             "age_m_f9" = "f9age"))
+```
+
+
+# Whole sample descriptives
+
+```{r all-desc}
+ppt_classes %>% 
+  select(-cidB3153, -c(cprob1:c)) %>% 
+  psych::describe() %>% 
+  as.data.frame() %>% 
+  select(n, mean, sd, min, max) %>% 
+  round(., 2)
+```
+
+The NARA comes with test-normed standardised scores, but the others have raw score only (bespoke tests and/or only subset of items). Compute sample standardised scores, accounting for age variability.
+
+```{r standardise}
+sample_std <- function(test_scores = NA, age = NA, data = NA){
+  
+  # Create row references
+  data <- data %>% 
+    rownames_to_column("rowno_id")
+  
+  # For each variable in list
+  for (test in test_scores){
+    
+      # Create new variable name
+      var_name = str_replace(test, "raw", "bstd")   # for bespoke standard
+    
+      # Regress out age
+      lm_age <- lm(get(test) ~ get(age), data = data)
+      
+      # Use standardised residuals, and then convert to standardised score (M = 100, SD = 15)
+      ppt_resid <- rstandard(lm_age)
+      std_score <- round(ppt_resid*15 + 100)
+
+      # Convert new standardised score to data frame
+      append_score <- data.frame(std_score) %>%
+        set_names(var_name) %>%
+        rownames_to_column("rowno_id")
+
+      # Merge score by row reference
+      data <- data %>%
+        left_join(append_score, by = "rowno_id") 
+  }
+  
+  # Remove row reference from final output
+  data <- data %>% 
+    select(-rowno_id)
+}
+
+std_data <- sample_std(data = ppt_classes, test_scores = c("read_comb_raw_f9", "nara_acc_raw_f9", "nara_comp_raw_f9"), age = "age_m_f9")
+std_data <- sample_std(data = std_data, test_scores = c("wold_comp_raw_f8"), age = "age_m_f8")
+```
+
+
+Intend to report test-standardised scores for the NARA, but check how the two compare. 
+```{r std-compare}
+# Accuracy
+plot(std_data$nara_acc_std_f9, std_data$nara_acc_bstd_f9) +
+  abline(1, 1)
+
+# Comprehension
+plot(std_data$nara_comp_std_f9, std_data$nara_comp_bstd_f9) +
+  abline(1, 1)
+```
+
+# Class descriptives 
+
+```{r class-desc}
+class_averages_raw <- ppt_classes %>% 
+  group_by(c) %>% 
+  summarise_at(vars(read_nonw_raw_f9, read_word_raw_f9, nara_acc_raw_f9, nara_comp_raw_f9, wold_comp_raw_f8 ), 
+               list(mean = mean, sd = sd, min = min, max = max), na.rm = TRUE) %>% 
+  round(.,2)
+
+class_averages_raw
+
+class_averages_std <- std_data %>% 
+  group_by(c) %>% 
+  summarise_at(vars(read_comb_bstd_f9, nara_acc_bstd_f9, nara_comp_bstd_f9, wold_comp_bstd_f8), 
+               list(mean = mean, sd = sd, min = min, max = max), na.rm = TRUE) %>% 
+  round(.,2)
+
+class_averages_std
+```
+
+```{r class-plot}
+#### STILL TO-DO / TO MAKE NICE ####
+# would be nice to add distributions, but might end up looking messy
+
+# Format data for plotting
+plot_data <- std_data %>% 
+  select(cidB3153, c, read_comb_bstd_f9, nara_acc_bstd_f9, nara_comp_bstd_f9, wold_comp_bstd_f8) %>% 
+  pivot_longer(cols = c(read_comb_bstd_f9,  nara_acc_bstd_f9, nara_comp_bstd_f9, wold_comp_bstd_f8),
+               names_to = "task",
+               values_to = "score") %>% 
+  group_by(c, task) %>%
+  summarise(class_mean = mean(score, na.rm = TRUE), sd = sd(score, na.rm = TRUE), se = sd/sqrt(n()),
+            n = n(), proportion = n/3423*100) %>% 
+  mutate(c = paste0(c, " (", round(proportion,2), "%)")) %>% 
+  mutate(c = as.factor(c),
+         task = factor(task, levels = c("read_comb_bstd_f9", "nara_acc_bstd_f9", "nara_comp_bstd_f9", "wold_comp_bstd_f8")))
+
+long_data <- std_data %>% 
+  select(cidB3153, c, read_comb_bstd_f9, nara_acc_bstd_f9, nara_comp_bstd_f9, wold_comp_bstd_f8) %>% 
+  pivot_longer(cols = c(read_comb_bstd_f9, nara_acc_bstd_f9, nara_comp_bstd_f9, wold_comp_bstd_f8),
+               names_to = "task",
+               values_to = "score") %>% 
+  mutate(c = as.factor(c),
+         task = factor(task, levels = c("read_comb_bstd_f9", "nara_acc_bstd_f9", "nara_comp_bstd_f9", "wold_comp_bstd_f8")))
+
+# Class descriptives (Means & 1SD) 
+ggplot(plot_data, aes(x = task, y = class_mean, group = c, colour = c)) +
+  theme_bw() +
+  geom_rect(aes(xmin = 0, xmax = Inf, ymin = -Inf, ymax = 85), fill = "grey95", colour = "white") +
+  geom_point(aes(shape = c), position = position_dodge(0.2)) + 
+  geom_line(aes(linetype = c), position = position_dodge(0.2)) + 
+  geom_errorbar(aes(ymin = class_mean - (1*sd), ymax = class_mean + (1*sd)), width = 0.1, position = position_dodge(0.2)) +
+  scale_x_discrete(name = "Task", labels = c("Item\naccuracy", "Passage\naccuracy", "Reading\ncomprehension", "Listening\ncomprehension")) +
+  scale_y_continuous(name = "Class mean (+/- 1SD)") +
+  geom_hline(yintercept = 100, linetype = "longdash") 
+
+#ggsave("../output/figures/SimpView_E4_1SD.tiff", dpi = 600, width = 7, height = 5)
+
+# Raw data
+ggplot(plot_data, aes(x = task, y = class_mean, group = c)) +
+  theme_bw() +
+  #geom_rect(aes(xmin = 0, xmax = Inf, ymin = -Inf, ymax = 85), fill = "grey95", colour = "white") +
+  geom_point(data = long_data, aes(x = task, y = score, group = c, colour = c), alpha = 0.1, 
+             position = position_jitterdodge(jitter.height = 1), show.legend = FALSE) + 
+  geom_point(aes(shape = c), position = position_dodge(0.75)) + 
+  scale_x_discrete(name = "Task", labels = c("Item\naccuracy", "Passage\naccuracy", "Reading\ncomprehension", "Listening\ncomprehension")) +
+  scale_y_continuous(name = "Individual scores") +
+  geom_hline(yintercept = 100, linetype = "longdash")
+
+#ggsave("../output/figures/SimpView_E4_raw.tiff", dpi = 600, width = 7, height = 5)
+
+# Scatterplot - item accuracy by reading comprehension
+ggplot(std_data, aes(read_comb_bstd_f9, nara_comp_bstd_f9, color = as.factor(c))) + 
+  theme_bw() +
+  geom_point() + 
+  geom_hline(yintercept = 85, linetype = "longdash") +
+  geom_vline(xintercept = 85, linetype = "longdash") + 
+  xlab("Item accuracy") + 
+  ylab("Reading comprehension")
+#ggsave("../output/figures/SimpView_E4_itemXcomp.tiff", dpi = 600, width = 7, height = 5)
+
+# Scatterplot - passage accuracy by passage comprehension
+ggplot(std_data, aes(nara_acc_bstd_f9, nara_comp_bstd_f9, color = as.factor(c))) + 
+  theme_bw() +
+  geom_point() + 
+  geom_hline(yintercept = 85, linetype = "longdash") +
+  geom_vline(xintercept = 85, linetype = "longdash") + 
+  xlab("Passage accuracy") +
+  ylab("Reading comprehension")
+#ggsave("../output/figures/SimpView_m2rk5_test.tiff", dpi = 600, width = 7, height = 5)
+```
+
+
+
+
+
+
+
+
+
+```{r}
+# Trial - traditional criteria
+all_data <- read.csv("../data/processed/WP1_data_subA.csv") %>%
+  select(cidB3153, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8,
+         nara_comp_std_f9, nara_acc_std_f9) %>% 
+  mutate(read_comb_raw_f9 = (read_word_raw_f9 + read_nonw_raw_f9))
+
+std_all<- sample_std(data = all_data, test_scores = c("read_comb_raw_f9", "nara_acc_raw_f9", "nara_comp_raw_f9"), age = "age_m_f9")
+std_all <- sample_std(data = std_all, test_scores = c("wold_comp_raw_f8"), age = "age_m_f8")
+
+
+std_all %>% 
+  filter(nara_comp_bstd_f9 < 85 & read_comb_bstd_f9 >= 85 & (read_comb_bstd_f9 - nara_comp_bstd_f9 >= 10)) %>% 
+  summarise(n = n(), nara_comp = mean(nara_comp_std_f9), nara_acc = mean(nara_acc_std_f9))
+
+poorcomp <- std_all %>% 
+  filter(nara_comp_bstd_f9 < 85 & read_comb_bstd_f9 >= 85 & (read_comb_bstd_f9 - nara_comp_bstd_f9 >= 10)) %>% 
+  select(cidB3153) %>% 
+  mutate(pc_threshold = 1) 
+
+poorcomp_long <- long_data %>% 
+  right_join(poorcomp, by = "cidB3153") %>% 
+  mutate(c = as.factor(c),
+         task = factor(task, levels = c("read_comb_bstd_f9", "nara_acc_bstd_f9", "nara_comp_bstd_f9", "wold_comp_bstd_f8")))
+
+poorcomp_long %>% 
+  distinct(cidB3153, .keep_all = TRUE) %>% 
+  group_by(c) %>% 
+  count()
+  
+# Raw data
+ggplot(plot_data, aes(x = task, y = class_mean, group = c)) +
+  theme_bw() +
+  #geom_rect(aes(xmin = 0, xmax = Inf, ymin = -Inf, ymax = 85), fill = "grey95", colour = "white") +
+  geom_point(aes(shape = c), position = position_dodge(0.75)) + 
+  geom_point(data = filter(long_data, !(cidB3153 %in% poorcomp_long$cidB3153)), 
+             aes(x = task, y = score, fill = c, group = c, colour = c), alpha = 0.01, 
+             position = position_jitterdodge(jitter.height = 1), show.legend = FALSE) + 
+  #ggnewscale::new_scale_colour() + 
+  geom_point(data = poorcomp_long, aes(x = task, y = score, group = c, fill = c, colour = c), alpha = 0.5, 
+             position = position_jitterdodge(jitter.height = 1), show.legend = FALSE) + 
+  #scale_colour_manual(values = rep("black", 4)) +
+  scale_x_discrete(name = "Task", labels = c("Item\naccuracy", "Passage\naccuracy", "Reading\ncomprehension", "Listening\ncomprehension")) +
+  scale_y_continuous(name = "Individual scores") +
+  geom_hline(yintercept = 100, linetype = "longdash") 
+
+
+#ggsave("../output/figures/SimpView_E4_raw_PC.tiff", dpi = 600, width = 7, height = 5)
+
+
+
+```

@@ -1,0 +1,45 @@
+TITLE:
+ LPA Model C: 6 classes;
+DATA:
+FILE = "mplus_models/simpview/lpa_comp/sv_lpa_mbench_576296b10d9f155ad9363f1cbb7ab8da.dat";
+ 
+VARIABLE:
+NAMES = cidB3153 f8age f9age naraAcc naraComp woldComp combAcc; 
+ MISSING=.;
+  idvariable = cidb3153; classes = c(6);
+ANALYSIS:
+ estimator = mlr; type = mixture; 
+                                                   starts = 0;
+                                                   optseed = 778338;
+                                                   processors = 4(starts);
+                                                   lrtstarts = 0 0 100 20;
+MODEL:
+%OVERALL% 
+           f8age; f9age;
+           combAcc naraAcc naraComp on f9age;
+           woldcomp on f8age;
+ naraComp; naraAcc; combAcc; woldComp; 
+  naraComp with naraAcc@0;
+  naraComp with combAcc@0; 
+  naraComp with woldComp@0; 
+  naraAcc with combAcc@0; 
+  naraAcc with woldComp@0; 
+  combAcc with woldComp@0;  
+ %c#1% 
+ naraComp; naraAcc; combAcc; woldComp;
+ %c#2% 
+ naraComp; naraAcc; combAcc; woldComp;
+ %c#3% 
+ naraComp; naraAcc; combAcc; woldComp;
+ %c#4% 
+ naraComp; naraAcc; combAcc; woldComp;
+ %c#5% 
+ naraComp; naraAcc; combAcc; woldComp;
+ %c#6% 
+ naraComp; naraAcc; combAcc; woldComp;
+OUTPUT:
+ TECH7 TECH11 TECH14 stdyx CINTERVAL ENTROPY;
+SAVEDATA:
+ FILE IS sv_lpa_c_6class.dat; SAVE = cprobabilities;
+PLOT:
+TYPE = PLOT3;

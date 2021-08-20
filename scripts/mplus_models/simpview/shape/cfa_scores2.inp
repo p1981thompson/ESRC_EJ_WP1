@@ -1,0 +1,23 @@
+TITLE:
+ Confirmatory Factor Analysis - modification1 comprehension tasks;
+DATA:
+FILE = "./mplus_models/simpview/shape/cfa_scores_4207ee4cbb6da0549ec57a8754c3fece.dat";
+ 
+VARIABLE:
+NAMES = cidB3153 naraComp naraAcc combAcc woldComp f8age f9age; 
+ MISSING=.;
+ idvariable = cidB3153;
+ANALYSIS:
+estimator = mlr; type = general;
+MODEL:
+f8age; f9age;
+           G by combAcc naraAcc naraComp woldComp;
+           combAcc naraAcc naraComp on f9age;
+           woldComp on f8age;
+ woldComp with naraComp;
+OUTPUT:
+sampstat; TECH1; TECH4; stdyx; modindices; 
+SAVEDATA:
+ FILE IS shape_cfa_scores2.dat; SAVE = fscores;
+PLOT:
+TYPE = PLOT3;
