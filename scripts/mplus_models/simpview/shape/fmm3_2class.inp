@@ -16,7 +16,7 @@ MODEL:
            combAcc naraAcc naraComp on f9age;
            woldcomp on f8age;
  
-  naraComp naraAcc combAcc woldComp; 
+  naraComp naraAcc@0 combAcc woldComp; 
  
   [naraComp naraAcc combAcc woldComp];
               G by combAcc* naraAcc naraComp woldComp;
@@ -26,13 +26,16 @@ MODEL:
               
  %c#1% 
  
-  naraComp naraAcc combAcc woldComp;
+  naraComp naraAcc@0 combAcc woldComp;
   [naraComp naraAcc combAcc woldComp];
  %c#2% 
  
-  naraComp naraAcc combAcc woldComp;
+  naraComp naraAcc@0 combAcc woldComp;
   [naraComp naraAcc combAcc woldComp];
 OUTPUT:
 TECH1 TECH8;
+ stdyx ENTROPY
+SAVEDATA:
+ FILE IS fmm3nn_2class.dat; SAVE = cprobabilities;
 PLOT:
 TYPE = PLOT3;

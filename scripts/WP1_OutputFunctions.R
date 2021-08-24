@@ -411,7 +411,7 @@ mm_extract_data <- function(orig_mods = NA,        # list of original models (in
   
 }
 
-# Re-compute LMR values for models that did not use the best LL for k-1 model
+### Re-compute LMR values for models that did not use the best LL for k-1 model #############
 recomp_LMR <- function(orig_mods = NA,        # list of original models (in environment)
                        orig_output = NA, 
                        mods = NA, # models that need LMR re-computing 
@@ -419,6 +419,7 @@ recomp_LMR <- function(orig_mods = NA,        # list of original models (in envi
                        analysis_id = "sv",
                        rerun = TRUE,          # whether to re-run models to extract data, set to false if just loading 
                        kstarts = "20 4",
+                       optseed = NA,
                        one_fit = TRUE) {      # whether a one-class model was fitted (if not, adjusts selection from list)
   
   # Make sure output ordered by class number
@@ -444,8 +445,14 @@ recomp_LMR <- function(orig_mods = NA,        # list of original models (in envi
         
         # Extract filename from original output, extract optseed
         mod_file <- names(orig_output)[[model]]
+        
+        if (is.na(optseed)) {
         optseed_path <- paste0(here::here(), "/scripts/", filepath, "/", mod_file)
         optseed_val <- get_optseed(optseed_path)
+        } else {
+          optseed_val <- optseed
+        }
+        
         
         body <- update(orig_mods[[model]],
                        ANALYSIS = as.formula(sprintf("~ 'estimator = mlr; type = mixture; 
@@ -454,7 +461,7 @@ recomp_LMR <- function(orig_mods = NA,        # list of original models (in envi
                                                    k-1starts = %s;'", optseed_val, kstarts)),
                        OUTPUT = ~ "TECH7 TECH11;")
       
-      mplusModeler(body, sprintf("%s/%s_%s_lmr_%dclass.dat", filepath, analysis_id, model_name, n_classes), run = TRUE)
+      mplusModeler(body, sprintf("%s/%s_lmr_%dclass.dat", filepath, model_name, n_classes), run = TRUE) # can add analysis id back in here for extra naming
     }
   }
   
