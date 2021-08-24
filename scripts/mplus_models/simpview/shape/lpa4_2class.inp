@@ -8,8 +8,8 @@ NAMES = NARACOMP NARAACC COMBACC WOLDCOMP F8AGE F9AGE G CIDB3153;
  MISSING=.;
   idvariable = cidb3153; classes = c(2);
 ANALYSIS:
-estimator = mlr; type = mixture; starts = 500 50; 
-              processors = 4(STARTS);
+ estimator = mlr; type = mixture; starts = 2000 200;
+                   processors = 4(STARTS);
 MODEL:
 %OVERALL%
            f8age; f9age;

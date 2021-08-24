@@ -30,7 +30,7 @@ Read in selected model file that contains class assignment data, and data file o
 
 ```{r read-data}
 # Read in and extract class data
-final_mod <- readModels(target = "./mplus_models/simpview/shape", filefilter = "lpa4_rerun_5")  # final model file
+final_mod <- readModels(target = "./mplus_models/simpview/shape", filefilter = "lpa4_rerun_3class")  # final model file
 class_data <- as.data.frame(final_mod$savedata) %>% 
   rename_all(tolower) %>% 
   select(cidb3153, naraacc:c, f8age, f9age) %>%   # keep age data for additional checking during merge
@@ -171,7 +171,7 @@ ggplot(plot_data, aes(x = task, y = class_mean, group = c, colour = c)) +
   geom_rect(aes(xmin = 0, xmax = Inf, ymin = -Inf, ymax = 85), fill = "grey95", colour = "white") +
   geom_point(aes(shape = c), position = position_dodge(0.2)) + 
   geom_line(aes(linetype = c), position = position_dodge(0.2)) + 
-  geom_errorbar(aes(ymin = class_mean - (1*sd), ymax = class_mean + (1*sd)), width = 0.1, position = position_dodge(0.2)) +
+  #geom_errorbar(aes(ymin = class_mean - (1*sd), ymax = class_mean + (1*sd)), width = 0.1, position = position_dodge(0.2)) +
   scale_x_discrete(name = "Task", labels = c("Item\naccuracy", "Passage\naccuracy", "Reading\ncomprehension", "Listening\ncomprehension")) +
   scale_y_continuous(name = "Class mean (+/- 1SD)") +
   geom_hline(yintercept = 100, linetype = "longdash") 
