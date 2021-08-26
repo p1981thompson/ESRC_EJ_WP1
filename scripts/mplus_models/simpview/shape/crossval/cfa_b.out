@@ -1,0 +1,898 @@
+Mplus VERSION 8.5
+MUTHEN & MUTHEN
+08/25/2021  10:49 AM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+  Confirmatory Factor Analysis - Extract factor scores;
+  DATA:
+  FILE = "./mplus_models/simpview/shape/crossval/cfa_B_5d1661a61d02e40cc3ff92203e61da3c.dat"
+
+  VARIABLE:
+  NAMES = cidB3153 naraComp naraAcc combAcc woldComp f8age f9age;
+   MISSING=.;
+   idvariable = cidB3153;
+  ANALYSIS:
+  estimator = mlr; type = general;
+  MODEL:
+  f8age; f9age;
+             G by combAcc naraAcc naraComp woldComp;
+             woldComp with naraComp;
+             combAcc naraAcc naraComp on f9age;
+             woldComp on f8age;
+  OUTPUT:
+  sampstat; TECH1; TECH4; stdyx; modindices;
+  SAVEDATA:
+  FILE IS cfa_B.dat; SAVE = fscores;
+  PLOT:
+  TYPE = PLOT3;
+
+
+
+*** WARNING
+  Input line exceeded 90 characters. Some input may be truncated.
+  FILE = "./mplus_models/simpview/shape/crossval/cfa_B_5d1661a61d02e40cc3ff92203e61da3c.dat";
+   1 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
+
+
+
+
+Confirmatory Factor Analysis - Extract factor scores;
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                        3423
+
+Number of dependent variables                                    4
+Number of independent variables                                  2
+Number of continuous latent variables                            1
+
+Observed dependent variables
+
+  Continuous
+   NARACOMP    NARAACC     COMBACC     WOLDCOMP
+
+Observed independent variables
+   F8AGE       F9AGE
+
+Continuous latent variables
+   G
+
+Variables with special functions
+
+  ID variable           CIDB3153
+
+Estimator                                                      MLR
+Information matrix                                        OBSERVED
+Maximum number of iterations                                  1000
+Convergence criterion                                    0.500D-04
+Maximum number of steepest descent iterations                   20
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+
+Input data file(s)
+  ./mplus_models/simpview/shape/crossval/cfa_B_5d1661a61d02e40cc3ff92203e61da3c.
+
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns             6
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT
+
+
+           Covariance Coverage
+              NARACOMP      NARAACC       COMBACC       WOLDCOMP      F8AGE
+              ________      ________      ________      ________      ________
+ NARACOMP       1.000
+ NARAACC        1.000         1.000
+ COMBACC        0.993         0.993         0.993
+ WOLDCOMP       0.857         0.857         0.852         0.857
+ F8AGE          0.864         0.864         0.858         0.857         0.864
+ F9AGE          1.000         1.000         0.993         0.857         0.864
+
+
+           Covariance Coverage
+              F9AGE
+              ________
+ F9AGE          1.000
+
+
+SAMPLE STATISTICS
+
+
+     ESTIMATED SAMPLE STATISTICS
+
+
+           Means
+              NARACOMP      NARAACC       COMBACC       WOLDCOMP      F8AGE
+              ________      ________      ________      ________      ________
+               24.968        65.861        12.617         7.414       103.772
+
+
+           Means
+              F9AGE
+              ________
+              118.704
+
+
+           Covariances
+              NARACOMP      NARAACC       COMBACC       WOLDCOMP      F8AGE
+              ________      ________      ________      ________      ________
+ NARACOMP      60.947
+ NARAACC      132.135       423.591
+ COMBACC       25.533        79.237        21.492
+ WOLDCOMP       6.577        12.110         2.214         3.774
+ F8AGE         -1.586        -2.483        -0.640         0.448        13.636
+ F9AGE          0.948         2.702        -0.024        -0.403         3.809
+
+
+           Covariances
+              F9AGE
+              ________
+ F9AGE         16.555
+
+
+           Correlations
+              NARACOMP      NARAACC       COMBACC       WOLDCOMP      F8AGE
+              ________      ________      ________      ________      ________
+ NARACOMP       1.000
+ NARAACC        0.822         1.000
+ COMBACC        0.706         0.830         1.000
+ WOLDCOMP       0.434         0.303         0.246         1.000
+ F8AGE         -0.055        -0.033        -0.037         0.062         1.000
+ F9AGE          0.030         0.032        -0.001        -0.051         0.253
+
+
+           Correlations
+              F9AGE
+              ________
+ F9AGE          1.000
+
+
+     MAXIMUM LOG-LIKELIHOOD VALUE FOR THE UNRESTRICTED (H1) MODEL IS -56580.887
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     NARACOMP             24.968      -0.218       0.000    0.03%      18.000     23.000     25.000
+            3423.000      60.947      -0.334      44.000    0.09%      27.000     32.000
+     NARAACC              65.861      -0.452       0.000    0.15%      47.000     60.000     68.000
+            3423.000     423.591      -0.549     100.000    0.23%      75.000     86.000
+     COMBACC              12.644      -0.687       0.000    1.29%       9.000     12.000     13.000
+            3399.000      21.304      -0.135      20.000    1.15%      15.000     17.000
+     WOLDCOMP              7.465       0.044       2.000    0.65%       6.000      7.000      7.000
+            2935.000       3.764       0.382      15.000    0.07%       8.000      9.000
+     F8AGE               103.676       2.573      97.000    0.07%     102.000    102.000    103.000
+            2958.000      13.489       7.992     127.000    0.03%     103.000    105.000
+     F9AGE               118.704       1.459     106.000    0.03%     115.000    117.000    118.000
+            3423.000      16.555       3.079     140.000    0.09%     119.000    121.000
+
+
+THE MODEL ESTIMATION TERMINATED NORMALLY
+
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                       24
+
+Loglikelihood
+
+          H0 Value                      -56586.085
+          H0 Scaling Correction Factor      1.2896
+            for MLR
+          H1 Value                      -56580.887
+          H1 Scaling Correction Factor      1.2561
+            for MLR
+
+Information Criteria
+
+          Akaike (AIC)                  113220.171
+          Bayesian (BIC)                113367.489
+          Sample-Size Adjusted BIC      113291.230
+            (n* = (n + 2) / 24)
+
+Chi-Square Test of Model Fit
+
+          Value                             10.520*
+          Degrees of Freedom                     3
+          P-Value                           0.0146
+          Scaling Correction Factor         0.9884
+            for MLR
+
+*   The chi-square value for MLM, MLMV, MLR, ULSMV, WLSM and WLSMV cannot be used
+    for chi-square difference testing in the regular way.  MLM, MLR and WLSM
+    chi-square difference testing is described on the Mplus website.  MLMV, WLSMV,
+    and ULSMV difference testing is done using the DIFFTEST option.
+
+RMSEA (Root Mean Square Error Of Approximation)
+
+          Estimate                           0.027
+          90 Percent C.I.                    0.011  0.046
+          Probability RMSEA <= .05           0.981
+
+CFI/TLI
+
+          CFI                                0.999
+          TLI                                0.996
+
+Chi-Square Test of Model Fit for the Baseline Model
+
+          Value                           7936.709
+          Degrees of Freedom                    14
+          P-Value                           0.0000
+
+SRMR (Standardized Root Mean Square Residual)
+
+          Value                              0.007
+
+
+
+MODEL RESULTS
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ G        BY
+    COMBACC            1.000      0.000    999.000    999.000
+    NARAACC            5.158      0.066     78.164      0.000
+    NARACOMP           1.665      0.024     70.532      0.000
+    WOLDCOMP           0.156      0.009     17.019      0.000
+
+ COMBACC  ON
+    F9AGE              0.242      0.060      4.003      0.000
+
+ NARAACC  ON
+    F9AGE              1.417      0.307      4.611      0.000
+
+ NARACOMP ON
+    F9AGE              0.462      0.095      4.841      0.000
+
+ WOLDCOMP ON
+    F8AGE              0.059      0.009      6.635      0.000
+
+ F8AGE    WITH
+    G                 -1.570      0.396     -3.968      0.000
+
+ F9AGE    WITH
+    G                 -4.026      1.027     -3.921      0.000
+
+ WOLDCOMP WITH
+    NARACOMP           2.732      0.163     16.756      0.000
+
+ F9AGE    WITH
+    F8AGE              3.804      0.443      8.578      0.000
+
+ Means
+    F8AGE            103.766      0.073   1428.425      0.000
+    F9AGE            118.704      0.070   1706.874      0.000
+
+ Intercepts
+    NARACOMP         -29.908     11.336     -2.638      0.008
+    NARAACC         -102.401     36.490     -2.806      0.005
+    COMBACC          -16.077      7.170     -2.242      0.025
+    WOLDCOMP           1.311      0.919      1.426      0.154
+
+ Variances
+    F8AGE             13.635      0.800     17.035      0.000
+    F9AGE             16.555      0.638     25.961      0.000
+    G                 16.341      0.740     22.082      0.000
+
+ Residual Variances
+    NARACOMP          18.282      0.616     29.701      0.000
+    NARAACC           14.473      3.331      4.345      0.000
+    COMBACC            6.128      0.193     31.731      0.000
+    WOLDCOMP           3.374      0.097     34.941      0.000
+
+
+STANDARDIZED MODEL RESULTS
+
+
+STDYX Standardization
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ G        BY
+    COMBACC            0.872      0.015     59.697      0.000
+    NARAACC            1.013      0.016     63.146      0.000
+    NARACOMP           0.862      0.015     58.315      0.000
+    WOLDCOMP           0.323      0.017     18.926      0.000
+
+ COMBACC  ON
+    F9AGE              0.212      0.053      4.007      0.000
+
+ NARAACC  ON
+    F9AGE              0.280      0.061      4.607      0.000
+
+ NARACOMP ON
+    F9AGE              0.241      0.050      4.825      0.000
+
+ WOLDCOMP ON
+    F8AGE              0.112      0.017      6.524      0.000
+
+ F8AGE    WITH
+    G                 -0.105      0.025     -4.229      0.000
+
+ F9AGE    WITH
+    G                 -0.245      0.058     -4.201      0.000
+
+ WOLDCOMP WITH
+    NARACOMP           0.348      0.017     20.112      0.000
+
+ F9AGE    WITH
+    F8AGE              0.253      0.025     10.190      0.000
+
+ Means
+    F8AGE             28.102      0.809     34.753      0.000
+    F9AGE             29.174      0.551     52.952      0.000
+
+ Intercepts
+    NARACOMP          -3.831      1.455     -2.633      0.008
+    NARAACC           -4.975      1.774     -2.804      0.005
+    COMBACC           -3.468      1.546     -2.244      0.025
+    WOLDCOMP           0.674      0.474      1.422      0.155
+
+ Variances
+    F8AGE              1.000      0.000    999.000    999.000
+    F9AGE              1.000      0.000    999.000    999.000
+    G                  1.000      0.000    999.000    999.000
+
+ Residual Variances
+    NARACOMP           0.300      0.011     26.814      0.000
+    NARAACC            0.034      0.008      4.353      0.000
+    COMBACC            0.285      0.011     26.578      0.000
+    WOLDCOMP           0.891      0.011     81.502      0.000
+
+
+R-SQUARE
+
+    Observed                                        Two-Tailed
+    Variable        Estimate       S.E.  Est./S.E.    P-Value
+
+    NARACOMP           0.700      0.011     62.578      0.000
+    NARAACC            0.966      0.008    123.054      0.000
+    COMBACC            0.715      0.011     66.623      0.000
+    WOLDCOMP           0.109      0.011      9.998      0.000
+
+
+QUALITY OF NUMERICAL RESULTS
+
+     Condition Number for the Information Matrix              0.380E-07
+       (ratio of smallest to largest eigenvalue)
+
+
+MODEL MODIFICATION INDICES
+
+NOTE:  Modification indices for direct effects of observed dependent variables
+regressed on covariates may not be included.  To include these, request
+MODINDICES (ALL).
+
+Minimum M.I. value for printing the modification index    10.000
+
+                                   M.I.     E.P.C.  Std E.P.C.  StdYX E.P.C.
+
+No modification indices above the minimum value.
+
+
+
+TECHNICAL 1 OUTPUT
+
+
+     PARAMETER SPECIFICATION
+
+
+           NU
+              NARACOMP      NARAACC       COMBACC       WOLDCOMP      F8AGE
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              F9AGE
+              ________
+                  0
+
+
+           LAMBDA
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARACOMP           0             0             0             0             0
+ NARAACC            0             0             0             0             0
+ COMBACC            0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARACOMP           0             0
+ NARAACC            0             0
+ COMBACC            0             0
+ WOLDCOMP           0             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           THETA
+              NARACOMP      NARAACC       COMBACC       WOLDCOMP      F8AGE
+              ________      ________      ________      ________      ________
+ NARACOMP           0
+ NARAACC            0             0
+ COMBACC            0             0             0
+ WOLDCOMP           0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           THETA
+              F9AGE
+              ________
+ F9AGE              0
+
+
+           ALPHA
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+                  0             1             2             3             4
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+                  5             6
+
+
+           BETA
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ G                  0             0             0             0             0
+ NARACOMP           7             0             0             0             0
+ NARAACC            9             0             0             0             0
+ COMBACC            0             0             0             0             0
+ WOLDCOMP          12             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ G                  0             0
+ NARACOMP           0             8
+ NARAACC            0            10
+ COMBACC            0            11
+ WOLDCOMP          13             0
+ F8AGE              0             0
+ F9AGE              0             0
+
+
+           PSI
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ G                 14
+ NARACOMP           0            15
+ NARAACC            0             0            16
+ COMBACC            0             0             0            17
+ WOLDCOMP           0            18             0             0            19
+ F8AGE             20             0             0             0             0
+ F9AGE             22             0             0             0             0
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE             21
+ F9AGE             23            24
+
+
+     STARTING VALUES
+
+
+           NU
+              NARACOMP      NARAACC       COMBACC       WOLDCOMP      F8AGE
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              F9AGE
+              ________
+                0.000
+
+
+           LAMBDA
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARACOMP       0.000         1.000         0.000         0.000         0.000
+ NARAACC        0.000         0.000         1.000         0.000         0.000
+ COMBACC        0.000         0.000         0.000         1.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         1.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              F8AGE         F9AGE
+              ________      ________
+ NARACOMP       0.000         0.000
+ NARAACC        0.000         0.000
+ COMBACC        0.000         0.000
+ WOLDCOMP       0.000         0.000
+ F8AGE          1.000         0.000
+ F9AGE          0.000         1.000
+
+
+           THETA
+              NARACOMP      NARAACC       COMBACC       WOLDCOMP      F8AGE
+              ________      ________      ________      ________      ________
+ NARACOMP       0.000
+ NARAACC        0.000         0.000
+ COMBACC        0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              F9AGE
+              ________
+ F9AGE          0.000
+
+
+           ALPHA
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+                0.000        24.968        65.861        12.644         7.465
+
+
+           ALPHA
+              F8AGE         F9AGE
+              ________      ________
+              103.676       118.704
+
+
+           BETA
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ G              0.000         0.000         0.000         0.000         0.000
+ NARACOMP       1.763         0.000         0.000         0.000         0.000
+ NARAACC        5.002         0.000         0.000         0.000         0.000
+ COMBACC        1.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.161         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              F8AGE         F9AGE
+              ________      ________
+ G              0.000         0.000
+ NARACOMP       0.000         0.000
+ NARAACC        0.000         0.000
+ COMBACC        0.000         0.000
+ WOLDCOMP       0.000         0.000
+ F8AGE          0.000         0.000
+ F9AGE          0.000         0.000
+
+
+           PSI
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ G              0.050
+ NARACOMP       0.000        30.474
+ NARAACC        0.000         0.000       211.795
+ COMBACC        0.000         0.000         0.000        10.652
+ WOLDCOMP       0.000         0.000         0.000         0.000         1.882
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          6.745
+ F9AGE          0.000         8.278
+
+
+TECHNICAL 4 OUTPUT
+
+
+     ESTIMATES DERIVED FROM THE MODEL
+
+
+           ESTIMATED MEANS FOR THE LATENT VARIABLES
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+                0.000        24.968        65.861        12.617         7.413
+
+
+           ESTIMATED MEANS FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+              103.766       118.704
+
+
+           S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+                0.000         0.133         0.352         0.079         0.035
+
+
+           S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+                0.073         0.070
+
+
+           EST./S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+                0.000       187.115       187.222       158.876       209.926
+
+
+           EST./S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+             1428.425      1706.874
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+                1.000         0.000         0.000         0.000         0.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+                0.000         0.000
+
+
+           ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ G             16.341
+ NARACOMP      25.354        60.947
+ NARAACC       78.577       132.117       423.591
+ COMBACC       15.368        25.583        79.230        21.490
+ WOLDCOMP       2.450         6.625        12.064         2.352         3.788
+ F8AGE         -1.570        -0.856        -2.705        -0.650         0.558
+ F9AGE         -4.026         0.948         2.702        -0.024        -0.403
+
+
+           ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE         13.635
+ F9AGE          3.804        16.555
+
+
+           S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ G              0.740
+ NARACOMP       0.795         1.344
+ NARAACC        2.113         3.319         8.720
+ COMBACC        0.535         0.772         2.047         0.504
+ WOLDCOMP       0.159         0.304         0.755         0.150         0.108
+ F8AGE          0.396         0.495         1.517         0.297         0.138
+ F9AGE          1.027         0.576         1.544         0.340         0.153
+
+
+           S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.800
+ F9AGE          0.443         0.638
+
+
+           EST./S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ G             22.082
+ NARACOMP      31.911        45.332
+ NARAACC       37.184        39.808        48.578
+ COMBACC       28.738        33.118        38.713        42.649
+ WOLDCOMP      15.367        21.776        15.981        15.659        35.085
+ F8AGE         -3.968        -1.728        -1.783        -2.193         4.041
+ F9AGE         -3.921         1.646         1.751        -0.070        -2.623
+
+
+           EST./S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE         17.035
+ F9AGE          8.578        25.961
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ G              0.000
+ NARACOMP       0.000         0.000
+ NARAACC        0.000         0.000         0.000
+ COMBACC        0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.084         0.075         0.028         0.000
+ F9AGE          0.000         0.100         0.080         0.944         0.009
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.000
+ F9AGE          0.000         0.000
+
+
+           ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ G              1.000
+ NARACOMP       0.803         1.000
+ NARAACC        0.944         0.822         1.000
+ COMBACC        0.820         0.707         0.830         1.000
+ WOLDCOMP       0.311         0.436         0.301         0.261         1.000
+ F8AGE         -0.105        -0.030        -0.036        -0.038         0.078
+ F9AGE         -0.245         0.030         0.032        -0.001        -0.051
+
+
+           ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          1.000
+ F9AGE          0.253         1.000
+
+
+           S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ G              0.000
+ NARACOMP       0.015         0.000
+ NARAACC        0.016         0.007         0.000
+ COMBACC        0.014         0.009         0.006         0.000
+ WOLDCOMP       0.017         0.015         0.017         0.015         0.000
+ F8AGE          0.025         0.017         0.020         0.017         0.019
+ F9AGE          0.058         0.018         0.018         0.018         0.019
+
+
+           S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.000
+ F9AGE          0.025         0.000
+
+
+           EST./S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ G            999.000
+ NARACOMP      53.977       999.000
+ NARAACC       57.820       124.749       999.000
+ COMBACC       59.312        76.577       138.854       999.000
+ WOLDCOMP      18.187        28.507        18.001        17.817       999.000
+ F8AGE         -4.229        -1.737        -1.791        -2.207         4.147
+ F9AGE         -4.201         1.645         1.748        -0.070        -2.634
+
+
+           EST./S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE        999.000
+ F9AGE         10.190       999.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              G             NARACOMP      NARAACC       COMBACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ G              0.000
+ NARACOMP       0.000         0.000
+ NARAACC        0.000         0.000         0.000
+ COMBACC        0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.082         0.073         0.027         0.000
+ F9AGE          0.000         0.100         0.081         0.944         0.008
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.000
+ F9AGE          0.000         0.000
+
+
+SAMPLE STATISTICS FOR ESTIMATED FACTOR SCORES
+
+
+     SAMPLE STATISTICS
+
+
+           Means
+              G             G_SE
+              ________      ________
+                0.000         0.671
+
+
+           Covariances
+              G             G_SE
+              ________      ________
+ G             15.890
+ G_SE          -0.001         0.000
+
+
+           Correlations
+              G             G_SE
+              ________      ________
+ G              1.000
+ G_SE          -0.095         1.000
+
+
+PLOT INFORMATION
+
+The following plots are available:
+
+  Histograms (sample values, estimated factor scores, estimated values, residuals)
+  Scatterplots (sample values, estimated factor scores, estimated values, residuals)
+  Latent variable distribution plots
+
+SAVEDATA INFORMATION
+
+
+  Save file
+    cfa_B.dat
+
+  Order and format of variables
+
+    NARACOMP       F10.3
+    NARAACC        F10.3
+    COMBACC        F10.3
+    WOLDCOMP       F10.3
+    F8AGE          F10.3
+    F9AGE          F10.3
+    G              F10.3
+    G_SE           F10.3
+    CIDB3153       I6
+
+  Save file format
+    8F10.3 I6
+
+  Save file record length    10000
+
+  Save missing symbol        *
+
+
+     Beginning Time:  10:49:10
+        Ending Time:  10:49:10
+       Elapsed Time:  00:00:00
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2020 Muthen & Muthen

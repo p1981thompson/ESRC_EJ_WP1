@@ -1,0 +1,46 @@
+TITLE:
+ Model 3 (FMM): 4 classes;
+DATA:
+FILE = "mplus_models/simpview/shapeB/fmm3_1class_804316e9cf9d5fe45b42d1dcd2bccc98.dat";
+ 
+VARIABLE:
+NAMES = cidB3153 f8age f9age naraAcc naraComp woldComp combAcc; 
+ MISSING=.;
+  idvariable = cidb3153; classes = c(4);
+ANALYSIS:
+ estimator = mlr; type = mixture; starts = 6000 1500;
+              processors = 4(STARTS);
+MODEL:
+%OVERALL%
+           f8age; f9age;
+           combAcc naraAcc naraComp on f9age;
+           woldcomp on f8age;
+ 
+  naraComp naraAcc@0 combAcc woldComp; 
+ 
+  [naraComp naraAcc combAcc woldComp];
+              G by combAcc* naraAcc naraComp woldComp;
+              naraComp with woldComp;
+              [G@0]; G@1;
+              f8age with G@0; f9age with G@0;
+              
+ %c#1% 
+ 
+  naraComp naraAcc@0 combAcc woldComp;
+  [naraComp naraAcc combAcc woldComp];
+ %c#2% 
+ 
+  naraComp naraAcc@0 combAcc woldComp;
+  [naraComp naraAcc combAcc woldComp];
+ %c#3% 
+ 
+  naraComp naraAcc@0 combAcc woldComp;
+  [naraComp naraAcc combAcc woldComp];
+ %c#4% 
+ 
+  naraComp naraAcc@0 combAcc woldComp;
+  [naraComp naraAcc combAcc woldComp];
+OUTPUT:
+TECH1 TECH8;
+PLOT:
+TYPE = PLOT3;
