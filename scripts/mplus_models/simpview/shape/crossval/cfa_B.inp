@@ -1,0 +1,23 @@
+TITLE:
+Confirmatory Factor Analysis - Extract factor scores;
+DATA:
+FILE = "./mplus_models/simpview/shape/crossval/cfa_B_5d1661a61d02e40cc3ff92203e61da3c.dat";
+ 
+VARIABLE:
+NAMES = cidB3153 naraComp naraAcc combAcc woldComp f8age f9age; 
+ MISSING=.;
+ idvariable = cidB3153;
+ANALYSIS:
+estimator = mlr; type = general;
+MODEL:
+f8age; f9age;
+           G by combAcc naraAcc naraComp woldComp;
+           woldComp with naraComp;
+           combAcc naraAcc naraComp on f9age;
+           woldComp on f8age;
+OUTPUT:
+sampstat; TECH1; TECH4; stdyx; modindices; 
+SAVEDATA:
+FILE IS cfa_B.dat; SAVE = fscores;
+PLOT:
+TYPE = PLOT3;
