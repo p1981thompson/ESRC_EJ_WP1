@@ -1,0 +1,1011 @@
+Mplus VERSION 8.5
+MUTHEN & MUTHEN
+09/13/2021  10:43 AM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+   LPA Model A: 8 classes;
+  DATA:
+  FILE = "mplus_models/simpview/lpa_comp/sv_lpa_mbench_576296b10d9f155ad9363f1cbb7ab8da.dat"
+
+  VARIABLE:
+  NAMES = cidB3153 f8age f9age naraAcc naraComp woldComp combAcc;
+   MISSING=.;
+    idvariable = cidb3153; classes = c(8);
+  ANALYSIS:
+   estimator = mlr; type = mixture;
+                                                     starts = 0;
+                                                     optseed = 995249;
+                                                     k-1starts = 20 4;
+                                                     STSCALE = 1;
+  MODEL:
+  %OVERALL%
+             f8age; f9age;
+             combAcc naraAcc naraComp on f9age;
+             woldcomp on f8age;
+   naraComp; naraAcc; combAcc; woldComp;
+    naraComp with naraAcc@0;
+    naraComp with combAcc@0;
+    naraComp with woldComp@0;
+    naraAcc with combAcc@0;
+    naraAcc with woldComp@0;
+    combAcc with woldComp@0;
+  OUTPUT:
+   TECH7 TECH11;
+  PLOT:
+  TYPE = PLOT3;
+
+
+
+*** WARNING
+  Input line exceeded 90 characters. Some input may be truncated.
+  FILE = "mplus_models/simpview/lpa_comp/sv_lpa_mbench_576296b10d9f155ad9363f1cbb7ab8da.dat";
+   1 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
+
+
+
+
+LPA Model A: 8 classes;
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                        3423
+
+Number of dependent variables                                    4
+Number of independent variables                                  2
+Number of continuous latent variables                            0
+Number of categorical latent variables                           1
+
+Observed dependent variables
+
+  Continuous
+   NARAACC     NARACOMP    WOLDCOMP    COMBACC
+
+Observed independent variables
+   F8AGE       F9AGE
+
+Categorical latent variables
+   C
+
+Variables with special functions
+
+  ID variable           CIDB3153
+
+Estimator                                                      MLR
+Information matrix                                        OBSERVED
+Optimization Specifications for the Quasi-Newton Algorithm for
+Continuous Outcomes
+  Maximum number of iterations                                 100
+  Convergence criterion                                  0.100D-05
+Optimization Specifications for the EM Algorithm
+  Maximum number of iterations                                 500
+  Convergence criteria
+    Loglikelihood change                                 0.100D-06
+    Relative loglikelihood change                        0.100D-06
+    Derivative                                           0.100D-05
+Optimization Specifications for the M step of the EM Algorithm for
+Categorical Latent variables
+  Number of M step iterations                                    1
+  M step convergence criterion                           0.100D-05
+  Basis for M step termination                           ITERATION
+Optimization Specifications for the M step of the EM Algorithm for
+Censored, Binary or Ordered Categorical (Ordinal), Unordered
+Categorical (Nominal) and Count Outcomes
+  Number of M step iterations                                    1
+  M step convergence criterion                           0.100D-05
+  Basis for M step termination                           ITERATION
+  Maximum value for logit thresholds                            15
+  Minimum value for logit thresholds                           -15
+  Minimum expected cell size for chi-square              0.100D-01
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+Optimization algorithm                                         EMA
+Random Starts Specifications
+  Random seed for analysis                                  995249
+
+Input data file(s)
+  mplus_models/simpview/lpa_comp/sv_lpa_mbench_576296b10d9f155ad9363f1cbb7ab8da.
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns             5
+     Number of y missing data patterns           5
+     Number of u missing data patterns           0
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT FOR Y
+
+
+           Covariance Coverage
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+ NARAACC        1.000
+ NARACOMP       1.000         1.000
+ WOLDCOMP       0.852         0.852         0.852
+ COMBACC        0.996         0.996         0.850         0.996
+ F8AGE          0.861         0.861         0.852         0.858         0.861
+ F9AGE          1.000         1.000         0.852         0.996         0.861
+
+
+           Covariance Coverage
+              F9AGE
+              ________
+ F9AGE          1.000
+
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     NARAACC              66.334      -0.525       0.000    0.06%      48.000     62.000     69.000
+            3423.000     417.180      -0.469     100.000    0.06%      76.000     86.000
+     NARACOMP             25.018      -0.273       0.000    0.09%      18.000     23.000     25.000
+            3423.000      62.018      -0.237      44.000    0.03%      28.000     32.000
+     WOLDCOMP              7.517       0.082       2.000    0.41%       6.000      7.000      7.000
+            2917.000       3.758       0.190      15.000    0.03%       8.000      9.000
+     COMBACC              12.788      -0.783       0.000    1.44%       9.000     13.000     14.000
+            3408.000      21.534      -0.011      20.000    1.44%      15.000     17.000
+     F8AGE               103.533       2.579      94.000    0.03%     102.000    102.000    103.000
+            2947.000      11.227       8.561     126.000    0.03%     103.000    105.000
+     F9AGE               118.643       1.305     105.000    0.03%     116.000    117.000    118.000
+            3423.000      14.907       2.626     139.000    0.06%     119.000    121.000
+
+
+THE MODEL ESTIMATION TERMINATED NORMALLY
+
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                       66
+
+Loglikelihood
+
+          H0 Value                      -55099.069
+          H0 Scaling Correction Factor      1.5679
+            for MLR
+
+Information Criteria
+
+          Akaike (AIC)                  110330.138
+          Bayesian (BIC)                110735.264
+          Sample-Size Adjusted BIC      110525.551
+            (n* = (n + 2) / 24)
+
+
+
+FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASSES
+BASED ON THE ESTIMATED MODEL
+
+    Latent
+   Classes
+
+       1         38.13009          0.01114
+       2        454.40062          0.13275
+       3        965.27681          0.28200
+       4        908.32316          0.26536
+       5        728.09018          0.21271
+       6        142.99131          0.04177
+       7        103.16943          0.03014
+       8         82.61839          0.02414
+
+
+FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASSES
+BASED ON ESTIMATED POSTERIOR PROBABILITIES
+
+    Latent
+   Classes
+
+       1         38.13009          0.01114
+       2        454.40062          0.13275
+       3        965.27681          0.28200
+       4        908.32316          0.26536
+       5        728.09018          0.21271
+       6        142.99131          0.04177
+       7        103.16943          0.03014
+       8         82.61839          0.02414
+
+
+FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASSES
+BASED ON THEIR MOST LIKELY LATENT CLASS MEMBERSHIP
+
+Class Counts and Proportions
+
+    Latent
+   Classes
+
+       1               34          0.00993
+       2              454          0.13263
+       3              976          0.28513
+       4              914          0.26702
+       5              735          0.21472
+       6              144          0.04207
+       7               92          0.02688
+       8               74          0.02162
+
+
+CLASSIFICATION QUALITY
+
+     Entropy                         0.855
+
+
+Average Latent Class Probabilities for Most Likely Latent Class Membership (Row)
+by Latent Class (Column)
+
+           1        2        3        4        5        6        7        8
+
+    1   0.897    0.033    0.000    0.000    0.000    0.066    0.000    0.004
+    2   0.007    0.887    0.000    0.000    0.080    0.020    0.000    0.005
+    3   0.000    0.000    0.848    0.087    0.055    0.000    0.008    0.003
+    4   0.000    0.000    0.092    0.898    0.000    0.000    0.010    0.000
+    5   0.000    0.056    0.069    0.000    0.860    0.000    0.000    0.015
+    6   0.028    0.057    0.000    0.000    0.000    0.914    0.000    0.000
+    7   0.000    0.000    0.022    0.036    0.000    0.000    0.928    0.014
+    8   0.003    0.016    0.009    0.000    0.082    0.000    0.009    0.880
+
+
+Classification Probabilities for the Most Likely Latent Class Membership (Column)
+by Latent Class (Row)
+
+           1        2        3        4        5        6        7        8
+
+    1   0.800    0.087    0.000    0.000    0.000    0.107    0.000    0.006
+    2   0.002    0.886    0.000    0.000    0.090    0.018    0.000    0.003
+    3   0.000    0.000    0.858    0.087    0.053    0.000    0.002    0.001
+    4   0.000    0.000    0.093    0.903    0.000    0.000    0.004    0.000
+    5   0.000    0.050    0.073    0.000    0.869    0.000    0.000    0.008
+    6   0.016    0.064    0.000    0.000    0.000    0.921    0.000    0.000
+    7   0.000    0.000    0.075    0.092    0.000    0.000    0.827    0.007
+    8   0.002    0.028    0.035    0.000    0.132    0.000    0.015    0.788
+
+
+Logits for the Classification Probabilities for the Most Likely Latent Class Membership (Column)
+by Latent Class (Row)
+
+              1        2        3        4        5        6        7        8
+
+    1      4.923    2.709   -8.669   -8.669   -8.669    2.907   -8.669    0.000
+    2     -0.061    5.818   -6.855   -7.877    3.533    1.931   -7.877    0.000
+    3     -6.563   -6.073    7.098    4.811    4.306   -6.563    1.095    0.000
+    4      0.000    0.000   11.440   13.714    1.929    0.000    8.210    0.000
+    5     -9.034    1.787    2.166   -8.136    4.641   -9.034   -7.223    0.000
+    6      9.655   11.059    0.000    0.000    0.000   13.733    0.000    0.000
+    7     -8.821   -8.821    2.398    2.604   -5.028   -8.821    4.805    0.000
+    8     -6.226   -3.321   -3.122  -13.577   -1.787  -13.577   -3.933    0.000
+
+
+MODEL RESULTS
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+Latent Class 1
+
+ COMBACC    ON
+    F9AGE             -0.003      0.018     -0.167      0.868
+
+ NARAACC    ON
+    F9AGE              0.111      0.079      1.400      0.161
+
+ NARACOMP   ON
+    F9AGE              0.060      0.034      1.773      0.076
+
+ WOLDCOMP   ON
+    F8AGE              0.024      0.019      1.256      0.209
+
+ NARACOMP WITH
+    NARAACC            0.000      0.000    999.000    999.000
+    COMBACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ NARAACC  WITH
+    COMBACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ COMBACC  WITH
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ F9AGE    WITH
+    F8AGE              0.658      0.225      2.922      0.003
+
+ Means
+    F8AGE            115.058      1.091    105.487      0.000
+    F9AGE            122.037      2.274     53.658      0.000
+
+ Intercepts
+    NARAACC           11.919     10.068      1.184      0.236
+    NARACOMP           3.620      4.350      0.832      0.405
+    WOLDCOMP           3.704      2.243      1.652      0.099
+    COMBACC            3.434      2.233      1.538      0.124
+
+ Variances
+    F8AGE              4.117      0.217     19.008      0.000
+    F9AGE             13.440      0.542     24.812      0.000
+
+ Residual Variances
+    NARAACC           45.972      2.289     20.081      0.000
+    NARACOMP          17.740      0.715     24.829      0.000
+    WOLDCOMP           3.311      0.096     34.420      0.000
+    COMBACC            5.478      0.185     29.638      0.000
+
+Latent Class 2
+
+ COMBACC    ON
+    F9AGE             -0.003      0.018     -0.167      0.868
+
+ NARAACC    ON
+    F9AGE              0.111      0.079      1.400      0.161
+
+ NARACOMP   ON
+    F9AGE              0.060      0.034      1.773      0.076
+
+ WOLDCOMP   ON
+    F8AGE              0.024      0.019      1.256      0.209
+
+ NARACOMP WITH
+    NARAACC            0.000      0.000    999.000    999.000
+    COMBACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ NARAACC  WITH
+    COMBACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ COMBACC  WITH
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ F9AGE    WITH
+    F8AGE              0.658      0.225      2.922      0.003
+
+ Means
+    F8AGE            103.024      0.143    718.928      0.000
+    F9AGE            118.294      0.205    576.335      0.000
+
+ Intercepts
+    NARAACC           27.550      9.408      2.928      0.003
+    NARACOMP           9.605      4.024      2.387      0.017
+    WOLDCOMP           4.451      1.947      2.286      0.022
+    COMBACC            7.134      2.127      3.353      0.001
+
+ Variances
+    F8AGE              4.117      0.217     19.008      0.000
+    F9AGE             13.440      0.542     24.812      0.000
+
+ Residual Variances
+    NARAACC           45.972      2.289     20.081      0.000
+    NARACOMP          17.740      0.715     24.829      0.000
+    WOLDCOMP           3.311      0.096     34.420      0.000
+    COMBACC            5.478      0.185     29.638      0.000
+
+Latent Class 3
+
+ COMBACC    ON
+    F9AGE             -0.003      0.018     -0.167      0.868
+
+ NARAACC    ON
+    F9AGE              0.111      0.079      1.400      0.161
+
+ NARACOMP   ON
+    F9AGE              0.060      0.034      1.773      0.076
+
+ WOLDCOMP   ON
+    F8AGE              0.024      0.019      1.256      0.209
+
+ NARACOMP WITH
+    NARAACC            0.000      0.000    999.000    999.000
+    COMBACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ NARAACC  WITH
+    COMBACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ COMBACC  WITH
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ F9AGE    WITH
+    F8AGE              0.658      0.225      2.922      0.003
+
+ Means
+    F8AGE            102.896      0.080   1283.312      0.000
+    F9AGE            118.392      0.134    886.020      0.000
+
+ Intercepts
+    NARAACC           60.619      9.321      6.504      0.000
+    NARACOMP          19.845      3.986      4.979      0.000
+    WOLDCOMP           4.898      1.947      2.516      0.012
+    COMBACC           14.758      2.134      6.915      0.000
+
+ Variances
+    F8AGE              4.117      0.217     19.008      0.000
+    F9AGE             13.440      0.542     24.812      0.000
+
+ Residual Variances
+    NARAACC           45.972      2.289     20.081      0.000
+    NARACOMP          17.740      0.715     24.829      0.000
+    WOLDCOMP           3.311      0.096     34.420      0.000
+    COMBACC            5.478      0.185     29.638      0.000
+
+Latent Class 4
+
+ COMBACC    ON
+    F9AGE             -0.003      0.018     -0.167      0.868
+
+ NARAACC    ON
+    F9AGE              0.111      0.079      1.400      0.161
+
+ NARACOMP   ON
+    F9AGE              0.060      0.034      1.773      0.076
+
+ WOLDCOMP   ON
+    F8AGE              0.024      0.019      1.256      0.209
+
+ NARACOMP WITH
+    NARAACC            0.000      0.000    999.000    999.000
+    COMBACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ NARAACC  WITH
+    COMBACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ COMBACC  WITH
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ F9AGE    WITH
+    F8AGE              0.658      0.225      2.922      0.003
+
+ Means
+    F8AGE            102.724      0.073   1404.849      0.000
+    F9AGE            118.402      0.146    812.310      0.000
+
+ Intercepts
+    NARAACC           74.832      9.397      7.964      0.000
+    NARACOMP          25.842      3.992      6.473      0.000
+    WOLDCOMP           6.038      1.934      3.122      0.002
+    COMBACC           17.087      2.134      8.009      0.000
+
+ Variances
+    F8AGE              4.117      0.217     19.008      0.000
+    F9AGE             13.440      0.542     24.812      0.000
+
+ Residual Variances
+    NARAACC           45.972      2.289     20.081      0.000
+    NARACOMP          17.740      0.715     24.829      0.000
+    WOLDCOMP           3.311      0.096     34.420      0.000
+    COMBACC            5.478      0.185     29.638      0.000
+
+Latent Class 5
+
+ COMBACC    ON
+    F9AGE             -0.003      0.018     -0.167      0.868
+
+ NARAACC    ON
+    F9AGE              0.111      0.079      1.400      0.161
+
+ NARACOMP   ON
+    F9AGE              0.060      0.034      1.773      0.076
+
+ WOLDCOMP   ON
+    F8AGE              0.024      0.019      1.256      0.209
+
+ NARACOMP WITH
+    NARAACC            0.000      0.000    999.000    999.000
+    COMBACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ NARAACC  WITH
+    COMBACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ COMBACC  WITH
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ F9AGE    WITH
+    F8AGE              0.658      0.225      2.922      0.003
+
+ Means
+    F8AGE            103.013      0.104    991.341      0.000
+    F9AGE            118.139      0.150    785.335      0.000
+
+ Intercepts
+    NARAACC           42.184      9.277      4.547      0.000
+    NARACOMP          14.458      3.962      3.649      0.000
+    WOLDCOMP           4.583      1.943      2.358      0.018
+    COMBACC           12.046      2.121      5.679      0.000
+
+ Variances
+    F8AGE              4.117      0.217     19.008      0.000
+    F9AGE             13.440      0.542     24.812      0.000
+
+ Residual Variances
+    NARAACC           45.972      2.289     20.081      0.000
+    NARACOMP          17.740      0.715     24.829      0.000
+    WOLDCOMP           3.311      0.096     34.420      0.000
+    COMBACC            5.478      0.185     29.638      0.000
+
+Latent Class 6
+
+ COMBACC    ON
+    F9AGE             -0.003      0.018     -0.167      0.868
+
+ NARAACC    ON
+    F9AGE              0.111      0.079      1.400      0.161
+
+ NARACOMP   ON
+    F9AGE              0.060      0.034      1.773      0.076
+
+ WOLDCOMP   ON
+    F8AGE              0.024      0.019      1.256      0.209
+
+ NARACOMP WITH
+    NARAACC            0.000      0.000    999.000    999.000
+    COMBACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ NARAACC  WITH
+    COMBACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ COMBACC  WITH
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ F9AGE    WITH
+    F8AGE              0.658      0.225      2.922      0.003
+
+ Means
+    F8AGE            103.166      0.202    511.446      0.000
+    F9AGE            118.529      0.410    288.946      0.000
+
+ Intercepts
+    NARAACC            7.512      9.477      0.793      0.428
+    NARACOMP           1.228      4.056      0.303      0.762
+    WOLDCOMP           3.836      1.960      1.958      0.050
+    COMBACC            2.251      2.146      1.049      0.294
+
+ Variances
+    F8AGE              4.117      0.217     19.008      0.000
+    F9AGE             13.440      0.542     24.812      0.000
+
+ Residual Variances
+    NARAACC           45.972      2.289     20.081      0.000
+    NARACOMP          17.740      0.715     24.829      0.000
+    WOLDCOMP           3.311      0.096     34.420      0.000
+    COMBACC            5.478      0.185     29.638      0.000
+
+Latent Class 7
+
+ COMBACC    ON
+    F9AGE             -0.003      0.018     -0.167      0.868
+
+ NARAACC    ON
+    F9AGE              0.111      0.079      1.400      0.161
+
+ NARACOMP   ON
+    F9AGE              0.060      0.034      1.773      0.076
+
+ WOLDCOMP   ON
+    F8AGE              0.024      0.019      1.256      0.209
+
+ NARACOMP WITH
+    NARAACC            0.000      0.000    999.000    999.000
+    COMBACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ NARAACC  WITH
+    COMBACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ COMBACC  WITH
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ F9AGE    WITH
+    F8AGE              0.658      0.225      2.922      0.003
+
+ Means
+    F8AGE            114.754      0.714    160.644      0.000
+    F9AGE            124.068      0.800    155.023      0.000
+
+ Intercepts
+    NARAACC           70.120     10.107      6.938      0.000
+    NARACOMP          22.352      4.368      5.117      0.000
+    WOLDCOMP           5.462      2.170      2.518      0.012
+    COMBACC           16.391      2.285      7.174      0.000
+
+ Variances
+    F8AGE              4.117      0.217     19.008      0.000
+    F9AGE             13.440      0.542     24.812      0.000
+
+ Residual Variances
+    NARAACC           45.972      2.289     20.081      0.000
+    NARACOMP          17.740      0.715     24.829      0.000
+    WOLDCOMP           3.311      0.096     34.420      0.000
+    COMBACC            5.478      0.185     29.638      0.000
+
+Latent Class 8
+
+ COMBACC    ON
+    F9AGE             -0.003      0.018     -0.167      0.868
+
+ NARAACC    ON
+    F9AGE              0.111      0.079      1.400      0.161
+
+ NARACOMP   ON
+    F9AGE              0.060      0.034      1.773      0.076
+
+ WOLDCOMP   ON
+    F8AGE              0.024      0.019      1.256      0.209
+
+ NARACOMP WITH
+    NARAACC            0.000      0.000    999.000    999.000
+    COMBACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ NARAACC  WITH
+    COMBACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ COMBACC  WITH
+    WOLDCOMP           0.000      0.000    999.000    999.000
+
+ F9AGE    WITH
+    F8AGE              0.658      0.225      2.922      0.003
+
+ Means
+    F8AGE            114.224      1.010    113.092      0.000
+    F9AGE            122.442      1.017    120.383      0.000
+
+ Intercepts
+    NARAACC           41.700     10.239      4.073      0.000
+    NARACOMP          14.518      4.328      3.355      0.001
+    WOLDCOMP           4.990      2.235      2.233      0.026
+    COMBACC           12.039      2.350      5.124      0.000
+
+ Variances
+    F8AGE              4.117      0.217     19.008      0.000
+    F9AGE             13.440      0.542     24.812      0.000
+
+ Residual Variances
+    NARAACC           45.972      2.289     20.081      0.000
+    NARACOMP          17.740      0.715     24.829      0.000
+    WOLDCOMP           3.311      0.096     34.420      0.000
+    COMBACC            5.478      0.185     29.638      0.000
+
+Categorical Latent Variables
+
+ Means
+    C#1               -0.773      0.274     -2.825      0.005
+    C#2                1.705      0.185      9.234      0.000
+    C#3                2.458      0.164     14.949      0.000
+    C#4                2.397      0.180     13.291      0.000
+    C#5                2.176      0.172     12.645      0.000
+    C#6                0.549      0.203      2.700      0.007
+    C#7                0.222      0.204      1.091      0.275
+
+
+QUALITY OF NUMERICAL RESULTS
+
+     Condition Number for the Information Matrix              0.698E-08
+       (ratio of smallest to largest eigenvalue)
+
+
+TECHNICAL 7 OUTPUT
+
+
+     SAMPLE STATISTICS WEIGHTED BY ESTIMATED CLASS PROBABILITIES FOR CLASS 1
+
+
+           Means
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+               25.482        10.921         6.435         3.068       114.960
+
+
+           Means
+              F9AGE
+              ________
+              122.037
+
+
+           Covariances
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+ NARAACC       75.200
+ NARACOMP      29.186        20.212
+ WOLDCOMP      -6.641        -2.500         2.385
+ COMBACC        8.501         5.215         0.250         3.814
+ F8AGE       -113.881       -77.651        -0.349         3.464        12.079
+ F9AGE          5.040         3.082       -13.221         0.789      -216.805
+
+
+           Covariances
+              F9AGE
+              ________
+ F9AGE         41.624
+
+
+     SAMPLE STATISTICS WEIGHTED BY ESTIMATED CLASS PROBABILITIES FOR CLASS 2
+
+
+           Means
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+               40.697        16.682         6.897         6.778       103.005
+
+
+           Means
+              F9AGE
+              ________
+              118.294
+
+
+           Covariances
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+ NARAACC       41.693
+ NARACOMP      10.817        11.809
+ WOLDCOMP      -1.105         2.174         3.136
+ COMBACC        2.869         0.125        -0.228         5.863
+ F8AGE         -2.186        16.096         0.211         0.553         4.244
+ F9AGE          0.891         0.452        -3.215         0.089       -40.872
+
+
+           Covariances
+              F9AGE
+              ________
+ F9AGE         12.177
+
+
+     SAMPLE STATISTICS WEIGHTED BY ESTIMATED CLASS PROBABILITIES FOR CLASS 3
+
+
+           Means
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+               73.776        26.928         7.341        14.402       102.884
+
+
+           Means
+              F9AGE
+              ________
+              118.392
+
+
+           Covariances
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+ NARAACC       54.799
+ NARACOMP      -1.160        19.556
+ WOLDCOMP      -0.821         2.543         3.012
+ COMBACC        1.648        -1.880        -0.435         6.237
+ F8AGE         10.175         5.961         0.121         2.585         3.627
+ F9AGE          0.432         1.246        -2.266        -0.544       -23.655
+
+
+           Covariances
+              F9AGE
+              ________
+ F9AGE         12.693
+
+
+     SAMPLE STATISTICS WEIGHTED BY ESTIMATED CLASS PROBABILITIES FOR CLASS 4
+
+
+           Means
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+               87.991        32.926         8.477        16.731       102.716
+
+
+           Means
+              F9AGE
+              ________
+              118.402
+
+
+           Covariances
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+ NARAACC       35.055
+ NARACOMP       4.159        19.395
+ WOLDCOMP       0.511         2.989         3.648
+ COMBACC        3.335        -0.323        -0.153         4.009
+ F8AGE          0.365         2.938        -0.011        -0.302         3.423
+ F9AGE          2.489         0.949        -1.764        -0.012       -16.129
+
+
+           Covariances
+              F9AGE
+              ________
+ F9AGE         12.280
+
+
+     SAMPLE STATISTICS WEIGHTED BY ESTIMATED CLASS PROBABILITIES FOR CLASS 5
+
+
+           Means
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+               55.313        21.526         7.029        11.690       103.004
+
+
+           Means
+              F9AGE
+              ________
+              118.139
+
+
+           Covariances
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+ NARAACC       43.372
+ NARACOMP       5.017        16.076
+ WOLDCOMP      -1.656         2.449         3.155
+ COMBACC        2.097        -0.822        -0.178         6.312
+ F8AGE         -6.472         7.108        -0.008        -1.814         3.618
+ F9AGE          1.043         1.042        -1.837         0.390       -18.082
+
+
+           Covariances
+              F9AGE
+              ________
+ F9AGE         11.251
+
+
+     SAMPLE STATISTICS WEIGHTED BY ESTIMATED CLASS PROBABILITIES FOR CLASS 6
+
+
+           Means
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+               20.686         8.319         6.285         1.895       103.151
+
+
+           Means
+              F9AGE
+              ________
+              118.529
+
+
+           Covariances
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+ NARAACC       52.926
+ NARACOMP      20.114        14.222
+ WOLDCOMP       2.525         2.426         3.794
+ COMBACC        5.404         2.224         1.218         3.778
+ F8AGE         51.523        31.790        -0.051        16.675         3.258
+ F9AGE          0.414        -1.050        -2.936         0.272       -32.028
+
+
+           Covariances
+              F9AGE
+              ________
+ F9AGE         14.975
+
+
+     SAMPLE STATISTICS WEIGHTED BY ESTIMATED CLASS PROBABILITIES FOR CLASS 7
+
+
+           Means
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+               83.908        29.775         8.183        16.018       114.677
+
+
+           Means
+              F9AGE
+              ________
+              124.068
+
+
+           Covariances
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+ NARAACC       63.913
+ NARACOMP      14.418        27.804
+ WOLDCOMP       0.760         4.440         4.342
+ COMBACC        7.642         1.997         1.911         4.895
+ F8AGE        -63.411       -32.116        -0.260        22.248        12.580
+ F9AGE          4.792        -2.372       -14.131        -2.749      -176.810
+
+
+           Covariances
+              F9AGE
+              ________
+ F9AGE         31.023
+
+
+     SAMPLE STATISTICS WEIGHTED BY ESTIMATED CLASS PROBABILITIES FOR CLASS 8
+
+
+           Means
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+               55.308        21.843         7.700        11.671       114.167
+
+
+           Means
+              F9AGE
+              ________
+              122.442
+
+
+           Covariances
+              NARAACC       NARACOMP      WOLDCOMP      COMBACC       F8AGE
+              ________      ________      ________      ________      ________
+ NARAACC       68.253
+ NARACOMP       7.398        19.997
+ WOLDCOMP      -4.446         5.976         3.973
+ COMBACC        5.492        -0.032        -0.770         7.582
+ F8AGE        -26.023        28.627         1.627       -13.305        12.149
+ F9AGE          6.346         0.005        -6.671         1.728      -130.534
+
+
+           Covariances
+              F9AGE
+              ________
+ F9AGE         23.522
+
+
+TECHNICAL 11 OUTPUT
+
+     Random Starts Specifications for the k-1 Class Analysis Model
+        Number of initial stage random starts                  20
+        Number of final stage optimizations                     4
+
+
+
+     VUONG-LO-MENDELL-RUBIN LIKELIHOOD RATIO TEST FOR 7 (H0) VERSUS 8 CLASSES
+
+          H0 Loglikelihood Value                       -55281.564
+          2 Times the Loglikelihood Difference            364.991
+          Difference in the Number of Parameters                7
+          Mean                                           -919.940
+          Standard Deviation                             1491.505
+          P-Value                                          0.1945
+
+     LO-MENDELL-RUBIN ADJUSTED LRT TEST
+
+          Value                                           358.694
+          P-Value                                          0.1956
+
+
+PLOT INFORMATION
+
+The following plots are available:
+
+  Histograms (sample values)
+  Scatterplots (sample values)
+  Estimated overall and class-specific distributions
+
+     Beginning Time:  10:43:09
+        Ending Time:  10:43:15
+       Elapsed Time:  00:00:06
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2020 Muthen & Muthen

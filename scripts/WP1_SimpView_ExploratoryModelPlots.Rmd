@@ -26,18 +26,18 @@ pkgs <- c("tidyverse", "MplusAutomation", "texreg", "kableExtra")
 invisible(lapply(pkgs, library, character.only = TRUE))
 ```
 
-Read in selected model file that contains class assignment data, and data file of descriptive statistics. Merge and check. 
+Read in selected model file that contains class assignment data, and data file of descriptive statistics. Merge and check.
 
 ```{r read-data}
 # Read in and extract class data
-final_mod <- readModels(target = "./mplus_models/simpview/shape", filefilter = "lpa4_rerun_3class")  # final model file
+final_mod <- readModels(target = "./mplus_models/simpview/shape/crossval", filefilter = "lpa4_full")  # final model file
 class_data <- as.data.frame(final_mod$savedata) %>% 
   rename_all(tolower) %>% 
   select(cidb3153, naraacc:c, f8age, f9age) %>%   # keep age data for additional checking during merge
   rename(cidB3153 = cidb3153)
 
 # Read in and extract relevant variables from data file
-ppt_data <- read.csv("../data/processed/WP1_data_subA.csv") %>%
+ppt_data <- read.csv("../data/processed/WP1_data_all.csv") %>%
   select(cidB3153, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8,
          nara_comp_std_f9, nara_acc_std_f9) %>% 
   mutate(read_comb_raw_f9 = (read_word_raw_f9 + read_nonw_raw_f9))
@@ -54,7 +54,6 @@ ppt_classes <- ppt_data %>%
                              "age_m_f8" = "f8age",
                              "age_m_f9" = "f9age"))
 ```
-
 
 # Whole sample descriptives
 
@@ -108,8 +107,8 @@ std_data <- sample_std(data = ppt_classes, test_scores = c("read_comb_raw_f9", "
 std_data <- sample_std(data = std_data, test_scores = c("wold_comp_raw_f8"), age = "age_m_f8")
 ```
 
+Intend to report test-standardised scores for the NARA, but check how the two compare.
 
-Intend to report test-standardised scores for the NARA, but check how the two compare. 
 ```{r std-compare}
 # Accuracy
 plot(std_data$nara_acc_std_f9, std_data$nara_acc_bstd_f9) +
@@ -120,7 +119,7 @@ plot(std_data$nara_comp_std_f9, std_data$nara_comp_bstd_f9) +
   abline(1, 1)
 ```
 
-# Class descriptives 
+# Class descriptives
 
 ```{r class-desc}
 class_averages_raw <- ppt_classes %>% 
@@ -146,13 +145,14 @@ class_averages_std
 
 # Format data for plotting
 plot_data <- std_data %>% 
+  #mutate(c = recode_factor(c, `1` = 1, `2` = 4, `3` = 2, `4` = 3, `5` = 5, `6` = 6)) %>% 
   select(cidB3153, c, read_comb_bstd_f9, nara_acc_bstd_f9, nara_comp_bstd_f9, wold_comp_bstd_f8) %>% 
   pivot_longer(cols = c(read_comb_bstd_f9,  nara_acc_bstd_f9, nara_comp_bstd_f9, wold_comp_bstd_f8),
                names_to = "task",
                values_to = "score") %>% 
   group_by(c, task) %>%
   summarise(class_mean = mean(score, na.rm = TRUE), sd = sd(score, na.rm = TRUE), se = sd/sqrt(n()),
-            n = n(), proportion = n/3423*100) %>% 
+            n = n(), proportion = n/6846*100) %>% 
   mutate(c = paste0(c, " (", round(proportion,2), "%)")) %>% 
   mutate(c = as.factor(c),
          task = factor(task, levels = c("read_comb_bstd_f9", "nara_acc_bstd_f9", "nara_comp_bstd_f9", "wold_comp_bstd_f8")))
@@ -176,7 +176,7 @@ ggplot(plot_data, aes(x = task, y = class_mean, group = c, colour = c)) +
   scale_y_continuous(name = "Class mean (+/- 1SD)") +
   geom_hline(yintercept = 100, linetype = "longdash") 
 
-#ggsave("../output/figures/SimpView_E4_1SD.tiff", dpi = 600, width = 7, height = 5)
+ggsave("../output/figures/lpa4full_6class_desc.tiff", dpi = 600, width = 7, height = 5)
 
 # Raw data
 ggplot(plot_data, aes(x = task, y = class_mean, group = c)) +
@@ -189,7 +189,7 @@ ggplot(plot_data, aes(x = task, y = class_mean, group = c)) +
   scale_y_continuous(name = "Individual scores") +
   geom_hline(yintercept = 100, linetype = "longdash")
 
-#ggsave("../output/figures/SimpView_E4_raw.tiff", dpi = 600, width = 7, height = 5)
+ggsave("../output/figures/lpa4full_6class_raw.tiff", dpi = 600, width = 7, height = 5)
 
 # Scatterplot - item accuracy by reading comprehension
 ggplot(std_data, aes(read_comb_bstd_f9, nara_comp_bstd_f9, color = as.factor(c))) + 
@@ -199,7 +199,7 @@ ggplot(std_data, aes(read_comb_bstd_f9, nara_comp_bstd_f9, color = as.factor(c))
   geom_vline(xintercept = 85, linetype = "longdash") + 
   xlab("Item accuracy") + 
   ylab("Reading comprehension")
-#ggsave("../output/figures/SimpView_E4_itemXcomp.tiff", dpi = 600, width = 7, height = 5)
+ggsave("../output/figures/lpa4full_6class_itemXcomp.tiff", dpi = 600, width = 7, height = 5)
 
 # Scatterplot - passage accuracy by passage comprehension
 ggplot(std_data, aes(nara_acc_bstd_f9, nara_comp_bstd_f9, color = as.factor(c))) + 
@@ -209,16 +209,8 @@ ggplot(std_data, aes(nara_acc_bstd_f9, nara_comp_bstd_f9, color = as.factor(c)))
   geom_vline(xintercept = 85, linetype = "longdash") + 
   xlab("Passage accuracy") +
   ylab("Reading comprehension")
-#ggsave("../output/figures/SimpView_m2rk5_test.tiff", dpi = 600, width = 7, height = 5)
+ggsave("../output/figures/lpa4full_6class_passXcomp.tiff", dpi = 600, width = 7, height = 5)
 ```
-
-
-
-
-
-
-
-
 
 ```{r}
 # Trial - traditional criteria
@@ -271,4 +263,44 @@ ggplot(plot_data, aes(x = task, y = class_mean, group = c)) +
 
 
 
+```
+
+
+
+
+quick meeting vocab
+
+```{r}
+# Read in and extract relevant variables from data file
+ppt_data <- read.csv("../data/processed/WP1_data_all.csv") %>%
+  select(cidB3153, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8,
+         nara_comp_std_f9, nara_acc_std_f9, wisc_vcb_raw_f8, wold_vcb_raw_f8) %>% 
+  mutate(read_comb_raw_f9 = (read_word_raw_f9 + read_nonw_raw_f9))
+
+### ... simulated version for testing
+# ppt_data <- read.csv("../data/simulated/WP1_SimpView_sim_raw_n1000_k3.csv") %>%
+#   select(yp_id, yp_no, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8) %>% 
+#   mutate(nara_comp_std_f9 = round(rnorm(n(), 100, 15)), # Create dummy variables for now
+#          nara_acc_std_f9 = round(rnorm(n(), 100, 15)))  
+
+# Merge
+ppt_classes <- ppt_data %>% 
+  full_join(class_data, by = c("cidB3153",
+                             "age_m_f8" = "f8age",
+                             "age_m_f9" = "f9age"))
+
+
+std_data <- sample_std(data = ppt_classes, test_scores = c("read_comb_raw_f9", "nara_acc_raw_f9", "nara_comp_raw_f9"), age = "age_m_f9")
+std_data <- sample_std(data = std_data, test_scores = c("wold_comp_raw_f8", "wisc_vcb_raw_f8", "wold_vcb_raw_f8"), age = "age_m_f8")
+
+
+# Averages
+
+class_averages_std <- std_data %>% 
+  group_by(c) %>% 
+  summarise_at(vars(wisc_vcb_bstd_f8, wold_vcb_bstd_f8), 
+               list(mean = mean, sd = sd, min = min, max = max), na.rm = TRUE) %>% 
+  round(.,2)
+
+class_averages_std
 ```

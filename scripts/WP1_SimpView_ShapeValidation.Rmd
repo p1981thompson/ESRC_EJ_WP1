@@ -118,7 +118,7 @@ loopReplace <- function(text, replacements) {
 }
 ```
 
-# Step 1: Evaluate model with fixed parameters
+# Step 1A: Evaluate model with fixed parameters from subsample A
 
 Based on script from Grimm et al. (2017), downloaded from [first author's website](https://sites.google.com/site/longitudinalmethods/downloads?authuser=0)
 
@@ -240,7 +240,207 @@ plotMixtures_simpView(fixed_out)
 ```
 
 
-# Step 2: Compare fit of fixed and freely estimated parameter models 
+# Step 2A: Compare fit of fixed and freely estimated parameter models 
+
+Fit the model to subsample B, allowing parameters to be freely estimated. 
+
+Use previous parameters as starting values to guide the model into ordering the classes in the same way for comparison.
+(*Not sure if I've done this correctly? Also could ignore this part if only interested in overall model fit*)
+
+```{r free-model}
+free_model <- mplusObject(
+  TITLE = "LPA: Confirmatory model (subB free estimation)",
+  ANALYSIS = "estimator = mlr; type = mixture; starts = 500 50; 
+              processors = 4(STARTS);",
+  VARIABLE = "idvariable = cidB3153; classes = c(6);",
+  MODEL = loopReplace("
+    %OVERALL%
+      f8age; f9age;
+      combAcc naraAcc naraComp on f9age;
+      woldcomp on f8age;
+
+    naraComp combAcc woldComp naraAcc;
+
+    [naraComp naraAcc combAcc woldComp];
+    combAcc naraAcc naraComp woldComp ON G;
+
+    naraComp with naraAcc@0;
+    naraComp with combAcc@0;
+    naraComp with woldComp@0;
+    naraAcc with combAcc@0;
+    naraAcc with woldComp@0;
+    combAcc with woldComp@0;
+  
+  %c#1%
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#2% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#3% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#4% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#5% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#6% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+
+", named_params), 
+  OUTPUT = "TECH1 TECH8 TECH11 TECH14 stdyx CINTERVAL ENTROPY;",
+  PLOT = "TYPE = PLOT3;",
+  usevariables = colnames(g_data[,!names(g_data) %in% c("yp_id")]),
+  rdata = g_data,
+  SAVEDATA = "FILE IS free.dat; SAVE = cprobabilities;")
+
+free_results <- mplusModeler(free_model, "mplus_models/simpview/shape/crossval/free.dat", run = TRUE)
+```
+
+```{r compare-fit}
+# Use readModels to create extract all info for both models
+all_mods <- readModels("./mplus_models/simpview/shape/crossval")
+
+compareModels(all_mods[["fixed.out"]], all_mods[["free.out"]],
+              show = c("diff", "pdiff", "summaries", "unique"),
+              equalityMargin = c(param = .05, pvalue = .02),
+              sort = "type", diffTest = TRUE, showNS = FALSE)
+
+plotMixtures_simpView(all_mods)
+```
+
+
+**Given difference in model fit, model selection was repeated independently with subsample B to ensure the same model was selected. The resultant classes looked very similar across subsamples for the 6-class model. Test here whether model fit is similar if constraining parameters derived this way.** - ????????????? is this sensible ?? 
+
+# Step 1B: Evaluate model with fixed parameters from subsample A
+
+Based on script from Grimm et al. (2017), downloaded from [first author's website](https://sites.google.com/site/longitudinalmethods/downloads?authuser=0)
+
+Extract model parameter estimates from final model selected in exploratory class enumeration process on subsample A (WP1_LPA_composite.Rmd)
+
+```{r extract-subA-params}
+params <- final_mod$parameters
+df_params <- data.frame(params[[1]]$paramHeader,params[[1]]$param, params[[1]]$est, params[[1]]$LatentClass)
+names(df_params) <- c("header", "param", "est", "class")
+
+named_params <- df_params %>% 
+  mutate(parameter_name = paste(header, param, class, sep = "_")) %>% 
+  select(-c(header, param, class)) %>% 
+  pivot_wider(names_from = parameter_name, values_from = est)
+```
+
+Create new model script fixing all parameters to estimated values above, and run with subsample B.
+*Note that the model spec itself is written out manually, so will need editing if the final model set-up differs*
+
+```{r run-fixed-model}
+fixed_model <- mplusObject(
+  TITLE = "LPA: Confirmatory model (subB fixed parameters)",
+  ANALYSIS = "estimator = mlr; type = mixture; starts = 500 50; 
+              processors = 4(STARTS); STSCALE = 1;",
+  VARIABLE = "idvariable = cidB3153; classes = c(6);",
+  MODEL = loopReplace("
+  %OVERALL% 
+      f8age; f9age;
+      combAcc naraAcc naraComp on f9age;
+      woldcomp on f8age;
+
+    naraComp combAcc woldComp naraAcc ;
+
+    [naraComp naraAcc combAcc woldComp];
+    combAcc naraAcc naraComp woldComp ON G;
+
+    naraComp with naraAcc@0;
+    naraComp with combAcc@0;
+    naraComp with woldComp@0;
+    naraAcc with combAcc@0;
+    naraAcc with woldComp@0;
+    combAcc with woldComp@0;
+  
+  [c#1@[[Means_C#1_Categorical.Latent.Variables]]];
+  [c#2@[[Means_C#2_Categorical.Latent.Variables]]];
+  [c#3@[[Means_C#3_Categorical.Latent.Variables]]];
+  [c#4@[[Means_C#4_Categorical.Latent.Variables]]];
+  [c#5@[[Means_C#5_Categorical.Latent.Variables]]];
+  
+  %c#1%
+     [naraComp@[[Intercepts_NARACOMP_1]]];
+     [naraAcc@[[Intercepts_NARAACC_1]]];
+     [combAcc@[[Intercepts_COMBACC_1]]];
+     [woldComp@[[Intercepts_WOLDCOMP_1]]];
+     naraComp naraAcc combAcc woldComp;
+
+  %c#2% 
+     [naraComp@[[Intercepts_NARACOMP_2]]];
+     [naraAcc@[[Intercepts_NARAACC_2]]];
+     [combAcc@[[Intercepts_COMBACC_2]]];
+     [woldComp@[[Intercepts_WOLDCOMP_2]]];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#3% 
+     [naraComp@[[Intercepts_NARACOMP_3]]];
+     [naraAcc@[[Intercepts_NARAACC_3]]];
+     [combAcc@[[Intercepts_COMBACC_3]]];
+     [woldComp@[[Intercepts_WOLDCOMP_3]]];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#4% 
+     [naraComp@[[Intercepts_NARACOMP_4]]];
+     [naraAcc@[[Intercepts_NARAACC_4]]];
+     [combAcc@[[Intercepts_COMBACC_4]]];
+     [woldComp@[[Intercepts_WOLDCOMP_4]]];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#5% 
+     [naraComp@[[Intercepts_NARACOMP_5]]];
+     [naraAcc@[[Intercepts_NARAACC_5]]];
+     [combAcc@[[Intercepts_COMBACC_5]]];
+     [woldComp@[[Intercepts_WOLDCOMP_5]]];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#6% 
+     [naraComp@[[Intercepts_NARACOMP_6]]];
+     [naraAcc@[[Intercepts_NARAACC_6]]];
+     [combAcc@[[Intercepts_COMBACC_6]]];
+     [woldComp@[[Intercepts_WOLDCOMP_6]]];
+     naraComp naraAcc combAcc woldComp;
+
+  ", named_params), 
+  OUTPUT = "TECH1 TECH8 TECH11 TECH14 stdyx CINTERVAL ENTROPY;",
+  PLOT = "TYPE = PLOT3;",
+  usevariables = colnames(g_data[,!names(g_data) %in% c("yp_id")]),
+  rdata = g_data,
+  SAVEDATA = "FILE IS fixed.dat; SAVE = cprobabilities;")
+
+fixed_results <- mplusModeler(fixed_model, "mplus_models/simpview/shape/crossval/fixed.dat", run = TRUE)
+```
+
+Evaluate overall fit of model.
+*except no good measures of absolute fit to use here? can only inspect general output and check for issues*
+
+```{r fixed-out}
+# Read in output
+fixed_out <- readModels(target = "./mplus_models/simpview/shape/crossval", filefilter = "fixed")
+
+# Print table 
+fixed_out_summary <- lpa_enum_table(output = fixed_out)
+#fixed_out_summary <- mixtureSummaryTable(fixed_out)
+fixed_out_summary
+
+# Compute classification diagnostics
+class_diag(fixed_out)
+
+# Plot class means
+plotMixtures_simpView(fixed_out)
+```
+# Step 2B: Compare fit of fixed and freely estimated parameter models 
 
 Fit the model to subsample B, allowing parameters to be freely estimated. 
 
@@ -323,6 +523,11 @@ If difference in fit, should probably repeat class enumeration process with subs
 TO HERE - remaining script not run/tested yet 
 *****************************************************************************************
 
+
+
+
+
+
 # Step 3: Re-fit the model on the full dataset for reporting 
 
 ```{r full-data}
@@ -331,10 +536,10 @@ data_all <- read.csv("../data/processed/WP1_data_all.csv")  %>%       # ALSPAC d
                 nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9,  # reading accuracy variables
                 nara_comp_raw_f9, wold_comp_raw_f8,                   # comprehension variables
                 ethn_white, m_age_birth, m_home_own, m_edu_alev) %>%  # auxiliary variables
+  mutate(combAcc = read_word_raw_f9 + read_nonw_raw_f9) %>%           # create combined single item accuracy score
+  select(-read_word_raw_f9, -read_nonw_raw_f9) %>%                    # remove other measures
   rename(naraComp = nara_comp_raw_f9,
          naraAcc = nara_acc_raw_f9,
-         wordAcc = read_word_raw_f9,
-         nonwAcc = read_nonw_raw_f9,
          woldComp = wold_comp_raw_f8,
          f8age = age_m_f8,
          f9age = age_m_f9,
@@ -345,79 +550,91 @@ data_all <- read.csv("../data/processed/WP1_data_all.csv")  %>%       # ALSPAC d
   mutate(yp_id = as.factor(yp_id))
 ```
 
+```{r full-cfa-scores}
+# Run single factor model (including age covariates)
+m_cfa <- mplusObject(
+  TITLE = "Confirmatory Factor Analysis - Extract factor scores;",
+  ANALYSIS = "estimator = mlr; type = general;",                  
+  MODEL = "f8age; f9age;
+           G by combAcc naraAcc naraComp woldComp;
+           woldComp with naraComp;
+           combAcc naraAcc naraComp on f9age;
+           woldComp on f8age;",  
+  VARIABLE = "idvariable = cidB3153;",
+  OUTPUT = "sampstat; TECH1; TECH4; stdyx; modindices; ",
+  PLOT = "TYPE = PLOT3;",
+  usevariables = c("cidB3153", "naraComp", "naraAcc", "combAcc", "woldComp", "f8age", "f9age"),
+  rdata = data_all,
+  SAVEDATA = "FILE IS cfa_full.dat; SAVE = fscores;")
+
+m_cfa_fit <- mplusModeler(m_cfa,
+                           modelout = "./mplus_models/simpview/shape/crossval/full.inp",
+                           check = TRUE, run = TRUE)
+
+# Inspect model output
+cfa_out <- readModels(target = "./mplus_models/simpview/shape/crossval", filefilter = "full")
+SummaryTable(cfa_out, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
+
+# The modified CFA is a much better fit, and good fit overall. Use these scores for analysis
+g_full <- as.data.frame(cfa_out$savedata) %>% 
+  select(-G_SE)
+```
+
+
 ```{r full-model}
 full_model <- mplusObject(
-  TITLE = "Latent Profile Analysis; Final model full dataset",
-  ANALYSIS = "estimator = mlr; type = mixture; starts = 4000 1000; 
+ TITLE = "LPA with covariate: Final model full dataset",
+  ANALYSIS = "estimator = mlr; type = mixture; starts = 2000 500; 
               processors = 4(STARTS);",
-  VARIABLE = "idvariable = cidB3153; classes = c(4);",
-  MODEL = "
-  %OVERALL% 
-     f8age; f9age;
-     combAcc naraAcc naraComp on f9age;
-     woldcomp on f8age;
-     naraComp; naraAcc; combAcc; woldComp;
-     naraComp with naraAcc;
-     naraComp with combAcc;
-     naraComp with woldComp;
-     naraAcc with combAcc;
-     naraAcc with woldComp;
-     combAcc with woldComp;
+  VARIABLE = "idvariable = cidB3153; classes = c(6);",
+  MODEL = 
+    "%OVERALL%
+      f8age; f9age;
+      combAcc naraAcc naraComp on f9age;
+      woldcomp on f8age;
+
+    naraComp combAcc woldComp naraAcc;
+
+    [naraComp naraAcc combAcc woldComp];
+    combAcc naraAcc naraComp woldComp ON G;
+
+    naraComp with naraAcc@0;
+    naraComp with combAcc@0;
+    naraComp with woldComp@0;
+    naraAcc with combAcc@0;
+    naraAcc with woldComp@0;
+    combAcc with woldComp@0;
   
-  %c#1% 
-     naraComp; 
-     naraAcc; 
-     combAcc;
-     woldComp;
-     naraComp with naraAcc;
-     naraComp with combAcc;
-     naraComp with woldComp;
-     naraAcc with combAcc;
-     naraAcc with woldComp;
-     combAcc with woldComp;
+  %c#1%
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
   
   %c#2% 
-     naraComp; 
-     naraAcc; 
-     combAcc;
-     woldComp;
-     naraComp with naraAcc;
-     naraComp with combAcc;
-     naraComp with woldComp;
-     naraAcc with combAcc;
-     naraAcc with woldComp;
-     combAcc with woldComp;
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
   
   %c#3% 
-     naraComp; 
-     naraAcc; 
-     combAcc;
-     woldComp;
-     naraComp with naraAcc;
-     naraComp with combAcc;
-     naraComp with woldComp;
-     naraAcc with combAcc;
-     naraAcc with woldComp;
-     combAcc with woldComp;
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
   
   %c#4% 
-     naraComp; 
-     naraAcc; 
-     combAcc;
-     woldComp;
-     naraComp with naraAcc;
-     naraComp with combAcc;
-     naraComp with woldComp;
-     naraAcc with combAcc;
-     naraAcc with woldComp;
-     combAcc with woldComp;", 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#5% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#6% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;", 
   OUTPUT = "TECH1 TECH8 TECH11 TECH14 stdyx CINTERVAL ENTROPY;",
   PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(sv_data[,!names(sv_data) %in% c("yp_id", "ethn", "mAge", "home", "mEdu")]),
-  rdata = data_all,
-  SAVEDATA = "FILE IS free.dat; SAVE = cprobabilities;")
+  usevariables = colnames(g_data[,!names(g_data) %in% c("yp_id", "ethn", "mAge", "home", "mEdu")]),
+  rdata = g_full,
+  SAVEDATA = "FILE IS lpa4_full.dat; SAVE = cprobabilities;")
 
-full_results <- mplusModeler(free_model, "mplus_models/simpview/lpa_comp/crossval/full.dat", run = TRUE)
+full_results <- mplusModeler(full_model, "mplus_models/simpview/shape/crossval/lpa4_full.dat", run = TRUE)
 
 ```
 

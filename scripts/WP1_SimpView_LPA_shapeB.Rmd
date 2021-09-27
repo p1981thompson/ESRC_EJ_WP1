@@ -537,7 +537,7 @@ Best model for:
 ```{r lpa4-candidates}
 # Extract participant level data
 lpa4_cand <- mm_extract_data(orig_mods = m_lpa4, orig_output = lpa4_out, 
-                               candidate_mods = c(4:6),                          
+                               candidate_mods = c(4:8),                          
                                filepath = "mplus_models/simpview/shapeB",
                                rerun = FALSE, optseed = TRUE,          
                                one_fit = TRUE)
@@ -553,7 +553,7 @@ class_diag(lpa4_cand)
 plotMixtures_simpView(lpa4_cand[2])
 
 # Inspect transitions 
-extract_classes(lpa4_cand, type = "lpa")
+extract_classes(lpa4_cand[3:4], type = "lpa")
 ```
 
 Comments:

@@ -14,18 +14,21 @@ This script computes basic summary statistics for the data, ensures that they al
 
 # Set-up
 
+## Libraries
+
+*Package versions were up-to-date as of 12/08/2021. Version information can be found at the [end of the output file](#version).*
+
+*Models were run using Mplus Version 8.5.*
+
 ```{r libraries, message = FALSE, warning = FALSE}
 # List packages
-pkgs <- c("tidyverse", "psych", "naniar", "MplusAutomation", "texreg", "semPlot", "knitr")
+pkgs <- c("tidyverse", "psych", "naniar", "MplusAutomation", "texreg", "semPlot", "knitr", "kableExtra")
 
-# Use groundhog package to load correct package versions
-# if (!require("groundhog")) install.packages("groundhog")
-# groundhog.day <- "2021-03-01"
-# groundhog::groundhog.library(pkgs, groundhog.day)
-
-# Or if not using groundhog package - load currently installed package versions separately (reproducibility not guaranteed)
+# Load all packages
 invisible(lapply(pkgs, library, character.only = TRUE))
 ```
+
+## Directories
 
 ```{r create-dir}
 # Create subdirectories for storing mplus scripts, data files, and output, if do not already exist
@@ -35,7 +38,9 @@ if(dir.exists("./mplus_models/simpview/desc")==FALSE){dir.create("./mplus_models
 if(dir.exists("./mplus_models/simpview/cfa")==FALSE){dir.create("./mplus_models/simpview/cfa")} 
 ```
 
-###  Load and prepare data for Mplus
+##  Data
+
+This analysis uses only half of the dataset, prior to conducting a finite mixture analysis on the same half. The final mixture model will be cross-validated on the reamining half (WP1_SimpView_CrossValidation.Rmd). 
 
 ```{r load-data}
 #sv_data <- read.csv("../data/simulated/WP1_SimpView_sim_raw_n1000_k3.csv") # for script testing 
@@ -43,55 +48,40 @@ if(dir.exists("./mplus_models/simpview/cfa")==FALSE){dir.create("./mplus_models/
 sv_data <- read.csv("../data/processed/WP1_data_subA.csv")  %>%                # ALSPAC data
   dplyr::select(yp_id, cidB3153, age_m_f8, age_m_f9, 
                 nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9,  # reading accuracy variables
-                nara_comp_raw_f9, wold_comp_raw_f8,                   # comprehension variables
-                ethn_white, m_age_birth, m_home_own, m_edu_alev)      # auxiliary variables
-```
-
-Mplus has an 8-character limit, so rename relevant variables with short names for modelling. 
-
-```{r mplus-names}
-# Check names
-str_sub(names(sv_data), 1, 8)
-
-# Rename any necessary, print new names
-sv_data <- sv_data %>% 
+                nara_comp_raw_f9, wold_comp_raw_f8) %>%               # comprehension variables
+  
+  # Rename for Mplus character limit
   rename(naraComp = nara_comp_raw_f9,
          naraAcc = nara_acc_raw_f9,
          wordAcc = read_word_raw_f9,
          nonwAcc = read_nonw_raw_f9,
          woldComp = wold_comp_raw_f8,
          f8age = age_m_f8,
-         f9age = age_m_f9) 
-
-names(sv_data)
-```
-
-Variable format problematic for mplus data conversion, change ID to factor.
-
-```{r mplus-formatting}
-sv_data <- sv_data %>% 
+         f9age = age_m_f9) %>% 
+  
+  # Change ID to a factor
   mutate(yp_id = as.factor(yp_id))
 ```
 
-
 # Descriptive statistics
+
+## Subsample A summary
 
 Extract summary statistics for each variable. Note that these will not actually reflect the final reported statistics, given that we are working here with only half of the sample. 
 
 ```{r summary-stats}
 describe(sv_data) %>% 
-  kable()
+  round(2) %>% 
+  kable("pipe")
 
 vis_miss(sv_data, cluster = TRUE)
 ```
 
 Patterns of missingness were more thoroughly explored for all WP1 variables in the initial data processing script. The only variable with significant missingness (~15%) is the WOLD listening comprehension variable, as it was collected at a different clinic visit. We showed in the earlier script that the data met the assumption of missing at random, as missingness could be predicted by other variables in the dataset. We will therefore deal with missing data by using full information maximum likelihood. 
 
-### Check that mplus reading data as expected
+```{r mplus-desc, include = FALSE}
+# EXTRACT DESCRIPTIVE STATISTICS AS CHECK THAT MPLUS READING DATA PROPERLY
 
-Extract descriptive statistics as check.
-
-```{r mplus-desc}
 # Specify model
 m_desc <- mplusObject(
   TITLE = "Data check - Descriptive statistics;",
@@ -103,7 +93,7 @@ m_desc <- mplusObject(
 m_desc_fit <- mplusModeler(m_desc,
                             dataout = "./mplus_models/simpview/desc/sv_sim.dat",
                             modelout = "./mplus_models/simpview/desc/sv_check.inp",
-                            check = TRUE, run = TRUE, hashfilename = TRUE)
+                            check = TRUE, run = FALSE, hashfilename = TRUE)
 
 # Read mplus output
 m_desc_out <- readModels("./mplus_models/simpview/desc/sv_check.out")
@@ -129,12 +119,13 @@ if (any((r_summ[,2:3] - mplus_summ[,2:3]) > abs(0.01))){  # allowing for roundin
   } else{
       print("Data check passed")
   }
+
+## (These differences were further inspected - only minor rounding errors; all observations accounted for)
 ```
-(Only minor rounding errors)
 
-# Confirmatory Factor Analysis
+# CFA (original measures)
 
-### One vs. Two Factors
+## Factor structure
 
 Test whether the data support the proposed two-factor model (accuracy, comprehension) over a single reading factor.
 
@@ -158,8 +149,8 @@ m_cfa1_fit <- mplusModeler(m_cfa1,
                            modelout = "./mplus_models/simpview/cfa/sv_cfa1.inp",
                            check = TRUE, run = FALSE)
 
-
 # TWO-FACTOR MODEL
+## Specify
 m_cfa2 <- update(m_cfa1,
                  TITLE = ~ "Confirmatory Factor Analysis - Two-Factor;",
                  MODEL = ~ "f8age; f9age;
@@ -169,10 +160,11 @@ m_cfa2 <- update(m_cfa1,
                             acc with comp;
                             f8age with acc@0; f8age with comp@0;
                             f9age with acc@0; f9age with comp@0;",  # age-factor covariances fixed to 0 for identifiability
-                 DEFINE = ~ "naraAcc = naraAcc/10; naraComp = naraComp/5;
-                             f8age = f8age/2; f9age = f9age/2;") # divide by constant to make variances on similar scale
-
-
+                 
+                 #DEFINE = ~ "naraAcc = naraAcc/10; naraComp = naraComp/5; # checked not scale issues
+                 #             f8age = f8age/2; f9age = f9age/2;"
+                 ) 
+## Fit
 m_cfa2_fit <- mplusModeler(m_cfa2,
                            modelout = "./mplus_models/simpview/cfa/sv_cfa2.inp",
                            check = TRUE, run = FALSE)
@@ -183,139 +175,99 @@ cfa_models <- readModels(target = "./mplus_models/simpview/cfa", filefilter = "s
 # Inspect for model errors
 cfa_models$sv_cfa1.out$warnings
 cfa_models$sv_cfa2.out$warnings
-
-#SummaryTable(cfa_models, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR")) %>% 
-#  kable()
 ```
 
-A number of solutions were tried to resolve the issues with the two-factor model, including freeing the factor loadings, and rescaling the variables. However, the naracomp and woldcomp variables do not sit will together as a comprehension factor (and whereas naracomp sits better amongst the other reading variables).
+A number of solutions were tried to resolve the issues with the two-factor model, including freeing the factor loadings and rescaling the variables. However, the naraComp and woldComp variables do not sit will together as a comprehension factor (whereas naraComp sits better amongst the other reading variables).
 
-On this basis, we will proceed with a Latent Profile Analysis. 
+On this basis, we will proceed with a Latent Profile Analysis, in line with the pre-registered plan. 
 
+## Figure
 
-```{r cfa-inspection, include = FALSE}
-# # Inspect model (by = loadings, with = covariances)
-# cfa_models$sv_cfa2.out$parameters$unstandardized %>%
-#   kable()
-# cfa_models$sv_cfa2.out$parameters$stdyx.standardized %>%
-#   kable()
-# 
-# # Inspect modification indices
-# cfa_models$sv_cfa2.out$mod_indices %>%
-#   arrange(desc(MI)) %>%
-#   filter(operator == "WITH") %>%
-#   kable()
-```
-
-
-
-```{r cfa-modification, include = FALSE}
-# * Check for very large standardised residuals.  
-# * No accepted view on how large MIs should be. Change only one at a time, starting with largest, but must be theoretically meaningful.  
-# * *A priori*, we consider possible meaningful influences to be to be (in this order): naracomp with naraacc (taken from same assessment), wordacc with nonwacc (same battery of tests, similar format), wordacc with naraacc (both real word accuracy measures).  
-
-
-# # TWO-FACTOR MODEL with additional covariance between the two single word reading tasks (word, nonword)
-# m_cfa2b <- update(m_cfa2,
-#                  TITLE = ~ "Confirmatory Factor Analysis - Two-Factor - modification1 single reading tasks;",
-#                  MODEL = ~. + "nonwAcc with wordAcc;")
-# 
-# m_cfa2b_fit <- mplusModeler(m_cfa2b,
-#                            modelout = "./mplus_models/simpview/cfa/sv_cfa2b.inp",
-#                            check = TRUE, run = TRUE)
-# 
-# # COMPARE MODELS
-# cfa_models <- readModels(target = "./mplus_models/simpview/cfa", filefilter = "sv_cfa")
-# SummaryTable(cfa_models, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR")) %>%
-#   kable()
-
-
-# The following rules of thumb are often used to indicate a good-fitting model:  
-# 
-# * CFI & TLI > .95  
-# * RMSEA <= .05  
-# * SRMR < .05
-```
-
-
-```{r final-cfa, include = FALSE}
-# Inspect model (by = loadings, with = covariances)
-# cfa_models$sv_cfa2b.out$parameters$unstandardized %>% 
-#   kable()
-# cfa_models$sv_cfa2b.out$parameters$stdyx.standardized %>% 
-#   kable()
-```
-
-### CFA figure
-
-```{r cfa-diagram}
+```{r cfa-diagram, message = FALSE, warning = FALSE}
 semPaths(semPlotModel(cfa_models$sv_cfa1.out, mplusStd = "stdyx"), what = "paths", whatLabels = "std", rotation = 1, intercepts = FALSE)
 ```
 
-### Auxiliary variables
+# CFA (composite accuracy measure)
 
-```{r add-aux}
-# Implement auxiliary variables
+After beginning the latent profile analysis, it became apparent that the discrete and skewed nature of the wordAcc variable was problematic for modelling (i.e., there was often insufficient variance to estimate for each of the classes).  We considered treating it as a categorical variable, but this was not easy to reconcile with our plan to estimate covariances across/within classes, and the skew meant that for the majority of profiles this was not a useful indicator on its own (often leading to warnings in Mplus). We therefore decided to combine the nonword and word reading item scores into a single measure of item accuracy (combAcc). 
 
-# Single-factor model with mplus implementation of auxiliary variables
-m_final_aux <- update(m_cfa1,
-                 TITLE = ~ "Confirmatory Factor Analysis - Final model with auxiliary variables",
-                 VARIABLE = ~ . + "AUXILIARY = (M) ethn_white m_age_birth m_home_own m_edu_alev;",
-                 usevariables = names(sv_data[!names(sv_data) %in% c("yp_id", "cidB3153")]),
-                 rdata = sv_data)
+The latent profile model remains the best approach (i.e., the composite accuracy measure does not remediate issues with the factor structure). Re-run here for completeness. 
 
-m_final_aux_fit <- mplusModeler(m_final_aux,
-                           modelout = "./mplus_models/simpview/cfa/sv_final_aux.inp",
-                           check = TRUE, run = TRUE)
+## Composite accuracy measure
 
+```{r comb-acc}
+# Create combined score
+sv_data <- sv_data %>% 
+  mutate(combAcc = wordAcc+nonwAcc) %>% 
+  select(-c(wordAcc, nonwAcc))
 
-# Single-factor model with manual implementation of auxiliary variables (age 8 only)
-m_aux_manual_part <- update(m_cfa1,
-                 TITLE = ~ "Confirmatory Factor Analysis - Final model with auxiliary variables",
-                 MODEL = ~ . + "f8age with ethn_white m_age_birth m_home_own m_edu_alev;
-                                ethn_white with m_age_birth m_home_own m_edu_alev;
-                                m_age_birth with m_home_own m_edu_alev;
-                                m_home_own with m_edu_alev;
-                                woldcomp with ethn_white m_age_birth 
-                                m_home_own m_edu_alev;",
-                 usevariables = names(sv_data[!names(sv_data) %in% c("yp_id", "cidB3153")]),
-                 rdata = sv_data)
-
-m_aux_manual_fit1 <- mplusModeler(m_aux_manual_part,
-                           modelout = "./mplus_models/simpview/cfa/sv_final_aux_manualpart.inp",
-                           check = TRUE, run = TRUE)
-
-# Single-factor model with manual implementation of auxiliary variables (all)
-m_aux_manual_full <- update(m_cfa1,
-                 TITLE = ~ "Confirmatory Factor Analysis - Final model with auxiliary variables (full spec)",
-                 MODEL = ~ . + "f8age with ethn_white m_age_birth m_home_own m_edu_alev;
-                                f9age with ethn_white m_age_birth m_home_own m_edu_alev;
-                 
-                                ethn_white with m_age_birth m_home_own m_edu_alev;
-                                m_age_birth with m_home_own m_edu_alev;
-                                m_home_own with m_edu_alev;
-                 
-                                woldcomp with ethn_white m_age_birth 
-                                m_home_own m_edu_alev;
-                 
-                                nonwacc with ethn_white m_age_birth 
-                                m_home_own m_edu_alev;
-                 
-                                wordacc with ethn_white m_age_birth 
-                                m_home_own m_edu_alev;
-                 
-                                naraacc with ethn_white m_age_birth 
-                                m_home_own m_edu_alev;
-                 
-                                naracomp with ethn_white m_age_birth 
-                                m_home_own m_edu_alev;
-                 
-                                woldcomp with ethn_white m_age_birth 
-                                m_home_own m_edu_alev;",
-                 usevariables = names(sv_data[!names(sv_data) %in% c("yp_id", "cidB3153")]),
-                 rdata = sv_data)
-
-m_aux_manual_fit2 <- mplusModeler(m_aux_manual_full,
-                           modelout = "./mplus_models/simpview/cfa/sv_final_aux_manualfull.inp",
-                           check = TRUE, run = TRUE)
+# Descriptives
+describe(sv_data$combAcc) %>% 
+  round(2) %>% 
+  kable("pipe")
 ```
+
+## One vs Two Factors
+
+```{r cfa-compAcc}
+# ONE-FACTOR MODEL
+## Specify
+m_cfa1 <- mplusObject(
+  TITLE = "Confirmatory Factor Analysis - Single Factor (combAcc);",
+  ANALYSIS = "estimator = mlr; type = general;",                  
+  MODEL = "f8age; f9age;
+           read by naraComp naraAcc combAcc woldComp;
+           combAcc naraAcc naraComp on f9age;
+           woldcomp on f8age;",   # single reading factor, plus age covariates 
+  OUTPUT = "sampstat; TECH1; TECH4; stdyx; modindices; ",
+  PLOT = "TYPE = PLOT3;",
+  usevariables = c("naraComp", "naraAcc", "combAcc", "woldComp", "f8age", "f9age"),
+  rdata = sv_data)
+
+## Fit
+m_cfa1_fit <- mplusModeler(m_cfa1,
+                           modelout = "./mplus_models/simpview/cfa/sv_cfa1_comp.inp",
+                           check = TRUE, run = FALSE)
+
+
+# TWO-FACTOR MODEL
+## Specify
+m_cfa2 <- update(m_cfa1,
+                 TITLE = ~ "Confirmatory Factor Analysis - Two-Factor (combAcc);",
+                 MODEL = ~ "f8age; f9age;
+                            acc by combAcc naraAcc; comp by woldComp naraComp;
+                            combAcc naraAcc naraComp on f9age;
+                            woldcomp on f8age;
+                            acc with comp;
+                            f8age with acc@0; f8age with comp@0;
+                            f9age with acc@0; f9age with comp@0;",  # age-factor covariances fixed to 0 for identifiability
+                 #DEFINE = ~ "naraAcc = naraAcc/10; naraComp = naraComp/5; # checked not scale issues
+                 #             f8age = f8age/2; f9age = f9age/2;"
+                 ) 
+## Fit
+m_cfa2_fit <- mplusModeler(m_cfa2,
+                           modelout = "./mplus_models/simpview/cfa/sv_cfa2_comp.inp",
+                           check = TRUE, run = TRUE)
+
+# COMPARE MODELS
+cfa_models <- readModels(target = "./mplus_models/simpview/cfa", filefilter = "sv_cfa")
+
+# Inspect for model errors
+cfa_models$sv_cfa1_comp.out$warnings
+cfa_models$sv_cfa2_comp.out$warnings
+```
+
+## Figure
+
+```{r cfa-compAcc-diagram, message = FALSE, warning = FALSE}
+semPaths(semPlotModel(cfa_models$sv_cfa1_comp.out, mplusStd = "stdyx"), what = "paths", whatLabels = "std", rotation = 1, intercepts = FALSE)
+```
+
+# Version info {#version}
+
+*Package versions were up-to-date as of 12/08/2021.* *LPA models were run using Mplus Version 8.5.*
+
+```{r version}
+sessionInfo()
+```
+

@@ -1,0 +1,214 @@
+Mplus VERSION 8.5
+MUTHEN & MUTHEN
+09/02/2021   2:15 PM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+  Data check - Descriptive statistics;
+  DATA:
+  FILE = "./mplus_models/simpview/desc/sv_sim_90c130e671e09fe7a72347baf3ba3275.dat";
+
+  VARIABLE:
+  NAMES = naraComp naraAcc wordAcc nonwAcc woldComp f8age f9age;
+   MISSING=.;
+
+  ANALYSIS:
+  type = basic;
+
+
+
+INPUT READING TERMINATED NORMALLY
+
+
+
+
+Data check - Descriptive statistics;
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                        3423
+
+Number of dependent variables                                    7
+Number of independent variables                                  0
+Number of continuous latent variables                            0
+
+Observed dependent variables
+
+  Continuous
+   NARACOMP    NARAACC     WORDACC     NONWACC     WOLDCOMP    F8AGE
+   F9AGE
+
+
+Estimator                                                       ML
+Information matrix                                        OBSERVED
+Maximum number of iterations                                  1000
+Convergence criterion                                    0.500D-04
+Maximum number of steepest descent iterations                   20
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+
+Input data file(s)
+  ./mplus_models/simpview/desc/sv_sim_90c130e671e09fe7a72347baf3ba3275.dat
+
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns             7
+
+
+SUMMARY OF MISSING DATA PATTERNS
+
+
+     MISSING DATA PATTERNS (x = not missing)
+
+           1  2  3  4  5  6  7
+ NARACOMP  x  x  x  x  x  x  x
+ NARAACC   x  x  x  x  x  x  x
+ WORDACC   x  x  x  x  x
+ NONWACC   x  x  x
+ WOLDCOMP  x        x     x
+ F8AGE     x  x     x     x
+ F9AGE     x  x  x  x  x  x  x
+
+
+     MISSING DATA PATTERN FREQUENCIES
+
+    Pattern   Frequency     Pattern   Frequency     Pattern   Frequency
+          1        2908           4           2           7           2
+          2          30           5           4
+          3         470           6           7
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT
+
+
+           Covariance Coverage
+              NARACOMP      NARAACC       WORDACC       NONWACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARACOMP       1.000
+ NARAACC        1.000         1.000
+ WORDACC        0.997         0.997         0.997
+ NONWACC        0.996         0.996         0.996         0.996
+ WOLDCOMP       0.852         0.852         0.850         0.850         0.852
+ F8AGE          0.861         0.861         0.859         0.858         0.852
+ F9AGE          1.000         1.000         0.997         0.996         0.852
+
+
+           Covariance Coverage
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          0.861
+ F9AGE          0.861         1.000
+
+
+
+
+
+RESULTS FOR BASIC ANALYSIS
+
+
+     ESTIMATED SAMPLE STATISTICS
+
+
+           Means
+              NARACOMP      NARAACC       WORDACC       NONWACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+               24.991        66.308         7.530         5.228         7.465
+
+
+           Means
+              F8AGE         F9AGE
+              ________      ________
+              103.622       118.643
+
+
+           Covariances
+              NARACOMP      NARAACC       WORDACC       NONWACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARACOMP      61.969
+ NARAACC      132.665       417.543
+ WORDACC       13.933        42.084         6.306
+ NONWACC       11.746        37.335         4.642         6.277
+ WOLDCOMP       6.288        11.188         1.153         0.883         3.769
+ F8AGE         -2.222        -5.171        -0.528        -0.511         0.127
+ F9AGE          0.998         2.570         0.073         0.003        -0.381
+
+
+           Covariances
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE         11.348
+ F9AGE          3.253        14.907
+
+
+           Correlations
+              NARACOMP      NARAACC       WORDACC       NONWACC       WOLDCOMP
+              ________      ________      ________      ________      ________
+ NARACOMP       1.000
+ NARAACC        0.825         1.000
+ WORDACC        0.705         0.820         1.000
+ NONWACC        0.596         0.729         0.738         1.000
+ WOLDCOMP       0.411         0.282         0.237         0.182         1.000
+ F8AGE         -0.084        -0.075        -0.062        -0.061         0.019
+ F9AGE          0.033         0.033         0.008         0.000        -0.051
+
+
+           Correlations
+              F8AGE         F9AGE
+              ________      ________
+ F8AGE          1.000
+ F9AGE          0.250         1.000
+
+
+     MAXIMUM LOG-LIKELIHOOD VALUE FOR THE UNRESTRICTED (H1) MODEL IS -60552.609
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     NARACOMP             24.991      -0.266       0.000    0.09%      18.000     23.000     25.000
+            3423.000      61.969      -0.237      44.000    0.03%      27.000     32.000
+     NARAACC              66.308      -0.522       0.000    0.06%      48.000     62.000     69.000
+            3423.000     417.543      -0.473     100.000    0.06%      76.000     86.000
+     WORDACC               7.532      -1.216       0.000    1.96%       6.000      8.000      8.000
+            3414.000       6.298       0.837      10.000   23.64%       9.000     10.000
+     NONWACC               5.239      -0.307       0.000    4.25%       3.000      5.000      5.000
+            3408.000       6.230      -0.689      10.000    1.82%       6.000      8.000
+     WOLDCOMP              7.510       0.086       2.000    0.41%       6.000      7.000      7.000
+            2917.000       3.751       0.202      15.000    0.03%       8.000      9.000
+     F8AGE               103.533       2.579      94.000    0.03%     102.000    102.000    103.000
+            2947.000      11.228       8.560     126.000    0.03%     103.000    105.000
+     F9AGE               118.643       1.305     105.000    0.03%     116.000    117.000    118.000
+            3423.000      14.907       2.626     139.000    0.06%     119.000    121.000
+
+
+     Beginning Time:  14:15:22
+        Ending Time:  14:15:22
+       Elapsed Time:  00:00:00
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2020 Muthen & Muthen

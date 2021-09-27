@@ -1,0 +1,23 @@
+TITLE:
+ Confirmatory Factor Analysis - Two-Factor;
+DATA:
+FILE = "./mplus_models/simpview/cfa/sv_cfa1_90c130e671e09fe7a72347baf3ba3275.dat";
+ 
+VARIABLE:
+NAMES = naraComp naraAcc wordAcc nonwAcc woldComp f8age f9age; 
+ MISSING=.;
+ 
+ANALYSIS:
+estimator = mlr; type = general;
+MODEL:
+ f8age; f9age;
+                            acc by nonwAcc wordAcc naraAcc; comp by woldComp naraComp;
+                            wordAcc nonwAcc naraAcc naraComp on f9age;
+                            woldcomp on f8age;
+                            acc with comp;
+                            f8age with acc@0; f8age with comp@0;
+                            f9age with acc@0; f9age with comp@0;
+OUTPUT:
+sampstat; TECH1; TECH4; stdyx; modindices; 
+PLOT:
+TYPE = PLOT3;

@@ -1,6 +1,6 @@
 Mplus VERSION 8.5
 MUTHEN & MUTHEN
-07/19/2021   1:08 PM
+09/21/2021   3:26 AM
 
 INPUT INSTRUCTIONS
 
@@ -15,10 +15,11 @@ INPUT INSTRUCTIONS
     idvariable = cidB3153; classes = c(4);
   ANALYSIS:
    estimator = mlr; type = mixture;
-                                                     starts = 0;
+                                                     starts = 0; stscale = 5;
                                                      optseed = 526742;
                                                      processors = 4(starts);
-                                                     lrtstarts = 0 0 100 20;
+                                                     lrtbootstrap = 500;
+                                                     lrtstarts = 0 0 1000 250;
   MODEL:
   %OVERALL%
              f8age; f9age;
@@ -1320,9 +1321,9 @@ TECHNICAL 14 OUTPUT
         Number of final stage optimizations for the
            initial stage random starts                          0
      Random Starts Specification for the k Class Model for Generated Data
-        Number of initial stage random starts                 100
-        Number of final stage optimizations                    20
-     Number of bootstrap draws requested                   Varies
+        Number of initial stage random starts                1000
+        Number of final stage optimizations                   250
+     Number of bootstrap draws requested                      500
 
 
      PARAMETRIC BOOTSTRAPPED LIKELIHOOD RATIO TEST FOR 3 (H0) VERSUS 4 CLASSES
@@ -1331,9 +1332,9 @@ TECHNICAL 14 OUTPUT
           2 Times the Loglikelihood Difference            385.986
           Difference in the Number of Parameters                7
           Approximate P-Value                              0.0000
-          Successful Bootstrap Draws                            5
+          Successful Bootstrap Draws                          500
 
-     WARNING:  OF THE 5 BOOTSTRAP DRAWS, 5 DRAWS HAD BOTH A SMALLER LRT VALUE THAN THE
+     WARNING:  OF THE 500 BOOTSTRAP DRAWS, 353 DRAWS HAD BOTH A SMALLER LRT VALUE THAN THE
      OBSERVED LRT VALUE AND NOT A REPLICATED BEST LOGLIKELIHOOD VALUE FOR THE 4-CLASS MODEL.
      THIS MEANS THAT THE P-VALUE MAY NOT BE TRUSTWORTHY DUE TO LOCAL MAXIMA.
      INCREASE THE NUMBER OF RANDOM STARTS USING THE LRTSTARTS OPTION.
@@ -1377,9 +1378,9 @@ SAVEDATA INFORMATION
   Save missing symbol        *
 
 
-     Beginning Time:  13:08:22
-        Ending Time:  13:08:40
-       Elapsed Time:  00:00:18
+     Beginning Time:  03:26:08
+        Ending Time:  05:09:40
+       Elapsed Time:  01:43:32
 
 
 

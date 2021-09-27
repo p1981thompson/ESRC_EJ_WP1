@@ -3,7 +3,13 @@
 .RData
 .Ruserdata
 
+*.dat 
+
 data/raw/
 data/processed/
 
+scripts/archive/
+
 scripts/mplus_models/*/*/*.dat
+scripts/archive/mplus_models/*/*.dat
+scripts/archive/mplus_models/*/*/*.dat

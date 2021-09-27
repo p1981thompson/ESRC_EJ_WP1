@@ -1,0 +1,203 @@
+Mplus VERSION 8.5
+MUTHEN & MUTHEN
+07/14/2021  11:35 AM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+  Data check - Descriptive statistics;
+  DATA:
+  FILE = "./mplus_models/simpview/desc/sv_sim_c97179d658ff0258aba9975b3975e2b9.dat";
+
+  VARIABLE:
+  NAMES = naraComp naraAcc compAcc woldComp f8age f9age;
+   MISSING=.;
+
+  ANALYSIS:
+  type = basic;
+
+
+
+INPUT READING TERMINATED NORMALLY
+
+
+
+
+Data check - Descriptive statistics;
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                        3423
+
+Number of dependent variables                                    6
+Number of independent variables                                  0
+Number of continuous latent variables                            0
+
+Observed dependent variables
+
+  Continuous
+   NARACOMP    NARAACC     COMPACC     WOLDCOMP    F8AGE       F9AGE
+
+
+Estimator                                                       ML
+Information matrix                                        OBSERVED
+Maximum number of iterations                                  1000
+Convergence criterion                                    0.500D-04
+Maximum number of steepest descent iterations                   20
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+
+Input data file(s)
+  ./mplus_models/simpview/desc/sv_sim_c97179d658ff0258aba9975b3975e2b9.dat
+
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns             5
+
+
+SUMMARY OF MISSING DATA PATTERNS
+
+
+     MISSING DATA PATTERNS (x = not missing)
+
+           1  2  3  4  5
+ NARACOMP  x  x  x  x  x
+ NARAACC   x  x  x  x  x
+ COMPACC   x  x  x
+ WOLDCOMP  x        x
+ F8AGE     x  x     x
+ F9AGE     x  x  x  x  x
+
+
+     MISSING DATA PATTERN FREQUENCIES
+
+    Pattern   Frequency     Pattern   Frequency     Pattern   Frequency
+          1        2908           3         470           5           6
+          2          30           4           9
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT
+
+
+           Covariance Coverage
+              NARACOMP      NARAACC       COMPACC       WOLDCOMP      F8AGE
+              ________      ________      ________      ________      ________
+ NARACOMP       1.000
+ NARAACC        1.000         1.000
+ COMPACC        0.996         0.996         0.996
+ WOLDCOMP       0.852         0.852         0.850         0.852
+ F8AGE          0.861         0.861         0.858         0.852         0.861
+ F9AGE          1.000         1.000         0.996         0.852         0.861
+
+
+           Covariance Coverage
+              F9AGE
+              ________
+ F9AGE          1.000
+
+
+
+
+
+RESULTS FOR BASIC ANALYSIS
+
+
+     ESTIMATED SAMPLE STATISTICS
+
+
+           Means
+              NARACOMP      NARAACC       COMPACC       WOLDCOMP      F8AGE
+              ________      ________      ________      ________      ________
+               25.018        66.334         6.384         7.471       103.622
+
+
+           Means
+              F9AGE
+              ________
+              118.643
+
+
+           Covariances
+              NARACOMP      NARAACC       COMPACC       WOLDCOMP      F8AGE
+              ________      ________      ________      ________      ________
+ NARACOMP      62.018
+ NARAACC      132.691       417.180
+ COMPACC       12.789        39.497         5.422
+ WOLDCOMP       6.318        11.312         1.028         3.776
+ F8AGE         -2.180        -5.099        -0.510         0.122        11.348
+ F9AGE          0.957         2.487         0.047        -0.388         3.253
+
+
+           Covariances
+              F9AGE
+              ________
+ F9AGE         14.907
+
+
+           Correlations
+              NARACOMP      NARAACC       COMPACC       WOLDCOMP      F8AGE
+              ________      ________      ________      ________      ________
+ NARACOMP       1.000
+ NARAACC        0.825         1.000
+ COMPACC        0.697         0.830         1.000
+ WOLDCOMP       0.413         0.285         0.227         1.000
+ F8AGE         -0.082        -0.074        -0.065         0.019         1.000
+ F9AGE          0.031         0.032         0.005        -0.052         0.250
+
+
+           Correlations
+              F9AGE
+              ________
+ F9AGE          1.000
+
+
+     MAXIMUM LOG-LIKELIHOOD VALUE FOR THE UNRESTRICTED (H1) MODEL IS -53770.303
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     NARACOMP             25.018      -0.273       0.000    0.09%      18.000     23.000     25.000
+            3423.000      62.018      -0.237      44.000    0.03%      28.000     32.000
+     NARAACC              66.334      -0.525       0.000    0.06%      48.000     62.000     69.000
+            3423.000     417.180      -0.469     100.000    0.06%      76.000     86.000
+     COMPACC               6.394      -0.783       0.000    1.44%       4.500      6.500      7.000
+            3408.000       5.384      -0.011      10.000    1.44%       7.500      8.500
+     WOLDCOMP              7.517       0.082       2.000    0.41%       6.000      7.000      7.000
+            2917.000       3.758       0.190      15.000    0.03%       8.000      9.000
+     F8AGE               103.533       2.579      94.000    0.03%     102.000    102.000    103.000
+            2947.000      11.227       8.561     126.000    0.03%     103.000    105.000
+     F9AGE               118.643       1.305     105.000    0.03%     116.000    117.000    118.000
+            3423.000      14.907       2.626     139.000    0.06%     119.000    121.000
+
+
+     Beginning Time:  11:35:48
+        Ending Time:  11:35:48
+       Elapsed Time:  00:00:00
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2020 Muthen & Muthen

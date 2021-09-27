@@ -9,10 +9,11 @@ NAMES = cidB3153 f8age f9age naraAcc naraComp woldComp combAcc;
   idvariable = cidB3153; classes = c(5);
 ANALYSIS:
  estimator = mlr; type = mixture; 
-                                                   starts = 0;
+                                                   starts = 0; stscale = 5;
                                                    optseed = 139885;
-                                                   processors = 4(starts);
-                                                   lrtstarts = 0 0 100 20;
+                                                   processors = 4(starts); 
+                                                   lrtbootstrap = 500;
+                                                   lrtstarts = 0 0 1000 250;
 MODEL:
 %OVERALL% 
            f8age; f9age;
