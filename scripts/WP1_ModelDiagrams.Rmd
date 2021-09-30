@@ -1,0 +1,227 @@
+---
+title: "Model figures"
+output: html_document
+---
+
+https://rich-iannone.github.io/DiagrammeR/graphviz_and_mermaid.html
+
+https://graphviz.org/documentation/
+
+*Note that curved double-headed arrows were edited manually using CorelDraw, and the figures subsequently combined using the same software.*
+
+```{r}
+library(tidyverse)
+library(DiagrammeR)
+library(DiagrammeRsvg)
+library(xml2)
+```
+
+```{r prereg-lpa}
+
+# PRE-REG MODEL - LPA
+
+grViz("
+digraph SEM {
+
+graph [layout = neato,
+       overlap = false,
+       outputorder = edgesfirst]
+
+node [shape = rectangle,fontsize=20]
+
+
+a [pos = '-5,7!', label = 'nonwAcc']
+b [pos = '-3,7!', label = 'wordAcc']
+c [pos = '-1,7!', label = 'naraAcc']
+d [pos = '1,7!', label = 'naraComp']
+e [pos = '3,7!', label = 'woldComp']
+
+
+h [pos = '-1,9!', label = 'C', shape = ellipse,fontsize=20]
+
+
+h->a 
+h->b
+h->c
+h->d
+h->e
+
+
+
+}
+")
+
+```
+
+```{r prereg-fmm}
+
+# PRE-REG MODEL - FMM
+
+grViz("
+digraph SEM {
+
+graph [layout = neato,
+       overlap = false,
+       outputorder = edgesfirst]
+
+node [shape = rectangle,fontsize=20]
+
+
+a [pos = '-5,7!', label = 'nonwAcc']
+b [pos = '-3,7!', label = 'wordAcc']
+c [pos = '-1,7!', label = 'naraAcc']
+d [pos = '1,7!', label = 'naraComp']
+e [pos = '3,7!', label = 'woldComp']
+
+f [pos = '-3,5!', label = 'acc', shape = ellipse,fontsize=20]
+
+g [pos = '2,5!', label = 'comp', shape = ellipse,fontsize=20]
+
+
+h [pos = '-1,9!', label = 'C', shape = ellipse,fontsize=20]
+
+
+f->a
+f->b 
+f->c
+
+g->d
+g->e
+
+h->a 
+h->b
+h->c
+h->d
+h->e
+
+
+
+}
+")
+
+```
+
+
+```{r prereg-lpa-comp}
+
+# PRE-REG MODEL (modified composite) - LPA
+
+mlpaE <- grViz("
+digraph SEM {
+
+graph [layout = neato,
+       overlap = true,
+       outputorder = edgesfirst]
+
+node [shape = rectangle,fontsize=20]
+
+
+a [pos = '-3,7!', label = '(non)word\nacc']
+b [pos = '-1,7!', label = 'passage\nacc']
+c [pos = '1,7!', label = 'reading\ncomp']
+d [pos = '3,7!', label = 'listening\ncomp']
+
+h [pos = '0,8.5!', label = 'C', shape = ellipse,fontsize=20]
+
+h->{a b c d} [headport = 'n']
+
+a->{b c d} [dir = 'both', headport = 's', tailport = 's', constraint = false]
+b->{c d} [dir = 'both', headport = 's', tailport = 's', constraint = false]
+c->{d} [dir = 'both', headport = 's', tailport = 's', constraint = false]
+
+}
+")
+mlpaE
+
+mlpaE %>%
+  export_svg() %>%
+  read_xml() %>%
+  write_xml("../output/figures/model_figs/modelfig_modE.svg")
+```
+
+```{r exploratory-fmm}
+
+# EXPLORATORY MODEL 3 - FMM
+
+m3fmm <- grViz("
+digraph SEM {
+
+graph [layout = neato,
+       overlap = false,
+       outputorder = edgesfirst]
+
+node [shape = rectangle,fontsize=20]
+
+
+a [pos = '-3,7!', label = '(non)word\nacc']
+b [pos = '-1,7!', label = 'passage\nacc']
+c [pos = '1,7!', label = 'reading\ncomp']
+d [pos = '3,7!', label = 'listening\ncomp']
+
+f [pos = '0,5.5!', label = 'general ability', shape = ellipse, fontsize=20]
+h [pos = '0,8.5!', label = 'C', shape = ellipse,fontsize=20]
+
+c->d [headport = 's', tailport = 's', dir = 'both']
+
+f->a [headport = 's']
+f->b [headport = 's']
+f->c [headport = 's']
+f->d [headport = 's']
+
+h->a [headport = 'n']
+h->b [headport = 'n']
+h->c [headport = 'n']
+h->d [headport = 'n']
+
+}
+")
+m3fmm
+
+m3fmm %>%
+  export_svg() %>%
+  read_xml() %>%
+  write_xml("../output/figures/model_figs/modelfig_mod3.svg")
+
+```
+
+```{r exploratory-lpa}
+
+# EXPLORATORY MODEL 4 - LPA
+
+m4lpa <- grViz("
+digraph SEM {
+
+graph [layout = neato,
+       overlap = false,
+       outputorder = edgesfirst]
+
+node [shape = rectangle,fontsize=20]
+
+
+a [pos = '-3,7!', label = '(non)word\nacc']
+b [pos = '-1,7!', label = 'passage\nacc']
+c [pos = '1,7!', label = 'reading\ncomp']
+d [pos = '3,7!', label = 'listening\ncomp']
+
+f [pos = '0,5.5!', label = 'general ability',fontsize=20]
+h [pos = '0,8.5!', label = 'C', shape = ellipse,fontsize=20]
+
+f->a [headport = 's']
+f->b [headport = 's']
+f->c [headport = 's']
+f->d [headport = 's']
+
+h->a [headport = 'n']
+h->b [headport = 'n']
+h->c [headport = 'n']
+h->d [headport = 'n']
+
+}
+")
+m4lpa
+
+m4lpa %>%
+  export_svg() %>%
+  read_xml() %>%
+  write_xml("../output/figures/model_figs/modelfig_mod4.svg")
+```

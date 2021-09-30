@@ -343,6 +343,17 @@ get_optseed <- function(filename){
   optiseed
 }
 
+# get_stscale: extract STSCALE value to refit model with same conditions as initial model fit
+get_stscale <- function(filename){
+  outfile_txt <- readLines(filename)
+  test <- getSection("INPUT INSTRUCTIONS", outfiletext = outfile_txt)
+  instr_line <- test[!is.na(str_extract(test, "STSCALE = ."))]
+  stscale_full <- str_extract(instr_line, "STSCALE = .")
+  stscale <- str_extract(stscale_full, "[[:digit:]]+")
+  stscale <- as.numeric(stscale)
+  stscale
+}
+
 # mm_extract_data: refit subset of models to save out participant classifications ----
 ### this currently requires the original model list to still be in the environment
 ### NOTE: increase lrtstarts if best values not replicated https://www.statmodel.com/examples/webnotes/webnote14.pdf
@@ -353,6 +364,7 @@ mm_extract_data <- function(orig_mods = NA,        # list of original models (in
                             analysis_id = "sv",
                             rerun = TRUE,          # whether to re-run models to extract data, set to false if just loading 
                             optseed = TRUE,        # vector of corresponding optseed values (manually identified from output)
+                            lrtstarts = NA,
                             one_fit = TRUE) {      # whether a one-class model was fitted (if not, adjusts selection from list)
   
   # Make sure output ordered by class number
@@ -369,35 +381,48 @@ mm_extract_data <- function(orig_mods = NA,        # list of original models (in
   # Update scripts 
   if (rerun == TRUE){
     
-    
     for (model in candidate_mods){
-      
       
       # Adjust name to reflect class n (if necessary)
       n_classes <- ifelse(one_fit == TRUE, model, model+1) 
       
+      # Extract filename from original output, extract 
+      mod_file <- names(orig_output)[[model]]
+      output_path <- paste0(here::here(), "/scripts/", filepath, "/", mod_file)
+      
+      # Check whether different STSCALE was used 
+      stscale <- get_stscale(output_path)
+      
+      if (length(stscale) < 1){
+        stscale <- 5
+      }
+      
+      # Set LRT starts if not already specified 
+      if (is.na(lrtstarts)){
+        lrtstarts <- "0 0 1000 250"   # increased 
+      }
+      
       # If using optseed
       if (optseed == TRUE) {
         
-        # Extract filename from original output, extract optseed
-        mod_file <- names(orig_output)[[model]]
-        optseed_path <- paste0(here::here(), "/scripts/", filepath, "/", mod_file)
-        optseed_val <- get_optseed(optseed_path)
+        # Extract optseed
+        optseed_val <- get_optseed(output_path)
         
         body <- update(orig_mods[[model]],
                        ANALYSIS = as.formula(sprintf("~ 'estimator = mlr; type = mixture; 
-                                                   starts = 0;
+                                                   starts = 0; stscale = %d;
                                                    optseed = %d;
-                                                   processors = 4(starts);
-                                                   lrtstarts = 0 0 100 20;'", optseed_val)),
+                                                   processors = 4(starts); 
+                                                   lrtbootstrap = 500;
+                                                   lrtstarts = %s;'", stscale, optseed_val, lrtstarts)),
                       # VARIABLE = ~ . + "AUXILIARY = cidB3153;",
                        OUTPUT = ~ "TECH7 TECH11 TECH14 stdyx CINTERVAL ENTROPY;",
                        SAVEDATA = as.formula(sprintf(" ~ 'FILE IS sv_%s_%dclass.dat; SAVE = cprobabilities;'", model_name, n_classes)))
       } else {
         body <- update(orig_mods[[model]],
                        OUTPUT = ~ "TECH7 TECH11 TECH14 stdyx CINTERVAL ENTROPY;",
-                       ANALYSIS = ~ "estimator = mlr; type = mixture; starts = 1000 250; 
-              processors = 4(STARTS);",
+                       ANALYSIS = as.formula(sprintf("~ 'estimator = mlr; type = mixture; starts = 1000 250; 
+              processors = 4(STARTS); lrtbootstrap = 200; STSCALE = %d;'", stscale)),
                        SAVEDATA = as.formula(sprintf(" ~ 'FILE IS sv_%s_%dclass.dat; SAVE = cprobabilities;'", model_name, n_classes)))
       }
       
@@ -419,6 +444,7 @@ recomp_LMR <- function(orig_mods = NA,        # list of original models (in envi
                        analysis_id = "sv",
                        rerun = TRUE,          # whether to re-run models to extract data, set to false if just loading 
                        kstarts = "20 4",
+                       stscale = NA,
                        optseed = NA,
                        one_fit = TRUE) {      # whether a one-class model was fitted (if not, adjusts selection from list)
   
@@ -437,29 +463,37 @@ recomp_LMR <- function(orig_mods = NA,        # list of original models (in envi
   if (rerun == TRUE){
     
     for (model in mods){
-      
-      
+
       # Adjust name to reflect class n (if necessary)
       n_classes <- ifelse(one_fit == TRUE, model, model+1) 
       
+      # Extract filename from original output
+      mod_file <- names(orig_output)[[model]]
+      output_path <- paste0(here::here(), "/scripts/", filepath, "/", mod_file)
         
-        # Extract filename from original output, extract optseed
-        mod_file <- names(orig_output)[[model]]
+      # Check whether different STSCALE was used 
+      stscale <- get_stscale(output_path)
         
+        # if STSCALE was not specified, assign default value for mplus
+        if (length(stscale) < 1){
+          stscale <- 5
+        }
+
+        # Extract optseed
         if (is.na(optseed)) {
-        optseed_path <- paste0(here::here(), "/scripts/", filepath, "/", mod_file)
-        optseed_val <- get_optseed(optseed_path)
+        optseed_val <- get_optseed(output_path)
         } else {
           optseed_val <- optseed
         }
         
-        
-        body <- update(orig_mods[[model]],
-                       ANALYSIS = as.formula(sprintf("~ 'estimator = mlr; type = mixture; 
+       # Update and rerun model
+          body <- update(orig_mods[[model]],
+                         ANALYSIS = as.formula(sprintf("~ 'estimator = mlr; type = mixture; 
                                                    starts = 0;
                                                    optseed = %d;
-                                                   k-1starts = %s;'", optseed_val, kstarts)),
-                       OUTPUT = ~ "TECH7 TECH11;")
+                                                   k-1starts = %s;
+                                                   STSCALE = %d;'", optseed_val, kstarts, stscale)),
+                         OUTPUT = ~ "TECH7 TECH11;")
       
       mplusModeler(body, sprintf("%s/%s_lmr_%dclass.dat", filepath, model_name, n_classes), run = TRUE) # can add analysis id back in here for extra naming
     }

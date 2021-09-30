@@ -1,0 +1,20 @@
+TITLE:
+Confirmatory Factor Analysis - Single Factor;
+DATA:
+FILE = "./mplus_models/simpview/cfa/sv_cfa1_90c130e671e09fe7a72347baf3ba3275.dat";
+ 
+VARIABLE:
+NAMES = naraComp naraAcc wordAcc nonwAcc woldComp f8age f9age; 
+ MISSING=.;
+ 
+ANALYSIS:
+estimator = mlr; type = general;
+MODEL:
+f8age; f9age;
+           read by naraComp naraAcc wordAcc nonwAcc woldComp;
+           wordAcc nonwAcc naraAcc naraComp on f9age;
+           woldcomp on f8age;
+OUTPUT:
+sampstat; TECH1; TECH4; stdyx; modindices; 
+PLOT:
+TYPE = PLOT3;

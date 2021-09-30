@@ -1,0 +1,83 @@
+TITLE:
+ LPA Model E: 6 classes;
+DATA:
+FILE = "mplus_models/simpview/lpa_comp/sv_lpa_mbench_576296b10d9f155ad9363f1cbb7ab8da.dat";
+ 
+VARIABLE:
+NAMES = cidB3153 f8age f9age naraAcc naraComp woldComp combAcc; 
+ MISSING=.;
+  idvariable = cidb3153; classes = c(6);
+ANALYSIS:
+ estimator = mlr; type = mixture; 
+                                                   starts = 0; stscale = 1;
+                                                   optseed = 595190;
+                                                   processors = 4(starts); 
+                                                   lrtbootstrap = 500;
+                                                   lrtstarts = 0 0 1000 250;
+MODEL:
+%OVERALL% 
+           f8age; f9age;
+           combAcc naraAcc naraComp on f9age;
+           woldcomp on f8age;
+ naraComp; naraAcc; combAcc; woldComp; 
+ 
+  naraComp with naraAcc;
+  naraComp with combAcc; 
+  naraComp with woldComp; 
+  naraAcc with combAcc; 
+  naraAcc with woldComp; 
+  combAcc with woldComp;   
+ %c#1% 
+ naraComp; naraAcc; combAcc; woldComp;
+  naraComp with naraAcc;
+  naraComp with combAcc; 
+  naraComp with woldComp; 
+  naraAcc with combAcc; 
+  naraAcc with woldComp; 
+  combAcc with woldComp;  
+ %c#2% 
+ naraComp; naraAcc; combAcc; woldComp;
+  naraComp with naraAcc;
+  naraComp with combAcc; 
+  naraComp with woldComp; 
+  naraAcc with combAcc; 
+  naraAcc with woldComp; 
+  combAcc with woldComp;  
+ %c#3% 
+ naraComp; naraAcc; combAcc; woldComp;
+  naraComp with naraAcc;
+  naraComp with combAcc; 
+  naraComp with woldComp; 
+  naraAcc with combAcc; 
+  naraAcc with woldComp; 
+  combAcc with woldComp;  
+ %c#4% 
+ naraComp; naraAcc; combAcc; woldComp;
+  naraComp with naraAcc;
+  naraComp with combAcc; 
+  naraComp with woldComp; 
+  naraAcc with combAcc; 
+  naraAcc with woldComp; 
+  combAcc with woldComp;  
+ %c#5% 
+ naraComp; naraAcc; combAcc; woldComp;
+  naraComp with naraAcc;
+  naraComp with combAcc; 
+  naraComp with woldComp; 
+  naraAcc with combAcc; 
+  naraAcc with woldComp; 
+  combAcc with woldComp;  
+ %c#6% 
+ naraComp; naraAcc; combAcc; woldComp;
+  naraComp with naraAcc;
+  naraComp with combAcc; 
+  naraComp with woldComp; 
+  naraAcc with combAcc; 
+  naraAcc with woldComp; 
+  combAcc with woldComp;  
+OUTPUT:
+ TECH7 TECH11 TECH14 stdyx CINTERVAL ENTROPY;
+SAVEDATA:
+ FILE IS sv_lpa_e_6class.dat; SAVE = cprobabilities;
+PLOT:
+TYPE = PLOT3;

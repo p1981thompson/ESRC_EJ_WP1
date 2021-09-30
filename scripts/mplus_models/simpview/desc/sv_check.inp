@@ -1,0 +1,11 @@
+TITLE:
+Data check - Descriptive statistics;
+DATA:
+FILE = "./mplus_models/simpview/desc/sv_sim_90c130e671e09fe7a72347baf3ba3275.dat";
+ 
+VARIABLE:
+NAMES = naraComp naraAcc wordAcc nonwAcc woldComp f8age f9age; 
+ MISSING=.;
+ 
+ANALYSIS:
+type = basic;

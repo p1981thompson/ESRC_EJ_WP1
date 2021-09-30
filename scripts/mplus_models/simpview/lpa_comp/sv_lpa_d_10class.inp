@@ -44,6 +44,6 @@ MODEL:
  %c#10% 
  naraComp; naraAcc; combAcc; woldComp;
 OUTPUT:
-TECH1 TECH8 TECH11;
+TECH1 TECH8;
 PLOT:
 TYPE = PLOT3;

@@ -1,6 +1,6 @@
 Mplus VERSION 8.5
 MUTHEN & MUTHEN
-08/23/2021  11:01 AM
+09/16/2021  12:44 PM
 
 INPUT INSTRUCTIONS
 
@@ -15,10 +15,11 @@ INPUT INSTRUCTIONS
     idvariable = cidb3153; classes = c(2);
   ANALYSIS:
    estimator = mlr; type = mixture;
-                                                     starts = 0;
+                                                     starts = 0; stscale = 5;
                                                      optseed = 345726;
                                                      processors = 4(starts);
-                                                     lrtstarts = 0 0 100 20;
+                                                     lrtbootstrap = 100;
+                                                     lrtstarts = 0 0 2000 500;
   MODEL:
   %OVERALL%
              f8age; f9age;
@@ -876,9 +877,9 @@ TECHNICAL 14 OUTPUT
         Number of final stage optimizations for the
            initial stage random starts                          0
      Random Starts Specification for the k Class Model for Generated Data
-        Number of initial stage random starts                 100
-        Number of final stage optimizations                    20
-     Number of bootstrap draws requested                   Varies
+        Number of initial stage random starts                2000
+        Number of final stage optimizations                   500
+     Number of bootstrap draws requested                      100
 
 
      PARAMETRIC BOOTSTRAPPED LIKELIHOOD RATIO TEST FOR 1 (H0) VERSUS 2 CLASSES
@@ -887,13 +888,7 @@ TECHNICAL 14 OUTPUT
           2 Times the Loglikelihood Difference           1857.668
           Difference in the Number of Parameters               10
           Approximate P-Value                              0.0000
-          Successful Bootstrap Draws                            5
-
-     WARNING:  OF THE 5 BOOTSTRAP DRAWS, 4 DRAWS HAD BOTH A SMALLER LRT VALUE THAN THE
-     OBSERVED LRT VALUE AND NOT A REPLICATED BEST LOGLIKELIHOOD VALUE FOR THE 2-CLASS MODEL.
-     THIS MEANS THAT THE P-VALUE MAY NOT BE TRUSTWORTHY DUE TO LOCAL MAXIMA.
-     INCREASE THE NUMBER OF RANDOM STARTS USING THE LRTSTARTS OPTION.
-
+          Successful Bootstrap Draws                          100
 
 
 SAMPLE STATISTICS FOR ESTIMATED FACTOR SCORES
@@ -960,9 +955,9 @@ SAVEDATA INFORMATION
   Save missing symbol        *
 
 
-     Beginning Time:  11:01:50
-        Ending Time:  11:01:54
-       Elapsed Time:  00:00:04
+     Beginning Time:  12:44:22
+        Ending Time:  13:06:27
+       Elapsed Time:  00:22:05
 
 
 
