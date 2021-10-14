@@ -11,7 +11,8 @@ ANALYSIS:
  estimator = mlr; type = mixture; 
                                                    starts = 0;
                                                    optseed = 501995;
-                                                   k-1starts = 6000 1500;
+                                                   k-1starts = 8000 2000;
+                                                   STSCALE = 5;
 MODEL:
 %OVERALL%
            f8age; f9age;

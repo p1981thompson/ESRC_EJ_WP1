@@ -1,0 +1,801 @@
+Mplus VERSION 8.5
+MUTHEN & MUTHEN
+08/05/2021  11:43 AM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+  CFA - ExecFun two factor
+  DATA:
+  FILE = "./mplus_models/compprof/cfa/ef_2cfa_37008ef94ccf02c67a37d15f0d91b770.dat";
+
+  VARIABLE:
+  NAMES = f8age f10age wiscBwsp cntspan attnSel attnDiv attnOpp;
+   MISSING=.;
+
+  DEFINE:
+  attnDiv = attnDiv/20;
+            attnOpp = attnOpp/4;
+  ANALYSIS:
+  estimator = mlr; type = general; starts = 20;
+  MODEL:
+   f8age; f10age;
+              wiscBwsp attn on f8age;
+              cntSpan on f10age;
+              workmem by wiscBwsp cntSpan;
+              attn by attnSel attnDiv attnOpp;
+              attn with workmem;
+  OUTPUT:
+  TECH1; TECH4; stdyx; modindices;
+
+
+
+*** WARNING
+  Data set contains cases with missing on all variables.
+  These cases were not included in the analysis.
+  Number of cases with missing on all variables:  5
+   1 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
+
+
+
+
+CFA - ExecFun two factor
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                         243
+
+Number of dependent variables                                    5
+Number of independent variables                                  2
+Number of continuous latent variables                            2
+
+Observed dependent variables
+
+  Continuous
+   WISCBWSP    CNTSPAN     ATTNSEL     ATTNDIV     ATTNOPP
+
+Observed independent variables
+   F8AGE       F10AGE
+
+Continuous latent variables
+   WORKMEM     ATTN
+
+
+Estimator                                                      MLR
+Information matrix                                        OBSERVED
+Maximum number of iterations                                  1000
+Convergence criterion                                    0.500D-04
+Maximum number of steepest descent iterations                   20
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+Random Starts Specifications
+  Number of random starts                                       20
+  Random starts scale                                    0.500D+01
+
+Input data file(s)
+  ./mplus_models/compprof/cfa/ef_2cfa_37008ef94ccf02c67a37d15f0d91b770.dat
+
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns            18
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT
+
+
+           Covariance Coverage
+              WISCBWSP      CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP
+              ________      ________      ________      ________      ________
+ WISCBWSP       0.790
+ CNTSPAN        0.687         0.872
+ ATTNSEL        0.774         0.687         0.794
+ ATTNDIV        0.737         0.658         0.749         0.753
+ ATTNOPP        0.770         0.683         0.786         0.745         0.794
+ F8AGE          0.790         0.704         0.794         0.753         0.794
+ F10AGE         0.716         0.872         0.716         0.679         0.712
+
+
+           Covariance Coverage
+              F8AGE         F10AGE
+              ________      ________
+ F8AGE          0.823
+ F10AGE         0.741         0.918
+
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     WISCBWSP              3.208       0.898       1.000    1.04%       3.000      3.000      3.000
+             192.000       0.582       3.695       7.000    0.52%       3.000      4.000
+     CNTSPAN               3.083      -0.404       0.500    3.30%       2.500      3.000      3.000
+             212.000       0.733       1.281       5.000    3.77%       3.500      3.500
+     ATTNSEL               5.819       3.824       0.000    0.52%       4.195      4.928      5.316
+             193.000       8.292      22.909      27.900    0.52%       5.809      6.794
+     ATTNDIV               0.358       5.688      -0.184    0.55%       0.010      0.085      0.147
+             183.000       0.608      42.130       7.506    0.55%       0.208      0.457
+     ATTNOPP               1.322       4.445      -0.500    0.52%       0.625      1.000      1.125
+             193.000       1.270      32.683      11.375    0.52%       1.250      1.750
+     F8AGE               103.565       2.190      99.000    2.50%     102.000    102.000    103.000
+             200.000      10.286       5.717     117.000    1.50%     103.000    105.000
+     F10AGE              127.448       1.799     120.000    0.45%     125.000    126.000    127.000
+             223.000      10.274       4.244     142.000    0.45%     127.000    129.000
+
+
+RANDOM STARTS RESULTS RANKED FROM THE BEST TO THE WORST FIT FUNCTION VALUES
+
+Fit function values at local maxima and random start numbers:
+
+             15.0787         7
+             15.0787         unperturbed
+             15.0787         1
+             15.0787         2
+             15.0787         14
+             15.0787         10
+             15.0787         4
+             15.0787         15
+             15.0787         9
+             15.0787         12
+             15.0787         20
+
+10 starting value run(s) did not converge.
+
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                       26
+
+Loglikelihood
+
+          H0 Value                       -2529.527
+          H0 Scaling Correction Factor      3.3127
+            for MLR
+          H1 Value                       -2521.988
+          H1 Scaling Correction Factor      2.6369
+            for MLR
+
+Information Criteria
+
+          Akaike (AIC)                    5111.055
+          Bayesian (BIC)                  5201.874
+          Sample-Size Adjusted BIC        5119.458
+            (n* = (n + 2) / 24)
+
+Chi-Square Test of Model Fit
+
+          Value                             22.022*
+          Degrees of Freedom                     9
+          P-Value                           0.0088
+          Scaling Correction Factor         0.6847
+            for MLR
+
+*   The chi-square value for MLM, MLMV, MLR, ULSMV, WLSM and WLSMV cannot be used
+    for chi-square difference testing in the regular way.  MLM, MLR and WLSM
+    chi-square difference testing is described on the Mplus website.  MLMV, WLSMV,
+    and ULSMV difference testing is done using the DIFFTEST option.
+
+RMSEA (Root Mean Square Error Of Approximation)
+
+          Estimate                           0.077
+          90 Percent C.I.                    0.036  0.119
+          Probability RMSEA <= .05           0.121
+
+CFI/TLI
+
+          CFI                                0.818
+          TLI                                0.596
+
+Chi-Square Test of Model Fit for the Baseline Model
+
+          Value                             91.634
+          Degrees of Freedom                    20
+          P-Value                           0.0000
+
+SRMR (Standardized Root Mean Square Residual)
+
+          Value                              0.077
+
+
+
+MODEL RESULTS
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ WORKMEM  BY
+    WISCBWSP           1.000      0.000    999.000    999.000
+    CNTSPAN            1.940      1.163      1.667      0.095
+
+ ATTN     BY
+    ATTNSEL            1.000      0.000    999.000    999.000
+    ATTNDIV            0.150      0.068      2.190      0.028
+    ATTNOPP            0.297      0.098      3.042      0.002
+
+ ATTN     ON
+    F8AGE             -0.059      0.046     -1.275      0.202
+
+ WISCBWSP ON
+    F8AGE              0.034      0.018      1.868      0.062
+
+ CNTSPAN  ON
+    F10AGE             0.043      0.043      1.002      0.316
+
+ ATTN     WITH
+    WORKMEM           -0.304      0.118     -2.573      0.010
+
+ F8AGE    WITH
+    WORKMEM           -0.045      0.103     -0.432      0.666
+
+ F10AGE   WITH
+    WORKMEM           -0.116      0.204     -0.568      0.570
+
+ F10AGE   WITH
+    F8AGE              0.410      0.968      0.424      0.672
+
+ Means
+    F8AGE            103.572      0.228    453.371      0.000
+    F10AGE           127.456      0.215    592.669      0.000
+
+ Intercepts
+    WISCBWSP          -0.309      1.880     -0.164      0.869
+    CNTSPAN           -2.454      5.522     -0.444      0.657
+    ATTNSEL           11.887      4.779      2.487      0.013
+    ATTNDIV            1.283      0.908      1.413      0.158
+    ATTNOPP            3.121      1.102      2.832      0.005
+
+ Variances
+    F8AGE             10.290      2.018      5.098      0.000
+    F10AGE            10.280      1.723      5.967      0.000
+    WORKMEM            0.071      0.053      1.332      0.183
+
+ Residual Variances
+    WISCBWSP           0.500      0.086      5.824      0.000
+    CNTSPAN            0.477      0.184      2.593      0.010
+    ATTNSEL            3.405      1.420      2.397      0.017
+    ATTNDIV            0.530      0.285      1.860      0.063
+    ATTNOPP            0.839      0.202      4.142      0.000
+    ATTN               4.804      3.168      1.517      0.129
+
+
+STANDARDIZED MODEL RESULTS
+
+
+STDYX Standardization
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ WORKMEM  BY
+    WISCBWSP           0.349      0.119      2.937      0.003
+    CNTSPAN            0.598      0.214      2.801      0.005
+
+ ATTN     BY
+    ATTNSEL            0.766      0.142      5.388      0.000
+    ATTNDIV            0.412      0.194      2.122      0.034
+    ATTNOPP            0.581      0.186      3.121      0.002
+
+ ATTN     ON
+    F8AGE             -0.086      0.077     -1.118      0.264
+
+ WISCBWSP ON
+    F8AGE              0.143      0.080      1.796      0.073
+
+ CNTSPAN  ON
+    F10AGE             0.161      0.159      1.012      0.311
+
+ ATTN     WITH
+    WORKMEM           -0.522      0.142     -3.665      0.000
+
+ F8AGE    WITH
+    WORKMEM           -0.052      0.119     -0.441      0.659
+
+ F10AGE   WITH
+    WORKMEM           -0.136      0.232     -0.584      0.559
+
+ F10AGE   WITH
+    F8AGE              0.040      0.094      0.423      0.672
+
+ Means
+    F8AGE             32.288      3.112     10.377      0.000
+    F10AGE            39.752      3.282     12.110      0.000
+
+ Intercepts
+    WISCBWSP          -0.406      2.470     -0.164      0.869
+    CNTSPAN           -2.847      6.353     -0.448      0.654
+    ATTNSEL            4.140      1.871      2.213      0.027
+    ATTNDIV            1.606      1.086      1.479      0.139
+    ATTNOPP            2.775      1.209      2.295      0.022
+
+ Variances
+    F8AGE              1.000      0.000    999.000    999.000
+    F10AGE             1.000      0.000    999.000    999.000
+    WORKMEM            1.000      0.000    999.000    999.000
+
+ Residual Variances
+    WISCBWSP           0.863      0.083     10.429      0.000
+    CNTSPAN            0.642      0.245      2.622      0.009
+    ATTNSEL            0.413      0.218      1.895      0.058
+    ATTNDIV            0.831      0.160      5.200      0.000
+    ATTNOPP            0.663      0.216      3.069      0.002
+    ATTN               0.993      0.013     75.630      0.000
+
+
+R-SQUARE
+
+    Observed                                        Two-Tailed
+    Variable        Estimate       S.E.  Est./S.E.    P-Value
+
+    WISCBWSP           0.137      0.083      1.659      0.097
+    CNTSPAN            0.358      0.245      1.461      0.144
+    ATTNSEL            0.587      0.218      2.694      0.007
+    ATTNDIV            0.169      0.160      1.061      0.289
+    ATTNOPP            0.337      0.216      1.561      0.119
+
+     Latent                                         Two-Tailed
+    Variable        Estimate       S.E.  Est./S.E.    P-Value
+
+    ATTN               0.007      0.013      0.559      0.576
+
+
+QUALITY OF NUMERICAL RESULTS
+
+     Condition Number for the Information Matrix              0.854E-08
+       (ratio of smallest to largest eigenvalue)
+
+
+MODEL MODIFICATION INDICES
+
+NOTE:  Modification indices for direct effects of observed dependent variables
+regressed on covariates may not be included.  To include these, request
+MODINDICES (ALL).
+
+Minimum M.I. value for printing the modification index    10.000
+
+                                   M.I.     E.P.C.  Std E.P.C.  StdYX E.P.C.
+
+No modification indices above the minimum value.
+
+
+
+TECHNICAL 1 OUTPUT
+
+
+     PARAMETER SPECIFICATION
+
+
+           NU
+              WISCBWSP      CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP
+              ________      ________      ________      ________      ________
+                  0             0             1             2             3
+
+
+           NU
+              F8AGE         F10AGE
+              ________      ________
+                  0             0
+
+
+           LAMBDA
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+ WISCBWSP           0             0             0             0             0
+ CNTSPAN            0             0             0             0             0
+ ATTNSEL            0             0             0             0             0
+ ATTNDIV            0             4             0             0             0
+ ATTNOPP            0             5             0             0             0
+ F8AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           LAMBDA
+              F10AGE
+              ________
+ WISCBWSP           0
+ CNTSPAN            0
+ ATTNSEL            0
+ ATTNDIV            0
+ ATTNOPP            0
+ F8AGE              0
+ F10AGE             0
+
+
+           THETA
+              WISCBWSP      CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP
+              ________      ________      ________      ________      ________
+ WISCBWSP           0
+ CNTSPAN            0             0
+ ATTNSEL            0             0             6
+ ATTNDIV            0             0             0             7
+ ATTNOPP            0             0             0             0             8
+ F8AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           THETA
+              F8AGE         F10AGE
+              ________      ________
+ F8AGE              0
+ F10AGE             0             0
+
+
+           ALPHA
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+                  0             0             9            10            11
+
+
+           ALPHA
+              F10AGE
+              ________
+                 12
+
+
+           BETA
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+ WORKMEM            0             0             0             0             0
+ ATTN               0             0             0             0            13
+ WISCBWSP           0             0             0             0            14
+ CNTSPAN           15             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           BETA
+              F10AGE
+              ________
+ WORKMEM            0
+ ATTN               0
+ WISCBWSP           0
+ CNTSPAN           16
+ F8AGE              0
+ F10AGE             0
+
+
+           PSI
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+ WORKMEM           17
+ ATTN              18            19
+ WISCBWSP           0             0            20
+ CNTSPAN            0             0             0            21
+ F8AGE             22             0             0             0            23
+ F10AGE            24             0             0             0            25
+
+
+           PSI
+              F10AGE
+              ________
+ F10AGE            26
+
+
+     STARTING VALUES
+
+
+           NU
+              WISCBWSP      CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP
+              ________      ________      ________      ________      ________
+                0.000         0.000         5.819         0.358         1.322
+
+
+           NU
+              F8AGE         F10AGE
+              ________      ________
+                0.000         0.000
+
+
+           LAMBDA
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+ WISCBWSP       0.000         0.000         1.000         0.000         0.000
+ CNTSPAN        0.000         0.000         0.000         1.000         0.000
+ ATTNSEL        0.000         1.000         0.000         0.000         0.000
+ ATTNDIV        0.000         0.132         0.000         0.000         0.000
+ ATTNOPP        0.000         0.252         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         1.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              F10AGE
+              ________
+ WISCBWSP       0.000
+ CNTSPAN        0.000
+ ATTNSEL        0.000
+ ATTNDIV        0.000
+ ATTNOPP        0.000
+ F8AGE          0.000
+ F10AGE         1.000
+
+
+           THETA
+              WISCBWSP      CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP
+              ________      ________      ________      ________      ________
+ WISCBWSP       0.000
+ CNTSPAN        0.000         0.000
+ ATTNSEL        0.000         0.000         4.146
+ ATTNDIV        0.000         0.000         0.000         0.304
+ ATTNOPP        0.000         0.000         0.000         0.000         0.635
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              F8AGE         F10AGE
+              ________      ________
+ F8AGE          0.000
+ F10AGE         0.000         0.000
+
+
+           ALPHA
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+                0.000         0.000         3.208         3.083       103.565
+
+
+           ALPHA
+              F10AGE
+              ________
+              127.448
+
+
+           BETA
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+ WORKMEM        0.000         0.000         0.000         0.000         0.000
+ ATTN           0.000         0.000         0.000         0.000         0.000
+ WISCBWSP       1.000         0.000         0.000         0.000         0.000
+ CNTSPAN        0.228         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              F10AGE
+              ________
+ WORKMEM        0.000
+ ATTN           0.000
+ WISCBWSP       0.000
+ CNTSPAN        0.000
+ F8AGE          0.000
+ F10AGE         0.000
+
+
+           PSI
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+ WORKMEM        0.050
+ ATTN           0.000         0.050
+ WISCBWSP       0.000         0.000         0.291
+ CNTSPAN        0.000         0.000         0.000         0.366
+ F8AGE          0.000         0.000         0.000         0.000         5.143
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              F10AGE
+              ________
+ F10AGE         5.137
+
+
+TECHNICAL 4 OUTPUT
+
+
+     ESTIMATES DERIVED FROM THE MODEL
+
+
+           ESTIMATED MEANS FOR THE LATENT VARIABLES
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+                0.000        -6.084         3.208         3.072       103.572
+
+
+           ESTIMATED MEANS FOR THE LATENT VARIABLES
+              F10AGE
+              ________
+              127.456
+
+
+           S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+                0.000         4.773         0.055         0.059         0.228
+
+
+           S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              F10AGE
+              ________
+                0.215
+
+
+           EST./S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+                0.000        -1.274        58.418        52.016       453.371
+
+
+           EST./S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              F10AGE
+              ________
+              592.669
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+                1.000         0.202         0.000         0.000         0.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              F10AGE
+              ________
+                0.000
+
+
+           ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+ WORKMEM        0.071
+ ATTN          -0.302         4.840
+ WISCBWSP       0.069        -0.322         0.579
+ CNTSPAN        0.132        -0.586         0.130         0.743
+ F8AGE         -0.045        -0.604         0.305        -0.069        10.290
+ F10AGE        -0.116        -0.024        -0.102         0.221         0.410
+
+
+           ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              F10AGE
+              ________
+ F10AGE        10.280
+
+
+           S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+ WORKMEM        0.053
+ ATTN           0.118         3.162
+ WISCBWSP       0.052         0.116         0.099
+ CNTSPAN        0.058         0.330         0.057         0.093
+ F8AGE          0.103         0.504         0.214         0.173         2.018
+ F10AGE         0.204         0.057         0.201         0.181         0.968
+
+
+           S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              F10AGE
+              ________
+ F10AGE         1.723
+
+
+           EST./S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+ WORKMEM        1.332
+ ATTN          -2.555         1.531
+ WISCBWSP       1.322        -2.788         5.837
+ CNTSPAN        2.293        -1.777         2.265         8.010
+ F8AGE         -0.432        -1.199         1.423        -0.396         5.098
+ F10AGE        -0.568        -0.423        -0.506         1.223         0.424
+
+
+           EST./S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              F10AGE
+              ________
+ F10AGE         5.967
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+ WORKMEM        0.183
+ ATTN           0.011         0.126
+ WISCBWSP       0.186         0.005         0.000
+ CNTSPAN        0.022         0.076         0.024         0.000
+ F8AGE          0.666         0.230         0.155         0.692         0.000
+ F10AGE         0.570         0.673         0.613         0.222         0.672
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              F10AGE
+              ________
+ F10AGE         0.000
+
+
+           ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+ WORKMEM        1.000
+ ATTN          -0.516         1.000
+ WISCBWSP       0.342        -0.192         1.000
+ CNTSPAN        0.576        -0.309         0.198         1.000
+ F8AGE         -0.052        -0.086         0.125        -0.025         1.000
+ F10AGE        -0.136        -0.003        -0.042         0.080         0.040
+
+
+           ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              F10AGE
+              ________
+ F10AGE         1.000
+
+
+           S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+ WORKMEM        0.000
+ ATTN           0.144         0.000
+ WISCBWSP       0.119         0.081         0.000
+ CNTSPAN        0.201         0.098         0.079         0.000
+ F8AGE          0.119         0.077         0.083         0.063         0.000
+ F10AGE         0.232         0.008         0.082         0.064         0.094
+
+
+           S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              F10AGE
+              ________
+ F10AGE         0.000
+
+
+           EST./S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+ WORKMEM      999.000
+ ATTN          -3.576       999.000
+ WISCBWSP       2.882        -2.386       999.000
+ CNTSPAN        2.875        -3.140         2.507       999.000
+ F8AGE         -0.441        -1.118         1.501        -0.394       999.000
+ F10AGE        -0.584        -0.420        -0.509         1.259         0.423
+
+
+           EST./S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              F10AGE
+              ________
+ F10AGE       999.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              WORKMEM       ATTN          WISCBWSP      CNTSPAN       F8AGE
+              ________      ________      ________      ________      ________
+ WORKMEM        0.000
+ ATTN           0.000         0.000
+ WISCBWSP       0.004         0.017         0.000
+ CNTSPAN        0.004         0.002         0.012         0.000
+ F8AGE          0.659         0.264         0.133         0.693         0.000
+ F10AGE         0.559         0.674         0.610         0.208         0.672
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              F10AGE
+              ________
+ F10AGE         0.000
+
+
+     Beginning Time:  11:43:48
+        Ending Time:  11:43:50
+       Elapsed Time:  00:00:02
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2020 Muthen & Muthen

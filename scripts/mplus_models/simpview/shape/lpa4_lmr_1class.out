@@ -1,6 +1,6 @@
 Mplus VERSION 8.5
 MUTHEN & MUTHEN
-08/24/2021  12:33 PM
+09/29/2021  11:46 AM
 
 INPUT INSTRUCTIONS
 
@@ -16,8 +16,9 @@ INPUT INSTRUCTIONS
   ANALYSIS:
    estimator = mlr; type = mixture;
                                                      starts = 0;
-                                                     optseed = 383986;
+                                                     optseed = 55115;
                                                      k-1starts = 20 4;
+                                                     STSCALE = 5;
   MODEL:
   %OVERALL%
              f8age; f9age;
@@ -111,7 +112,7 @@ Maximum number of iterations for H1                           2000
 Convergence criterion for H1                             0.100D-03
 Optimization algorithm                                         EMA
 Random Starts Specifications
-  Random seed for analysis                                  383986
+  Random seed for analysis                                   55115
 
 Input data file(s)
   mplus_models/simpview/shape/lpa4_1class_de1b3854e8a32ccc95df154eccc810fd.dat
@@ -365,8 +366,8 @@ The following plots are available:
   Estimated probabilities for a categorical latent variable as a
     function of its covariates
 
-     Beginning Time:  12:33:43
-        Ending Time:  12:33:43
+     Beginning Time:  11:46:07
+        Ending Time:  11:46:07
        Elapsed Time:  00:00:00
 
 

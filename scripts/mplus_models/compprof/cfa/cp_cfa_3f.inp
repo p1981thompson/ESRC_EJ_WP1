@@ -1,0 +1,30 @@
+TITLE:
+Confirmatory Factor Analysis - 3-factor (no rate);
+DATA:
+FILE = "./mplus_models/compprof/cfa/cp_cfa_3f_19feacc4dae7ab5270eb615cbe68dab4.dat";
+ 
+VARIABLE:
+NAMES = woldComp f8age f10age woldVcb wiscVcb wiscPcmp wiscParr wiscBloc wiscObja
+     wiscBwsp cntspan attnSel attnDiv attnOpp; 
+ MISSING=.;
+ 
+DEFINE:
+wiscVcb = wiscVcb/2;
+          wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
+          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20;
+          attnOpp = attnOpp/4;
+ANALYSIS:
+estimator = mlr; type = general; starts = 20;
+MODEL:
+ f8age; f10age;
+            lang perfiq wiscBwsp attnSel attnDiv attnOpp on f8age;
+            cntSpan on f10age;
+            lang by woldComp wiscVcb woldVcb;
+            perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
+            execfun by wiscBwsp cntSpan attnSel attnDiv attnOpp;
+            lang with perfiq; lang with execfun; 
+            perfiq with execfun;
+OUTPUT:
+TECH1; TECH4; stdyx; modindices;
+PLOT:
+TYPE = PLOT3;

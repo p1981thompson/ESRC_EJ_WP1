@@ -8,7 +8,7 @@ NAMES = NARACOMP NARAACC COMBACC WOLDCOMP F8AGE F9AGE G CIDB3153;
  MISSING=.;
  idvariable = cidB3153; classes = c(6);
 ANALYSIS:
-estimator = mlr; type = mixture; starts = 500 50; 
+estimator = mlr; type = mixture; starts = 2000 200; 
               processors = 4(STARTS); STSCALE = 1;
 MODEL:
 
@@ -29,17 +29,17 @@ MODEL:
     naraAcc with woldComp@0;
     combAcc with woldComp@0;
   
-  [c#1@0.825];
-  [c#2@1.246];
-  [c#3@1.397];
-  [c#4@1.124];
-  [c#5@0.991];
+  [c#1@-0.133];
+  [c#2@0.122];
+  [c#3@-0.299];
+  [c#4@0.273];
+  [c#5@-1.124];
   
   %c#1%
-     [naraComp@-41.181];
-     [naraAcc@-102.213];
-     [combAcc@-18.697];
-     [woldComp@3.544];
+     [naraComp@-32.001];
+     [naraAcc@-104.578];
+     [combAcc@-14.585];
+     [woldComp@4.584];
      naraComp naraAcc combAcc woldComp;
 
   %c#2% 
@@ -50,36 +50,36 @@ MODEL:
      naraComp naraAcc combAcc woldComp;
   
   %c#3% 
+     [naraComp@-41.181];
+     [naraAcc@-102.213];
+     [combAcc@-18.697];
+     [woldComp@3.544];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#4% 
      [naraComp@-36.574];
      [naraAcc@-103.409];
      [combAcc@-16.609];
      [woldComp@3.937];
      naraComp naraAcc combAcc woldComp;
   
-  %c#4% 
-     [naraComp@-30.946];
-     [naraAcc@-103.845];
-     [combAcc@-18.014];
-     [woldComp@5.165];
-     naraComp naraAcc combAcc woldComp;
-  
   %c#5% 
-     [naraComp@-32.001];
-     [naraAcc@-104.578];
-     [combAcc@-14.585];
-     [woldComp@4.584];
-     naraComp naraAcc combAcc woldComp;
-  
-  %c#6% 
      [naraComp@-35.313];
      [naraAcc@-103.209];
      [combAcc@-17.659];
      [woldComp@4.68];
      naraComp naraAcc combAcc woldComp;
+  
+  %c#6% 
+     [naraComp@-30.946];
+     [naraAcc@-103.845];
+     [combAcc@-18.014];
+     [woldComp@5.165];
+     naraComp naraAcc combAcc woldComp;
 
   
 OUTPUT:
-TECH1 TECH8 TECH11 TECH14 stdyx CINTERVAL ENTROPY;
+TECH1 TECH8 TECH11 stdyx CINTERVAL ENTROPY;
 SAVEDATA:
 FILE IS fixed.dat; SAVE = cprobabilities;
 PLOT:

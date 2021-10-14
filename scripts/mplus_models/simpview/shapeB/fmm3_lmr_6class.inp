@@ -10,8 +10,9 @@ NAMES = cidB3153 f8age f9age naraAcc naraComp woldComp combAcc;
 ANALYSIS:
  estimator = mlr; type = mixture; 
                                                    starts = 0;
-                                                   optseed = 386907;
+                                                   optseed = 186124;
                                                    k-1starts = 20 4;
+                                                   STSCALE = 1;
 MODEL:
 %OVERALL%
            f8age; f9age;
@@ -52,7 +53,5 @@ MODEL:
   [naraComp naraAcc combAcc woldComp];
 OUTPUT:
  TECH7 TECH11;
-SAVEDATA:
- FILE IS fmm3_6class.dat; SAVE = cprobabilities;
 PLOT:
 TYPE = PLOT3;

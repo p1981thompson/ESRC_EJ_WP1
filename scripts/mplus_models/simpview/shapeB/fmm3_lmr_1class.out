@@ -1,6 +1,6 @@
 Mplus VERSION 8.5
 MUTHEN & MUTHEN
-08/26/2021  11:37 AM
+10/11/2021   6:07 PM
 
 INPUT INSTRUCTIONS
 
@@ -18,6 +18,7 @@ INPUT INSTRUCTIONS
                                                      starts = 0;
                                                      optseed = 349263;
                                                      k-1starts = 20 4;
+                                                     STSCALE = 5;
   MODEL:
   %OVERALL%
              f8age; f9age;
@@ -38,8 +39,6 @@ INPUT INSTRUCTIONS
     [naraComp naraAcc combAcc woldComp];
   OUTPUT:
    TECH7 TECH11;
-  SAVEDATA:
-   FILE IS fmm3_1class.dat; SAVE = cprobabilities;
   PLOT:
   TYPE = PLOT3;
 
@@ -387,36 +386,8 @@ The following plots are available:
   Latent variable distribution plots
   Estimated overall and class-specific distributions
 
-SAVEDATA INFORMATION
-
-
-  Save file
-    fmm3_1class.dat
-
-  Order and format of variables
-
-    NARAACC        F10.3
-    NARACOMP       F10.3
-    WOLDCOMP       F10.3
-    COMBACC        F10.3
-    F8AGE          F10.3
-    F9AGE          F10.3
-    G              F10.3
-    C_G            F10.3
-    CPROB1         F10.3
-    C              F10.3
-    CIDB3153       I6
-
-  Save file format
-    10F10.3 I6
-
-  Save file record length    10000
-
-  Save missing symbol        *
-
-
-     Beginning Time:  11:37:21
-        Ending Time:  11:37:22
+     Beginning Time:  18:07:20
+        Ending Time:  18:07:21
        Elapsed Time:  00:00:01
 
 

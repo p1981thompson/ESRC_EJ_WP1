@@ -1,0 +1,86 @@
+TITLE:
+LPA: Confirmatory model (subB fixed parameters)
+DATA:
+FILE = "mplus_models/simpview/shapeB/crossval/fixed_de1b3854e8a32ccc95df154eccc810fd.dat";
+ 
+VARIABLE:
+NAMES = NARACOMP NARAACC COMBACC WOLDCOMP F8AGE F9AGE G CIDB3153; 
+ MISSING=.;
+ idvariable = cidB3153; classes = c(6);
+ANALYSIS:
+estimator = mlr; type = mixture; starts = 2000 200; 
+              processors = 4(STARTS); STSCALE = 1;
+MODEL:
+
+  %OVERALL% 
+      f8age; f9age;
+      combAcc naraAcc naraComp on f9age;
+      woldcomp on f8age;
+
+    naraComp combAcc woldComp naraAcc ;
+
+    [naraComp naraAcc combAcc woldComp];
+    combAcc naraAcc naraComp woldComp ON G;
+
+    naraComp with naraAcc@0;
+    naraComp with combAcc@0;
+    naraComp with woldComp@0;
+    naraAcc with combAcc@0;
+    naraAcc with woldComp@0;
+    combAcc with woldComp@0;
+  
+  [c#1@0.158];
+  [c#2@0.314];
+  [c#3@0.056];
+  [c#4@-0.105];
+  [c#5@-0.882];
+  
+  %c#1%
+     [naraComp@-31.123];
+     [naraAcc@-109.259];
+     [combAcc@-11.332];
+     [woldComp@4.198];
+     naraComp naraAcc combAcc woldComp;
+
+  %c#2% 
+     [naraComp@-36.253];
+     [naraAcc@-107.292];
+     [combAcc@-12.745];
+     [woldComp@3.496];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#3% 
+     [naraComp@-33.262];
+     [naraAcc@-106.465];
+     [combAcc@-16.166];
+     [woldComp@4.455];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#4% 
+     [naraComp@-39.414];
+     [naraAcc@-105.327];
+     [combAcc@-15.235];
+     [woldComp@3.294];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#5% 
+     [naraComp@-34.779];
+     [naraAcc@-107.312];
+     [combAcc@-13.281];
+     [woldComp@4.413];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#6% 
+     [naraComp@-31.05];
+     [naraAcc@-107.963];
+     [combAcc@-14.131];
+     [woldComp@4.681];
+     naraComp naraAcc combAcc woldComp;
+
+  
+OUTPUT:
+TECH1 TECH8 TECH11 TECH14 stdyx CINTERVAL ENTROPY;
+SAVEDATA:
+FILE IS fixed.dat; SAVE = cprobabilities;
+PLOT:
+TYPE = PLOT3;

@@ -1,6 +1,6 @@
 Mplus VERSION 8.5
 MUTHEN & MUTHEN
-09/16/2021  11:50 AM
+09/29/2021   5:13 PM
 
 INPUT INSTRUCTIONS
 
@@ -18,7 +18,7 @@ INPUT INSTRUCTIONS
                                                      starts = 0; stscale = 5;
                                                      optseed = 701525;
                                                      processors = 4(starts);
-                                                     lrtbootstrap = 100;
+                                                     lrtbootstrap = 500;
                                                      lrtstarts = 0 0 1000 250;
   MODEL:
   %OVERALL%
@@ -1149,7 +1149,7 @@ TECHNICAL 14 OUTPUT
      Random Starts Specification for the k Class Model for Generated Data
         Number of initial stage random starts                1000
         Number of final stage optimizations                   250
-     Number of bootstrap draws requested                      100
+     Number of bootstrap draws requested                      500
 
 
      PARAMETRIC BOOTSTRAPPED LIKELIHOOD RATIO TEST FOR 2 (H0) VERSUS 3 CLASSES
@@ -1158,7 +1158,13 @@ TECHNICAL 14 OUTPUT
           2 Times the Loglikelihood Difference            513.486
           Difference in the Number of Parameters               10
           Approximate P-Value                              0.0000
-          Successful Bootstrap Draws                          100
+          Successful Bootstrap Draws                          500
+
+     WARNING:  OF THE 500 BOOTSTRAP DRAWS, 263 DRAWS HAD BOTH A SMALLER LRT VALUE THAN THE
+     OBSERVED LRT VALUE AND NOT A REPLICATED BEST LOGLIKELIHOOD VALUE FOR THE 3-CLASS MODEL.
+     THIS MEANS THAT THE P-VALUE MAY NOT BE TRUSTWORTHY DUE TO LOCAL MAXIMA.
+     INCREASE THE NUMBER OF RANDOM STARTS USING THE LRTSTARTS OPTION.
+
 
 
 SAMPLE STATISTICS FOR ESTIMATED FACTOR SCORES
@@ -1226,9 +1232,9 @@ SAVEDATA INFORMATION
   Save missing symbol        *
 
 
-     Beginning Time:  11:50:07
-        Ending Time:  12:08:26
-       Elapsed Time:  00:18:19
+     Beginning Time:  17:13:25
+        Ending Time:  18:54:23
+       Elapsed Time:  01:40:58
 
 
 

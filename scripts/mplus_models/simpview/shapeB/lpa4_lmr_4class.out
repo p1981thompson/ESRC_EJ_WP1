@@ -1,6 +1,6 @@
 Mplus VERSION 8.5
 MUTHEN & MUTHEN
-08/26/2021   9:33 AM
+10/11/2021  10:29 PM
 
 INPUT INSTRUCTIONS
 
@@ -17,7 +17,8 @@ INPUT INSTRUCTIONS
    estimator = mlr; type = mixture;
                                                      starts = 0;
                                                      optseed = 501995;
-                                                     k-1starts = 6000 1500;
+                                                     k-1starts = 8000 2000;
+                                                     STSCALE = 5;
   MODEL:
   %OVERALL%
              f8age; f9age;
@@ -658,8 +659,8 @@ TECHNICAL 7 OUTPUT
 TECHNICAL 11 OUTPUT
 
      Random Starts Specifications for the k-1 Class Analysis Model
-        Number of initial stage random starts                6000
-        Number of final stage optimizations                  1500
+        Number of initial stage random starts                8000
+        Number of final stage optimizations                  2000
 
 
 
@@ -688,9 +689,9 @@ The following plots are available:
   Estimated probabilities for a categorical latent variable as a
     function of its covariates
 
-     Beginning Time:  09:33:27
-        Ending Time:  09:34:54
-       Elapsed Time:  00:01:27
+     Beginning Time:  22:29:03
+        Ending Time:  22:31:44
+       Elapsed Time:  00:02:41
 
 
 

@@ -1,0 +1,64 @@
+TITLE:
+ FMM Model A: 2 classes;
+DATA:
+FILE = "./mplus_models/compprof/fmm/cp_fmm_mbenchmark_b58d5c9e0bb38c95fc44291ccbaa69fd.dat";
+ 
+VARIABLE:
+NAMES = woldComp f8age f9age f10age naraRate woldVcb wiscVcb wiscPcmp wiscParr
+     wiscBloc wiscObja wiscBwsp cntSpan attnSel attnDiv attnOpp; 
+ MISSING=.;
+  classes = c(2);
+DEFINE:
+wiscVcb = wiscVcb/2; naraRate = naraRate/8;
+        wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
+        wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20;
+        attnOpp = attnOpp/4;
+ANALYSIS:
+estimator = mlr; type = mixture; starts = 500 50;
+              processors = 4(STARTS);
+MODEL:
+%OVERALL% 
+ 
+             f8age; f9age; f10age; 
+             lang perfiq wiscBwsp attn on f8age;
+             naraRate on f9age;
+             cntSpan on f10age; 
+                naraRate;
+                lang by woldComp wiscVcb woldVcb;
+                perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
+                workmem by wiscBwsp cntSpan; 
+                attn by attnSel attnDiv attnOpp;
+                 [lang@0]; [perfiq@0]; [workmem@0]; [attn@0];
+  
+                lang; perfiq; workmem; attn;  
+                  naraRate with lang; naraRate with perfiq;
+                  naraRate with workmem; naraRate with attn;
+                  lang with perfiq; lang with attn; lang with workmem;
+                  perfiq with workmem; perfiq with attn;
+                  workmem with attn;
+ %c#1% 
+                lang; perfiq; workmem; attn; 
+                  naraRate with lang; naraRate with perfiq;
+                  naraRate with workmem; naraRate with attn;
+                  lang with perfiq; lang with attn; lang with workmem;
+                  perfiq with workmem; perfiq with attn;
+                  workmem with attn; 
+              [naraRate 
+              woldComp woldVcb wiscVcb wiscPcmp 
+              wiscParr wiscBloc wiscObja wiscBwsp 
+              attnSel attnDiv attnOpp cntSpan];
+ %c#2% 
+                lang; perfiq; workmem; attn; 
+                  naraRate with lang; naraRate with perfiq;
+                  naraRate with workmem; naraRate with attn;
+                  lang with perfiq; lang with attn; lang with workmem;
+                  perfiq with workmem; perfiq with attn;
+                  workmem with attn; 
+              [naraRate 
+              woldComp woldVcb wiscVcb wiscPcmp 
+              wiscParr wiscBloc wiscObja wiscBwsp 
+              attnSel attnDiv attnOpp cntSpan];
+OUTPUT:
+TECH1; TECH8; TECH11;
+PLOT:
+TYPE = PLOT3;

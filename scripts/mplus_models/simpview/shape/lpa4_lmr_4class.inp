@@ -12,6 +12,7 @@ ANALYSIS:
                                                    starts = 0;
                                                    optseed = 544009;
                                                    k-1starts = 20 4;
+                                                   STSCALE = 5;
 MODEL:
 %OVERALL%
            f8age; f9age;

@@ -1,0 +1,23 @@
+TITLE:
+CFA - ExecFun two factor 
+DATA:
+FILE = "./mplus_models/compprof/cfa/ef_2cfa_37008ef94ccf02c67a37d15f0d91b770.dat";
+ 
+VARIABLE:
+NAMES = f8age f10age wiscBwsp cntspan attnSel attnDiv attnOpp; 
+ MISSING=.;
+ 
+DEFINE:
+attnDiv = attnDiv/20;
+          attnOpp = attnOpp/4;
+ANALYSIS:
+estimator = mlr; type = general; starts = 20;
+MODEL:
+ f8age; f10age;
+            wiscBwsp attn on f8age;
+            cntSpan on f10age;
+            workmem by wiscBwsp cntSpan;
+            attn by attnSel attnDiv attnOpp;
+            attn with workmem;
+OUTPUT:
+TECH1; TECH4; stdyx; modindices;

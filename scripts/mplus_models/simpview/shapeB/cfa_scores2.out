@@ -1,13 +1,13 @@
 Mplus VERSION 8.5
 MUTHEN & MUTHEN
-08/24/2021   5:47 PM
+10/11/2021   8:07 PM
 
 INPUT INSTRUCTIONS
 
   TITLE:
    Confirmatory Factor Analysis - modification1 comprehension tasks;
   DATA:
-  FILE = "./mplus_models/simpview/shapeB/cfa_scores_5d1661a61d02e40cc3ff92203e61da3c.dat";
+  FILE = "./mplus_models/simpview/shapeB/cfa_scores1_5d1661a61d02e40cc3ff92203e61da3c.dat";
 
   VARIABLE:
   NAMES = cidB3153 naraComp naraAcc combAcc woldComp f8age f9age;
@@ -70,7 +70,7 @@ Maximum number of iterations for H1                           2000
 Convergence criterion for H1                             0.100D-03
 
 Input data file(s)
-  ./mplus_models/simpview/shapeB/cfa_scores_5d1661a61d02e40cc3ff92203e61da3c.dat
+  ./mplus_models/simpview/shapeB/cfa_scores1_5d1661a61d02e40cc3ff92203e61da3c.da
 
 Input data format  FREE
 
@@ -877,9 +877,9 @@ SAVEDATA INFORMATION
   Save missing symbol        *
 
 
-     Beginning Time:  17:47:35
-        Ending Time:  17:47:35
-       Elapsed Time:  00:00:00
+     Beginning Time:  20:07:33
+        Ending Time:  20:07:34
+       Elapsed Time:  00:00:01
 
 
 

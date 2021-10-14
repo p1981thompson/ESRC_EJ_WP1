@@ -1,0 +1,1145 @@
+Mplus VERSION 8.5
+MUTHEN & MUTHEN
+08/06/2021  12:01 PM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+  Confirmatory Factor Analysis - 4-factor (no rate);
+  DATA:
+  FILE = "./mplus_models/compprof/cfa/cp_cfa_3f_19feacc4dae7ab5270eb615cbe68dab4.dat";
+
+  VARIABLE:
+  NAMES = woldComp f8age f10age woldVcb wiscVcb wiscPcmp wiscParr wiscBloc wiscObja
+       wiscBwsp cntspan attnSel attnDiv attnOpp;
+   MISSING=.;
+
+  DEFINE:
+  wiscVcb = wiscVcb/2;
+            wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
+            wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20;
+            attnOpp = attnOpp/4;
+  ANALYSIS:
+  estimator = mlr; type = general; starts = 20;
+  MODEL:
+   f8age; f10age;
+              lang perfiq wiscBwsp attn on f8age;
+              cntSpan on f10age;
+              lang by woldComp wiscVcb woldVcb;
+              perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
+              workmem by wiscBwsp cntSpan;
+              attn by attnSel attnDiv attnOpp;
+              lang with perfiq; lang with attn; lang with workmem;
+              perfiq with workmem; perfiq with attn;
+              workmem with attn;
+  OUTPUT:
+  TECH1; TECH4; stdyx; modindices;
+  PLOT:
+  TYPE = PLOT3;
+
+
+
+*** WARNING
+  Data set contains cases with missing on all variables.
+  These cases were not included in the analysis.
+  Number of cases with missing on all variables:  5
+   1 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
+
+
+
+
+Confirmatory Factor Analysis - 4-factor (no rate);
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                         243
+
+Number of dependent variables                                   12
+Number of independent variables                                  2
+Number of continuous latent variables                            4
+
+Observed dependent variables
+
+  Continuous
+   WOLDCOMP    WOLDVCB     WISCVCB     WISCPCMP    WISCPARR    WISCBLOC
+   WISCOBJA    WISCBWSP    CNTSPAN     ATTNSEL     ATTNDIV     ATTNOPP
+
+Observed independent variables
+   F8AGE       F10AGE
+
+Continuous latent variables
+   LANG        PERFIQ      WORKMEM     ATTN
+
+
+Estimator                                                      MLR
+Information matrix                                        OBSERVED
+Maximum number of iterations                                  1000
+Convergence criterion                                    0.500D-04
+Maximum number of steepest descent iterations                   20
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+Random Starts Specifications
+  Number of random starts                                       20
+  Random starts scale                                    0.500D+01
+
+Input data file(s)
+  ./mplus_models/compprof/cfa/cp_cfa_3f_19feacc4dae7ab5270eb615cbe68dab4.dat
+
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns            31
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT
+
+
+           Covariance Coverage
+              WOLDCOMP      WOLDVCB       WISCVCB       WISCPCMP      WISCPARR
+              ________      ________      ________      ________      ________
+ WOLDCOMP       0.811
+ WOLDVCB        0.790         0.790
+ WISCVCB        0.790         0.774         0.802
+ WISCPCMP       0.798         0.778         0.802         0.811
+ WISCPARR       0.782         0.765         0.790         0.794         0.794
+ WISCBLOC       0.761         0.745         0.765         0.770         0.757
+ WISCOBJA       0.757         0.741         0.765         0.770         0.761
+ WISCBWSP       0.778         0.765         0.786         0.790         0.778
+ CNTSPAN        0.691         0.679         0.691         0.695         0.683
+ ATTNSEL        0.782         0.770         0.782         0.786         0.778
+ ATTNDIV        0.741         0.728         0.745         0.749         0.737
+ ATTNOPP        0.782         0.765         0.782         0.786         0.774
+ F8AGE          0.811         0.790         0.802         0.811         0.794
+ F10AGE         0.728         0.712         0.720         0.728         0.712
+
+
+           Covariance Coverage
+              WISCBLOC      WISCOBJA      WISCBWSP      CNTSPAN       ATTNSEL
+              ________      ________      ________      ________      ________
+ WISCBLOC       0.770
+ WISCOBJA       0.741         0.770
+ WISCBWSP       0.757         0.757         0.790
+ CNTSPAN        0.667         0.671         0.687         0.872
+ ATTNSEL        0.749         0.753         0.774         0.687         0.794
+ ATTNDIV        0.716         0.712         0.737         0.658         0.749
+ ATTNOPP        0.749         0.749         0.770         0.683         0.786
+ F8AGE          0.770         0.770         0.790         0.704         0.794
+ F10AGE         0.695         0.695         0.716         0.872         0.716
+
+
+           Covariance Coverage
+              ATTNDIV       ATTNOPP       F8AGE         F10AGE
+              ________      ________      ________      ________
+ ATTNDIV        0.753
+ ATTNOPP        0.745         0.794
+ F8AGE          0.753         0.794         0.823
+ F10AGE         0.679         0.712         0.741         0.918
+
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     WOLDCOMP              6.360      -0.217       2.000    1.52%       5.000      6.000      6.000
+             197.000       2.434       0.263      10.000    2.03%       7.000      8.000
+     WOLDVCB               5.974      -0.435       0.000    0.52%       4.000      6.000      6.000
+             192.000       3.921      -0.090      10.000    1.56%       7.000      8.000
+     WISCVCB               8.826       0.138       0.000    1.03%       7.000      8.000      9.000
+             195.000       7.518       1.525      18.000    1.03%       9.000     11.000
+     WISCPCMP              6.959      -0.464       0.000    0.51%       5.000      7.000      7.000
+             197.000       5.582      -0.133      12.000    2.03%       8.000      9.000
+     WISCPARR              2.944       0.683       0.600    5.70%       0.800      2.200      2.400
+             193.000       3.723      -0.226       8.800    0.52%       3.200      4.400
+     WISCBLOC              4.643       0.119       0.833    0.53%       2.667      4.000      4.667
+             187.000       3.962      -0.458       9.833    0.53%       5.333      6.333
+     WISCOBJA              4.180       0.174       0.600    0.53%       2.600      3.400      3.600
+             187.000       3.107      -1.132       7.600    1.60%       4.400      6.200
+     WISCBWSP              3.208       0.898       1.000    1.04%       3.000      3.000      3.000
+             192.000       0.582       3.695       7.000    0.52%       3.000      4.000
+     CNTSPAN               3.083      -0.404       0.500    3.30%       2.500      3.000      3.000
+             212.000       0.733       1.281       5.000    3.77%       3.500      3.500
+     ATTNSEL               5.819       3.824       0.000    0.52%       4.195      4.928      5.316
+             193.000       8.292      22.909      27.900    0.52%       5.809      6.794
+     ATTNDIV               0.358       5.688      -0.184    0.55%       0.010      0.085      0.147
+             183.000       0.608      42.130       7.506    0.55%       0.208      0.457
+     ATTNOPP               1.322       4.445      -0.500    0.52%       0.625      1.000      1.125
+             193.000       1.270      32.683      11.375    0.52%       1.250      1.750
+     F8AGE               103.565       2.190      99.000    2.50%     102.000    102.000    103.000
+             200.000      10.286       5.717     117.000    1.50%     103.000    105.000
+     F10AGE              127.448       1.799     120.000    0.45%     125.000    126.000    127.000
+             223.000      10.274       4.244     142.000    0.45%     127.000    129.000
+
+
+RANDOM STARTS RESULTS RANKED FROM THE BEST TO THE WORST FIT FUNCTION VALUES
+
+Fit function values at local maxima and random start numbers:
+
+             86.6792         19
+             86.6792         18
+             86.6792         1
+             86.6792         8
+             86.6792         2
+             86.6792         7
+             86.6792         3
+             86.6792         5
+             86.6792         11
+             86.6792         4
+             86.6792         unperturbed
+             86.6792         10
+             86.6792         16
+
+8 starting value run(s) did not converge.
+
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                       54
+
+Loglikelihood
+
+          H0 Value                       -5259.099
+          H0 Scaling Correction Factor      2.2199
+            for MLR
+          H1 Value                       -5215.760
+          H1 Scaling Correction Factor      1.4927
+            for MLR
+
+Information Criteria
+
+          Akaike (AIC)                   10626.199
+          Bayesian (BIC)                 10814.824
+          Sample-Size Adjusted BIC       10643.652
+            (n* = (n + 2) / 24)
+
+Chi-Square Test of Model Fit
+
+          Value                             97.555*
+          Degrees of Freedom                    65
+          P-Value                           0.0056
+          Scaling Correction Factor         0.8885
+            for MLR
+
+*   The chi-square value for MLM, MLMV, MLR, ULSMV, WLSM and WLSMV cannot be used
+    for chi-square difference testing in the regular way.  MLM, MLR and WLSM
+    chi-square difference testing is described on the Mplus website.  MLMV, WLSMV,
+    and ULSMV difference testing is done using the DIFFTEST option.
+
+RMSEA (Root Mean Square Error Of Approximation)
+
+          Estimate                           0.045
+          90 Percent C.I.                    0.025  0.063
+          Probability RMSEA <= .05           0.643
+
+CFI/TLI
+
+          CFI                                0.900
+          TLI                                0.862
+
+Chi-Square Test of Model Fit for the Baseline Model
+
+          Value                            415.590
+          Degrees of Freedom                    90
+          P-Value                           0.0000
+
+SRMR (Standardized Root Mean Square Residual)
+
+          Value                              0.059
+
+
+
+MODEL RESULTS
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ LANG     BY
+    WOLDCOMP           1.000      0.000    999.000    999.000
+    WISCVCB            1.482      0.305      4.860      0.000
+    WOLDVCB            1.353      0.245      5.525      0.000
+
+ PERFIQ   BY
+    WISCPCMP           1.000      0.000    999.000    999.000
+    WISCPARR           0.771      0.167      4.620      0.000
+    WISCBLOC           1.270      0.271      4.694      0.000
+    WISCOBJA           1.069      0.180      5.926      0.000
+
+ WORKMEM  BY
+    WISCBWSP           1.000      0.000    999.000    999.000
+    CNTSPAN            1.296      0.433      2.996      0.003
+
+ ATTN     BY
+    ATTNSEL            1.000      0.000    999.000    999.000
+    ATTNDIV            0.190      0.104      1.837      0.066
+    ATTNOPP            0.311      0.079      3.912      0.000
+
+ LANG     ON
+    F8AGE              0.047      0.028      1.667      0.096
+
+ PERFIQ   ON
+    F8AGE              0.044      0.035      1.254      0.210
+
+ ATTN     ON
+    F8AGE             -0.053      0.041     -1.286      0.199
+
+ WISCBWSP ON
+    F8AGE              0.034      0.020      1.653      0.098
+
+ CNTSPAN  ON
+    F10AGE             0.035      0.030      1.176      0.240
+
+ LANG     WITH
+    PERFIQ             0.479      0.178      2.695      0.007
+    ATTN              -0.648      0.253     -2.563      0.010
+    WORKMEM            0.247      0.077      3.223      0.001
+
+ PERFIQ   WITH
+    WORKMEM            0.198      0.082      2.424      0.015
+    ATTN              -1.192      0.399     -2.988      0.003
+
+ WORKMEM  WITH
+    ATTN              -0.375      0.157     -2.382      0.017
+
+ F8AGE    WITH
+    WORKMEM           -0.041      0.148     -0.276      0.783
+
+ F10AGE   WITH
+    WORKMEM           -0.117      0.197     -0.595      0.552
+
+ F10AGE   WITH
+    F8AGE              0.402      0.966      0.416      0.677
+
+ Means
+    F8AGE            103.573      0.229    453.070      0.000
+    F10AGE           127.455      0.215    592.195      0.000
+
+ Intercepts
+    WOLDCOMP           1.509      2.908      0.519      0.604
+    WOLDVCB           -0.605      4.066     -0.149      0.882
+    WISCVCB            1.616      4.659      0.347      0.729
+    WISCPCMP           2.421      3.616      0.670      0.503
+    WISCPARR          -0.566      2.692     -0.210      0.833
+    WISCBLOC          -1.156      4.503     -0.257      0.797
+    WISCOBJA          -0.705      3.785     -0.186      0.852
+    WISCBWSP          -0.272      2.101     -0.129      0.897
+    CNTSPAN           -1.419      3.820     -0.371      0.710
+    ATTNSEL           11.347      4.318      2.628      0.009
+    ATTNDIV            1.431      1.082      1.322      0.186
+    ATTNOPP            3.037      1.131      2.684      0.007
+
+ Variances
+    F8AGE             10.289      2.018      5.099      0.000
+    F10AGE            10.281      1.722      5.969      0.000
+    WORKMEM            0.100      0.059      1.693      0.091
+
+ Residual Variances
+    WOLDCOMP           1.489      0.206      7.236      0.000
+    WOLDVCB            2.205      0.353      6.246      0.000
+    WISCVCB            5.460      0.843      6.479      0.000
+    WISCPCMP           4.252      0.613      6.934      0.000
+    WISCPARR           2.935      0.350      8.388      0.000
+    WISCBLOC           1.856      0.378      4.911      0.000
+    WISCOBJA           1.597      0.253      6.309      0.000
+    WISCBWSP           0.471      0.083      5.657      0.000
+    CNTSPAN            0.569      0.103      5.522      0.000
+    ATTNSEL            3.965      1.392      2.848      0.004
+    ATTNDIV            0.490      0.261      1.875      0.061
+    ATTNOPP            0.851      0.176      4.849      0.000
+    LANG               0.913      0.248      3.685      0.000
+    PERFIQ             1.302      0.448      2.909      0.004
+    ATTN               4.269      3.471      1.230      0.219
+
+
+STANDARDIZED MODEL RESULTS
+
+
+STDYX Standardization
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ LANG     BY
+    WOLDCOMP           0.621      0.064      9.746      0.000
+    WISCVCB            0.523      0.070      7.471      0.000
+    WOLDVCB            0.661      0.068      9.690      0.000
+
+ PERFIQ   BY
+    WISCPCMP           0.487      0.081      6.005      0.000
+    WISCPARR           0.460      0.068      6.781      0.000
+    WISCBLOC           0.731      0.064     11.486      0.000
+    WISCOBJA           0.697      0.058     12.074      0.000
+
+ WORKMEM  BY
+    WISCBWSP           0.416      0.107      3.882      0.000
+    CNTSPAN            0.478      0.118      4.056      0.000
+
+ ATTN     BY
+    ATTNSEL            0.721      0.180      3.999      0.000
+    ATTNDIV            0.491      0.163      3.019      0.003
+    ATTNOPP            0.573      0.199      2.871      0.004
+
+ LANG     ON
+    F8AGE              0.156      0.100      1.550      0.121
+
+ PERFIQ   ON
+    F8AGE              0.122      0.099      1.232      0.218
+
+ ATTN     ON
+    F8AGE             -0.082      0.075     -1.094      0.274
+
+ WISCBWSP ON
+    F8AGE              0.141      0.087      1.617      0.106
+
+ CNTSPAN  ON
+    F10AGE             0.131      0.110      1.194      0.233
+
+ LANG     WITH
+    PERFIQ             0.440      0.112      3.940      0.000
+    ATTN              -0.328      0.088     -3.741      0.000
+    WORKMEM            0.814      0.162      5.041      0.000
+
+ PERFIQ   WITH
+    WORKMEM            0.547      0.150      3.640      0.000
+    ATTN              -0.505      0.201     -2.511      0.012
+
+ WORKMEM  WITH
+    ATTN              -0.572      0.141     -4.053      0.000
+
+ F8AGE    WITH
+    WORKMEM           -0.040      0.146     -0.276      0.782
+
+ F10AGE   WITH
+    WORKMEM           -0.115      0.186     -0.620      0.535
+
+ F10AGE   WITH
+    F8AGE              0.039      0.094      0.416      0.678
+
+ Means
+    F8AGE             32.289      3.111     10.378      0.000
+    F10AGE            39.750      3.281     12.114      0.000
+
+ Intercepts
+    WOLDCOMP           0.969      1.867      0.519      0.604
+    WOLDVCB           -0.306      2.056     -0.149      0.882
+    WISCVCB            0.589      1.705      0.346      0.729
+    WISCPCMP           1.025      1.535      0.668      0.504
+    WISCPARR          -0.294      1.393     -0.211      0.833
+    WISCBLOC          -0.579      2.249     -0.257      0.797
+    WISCOBJA          -0.400      2.146     -0.186      0.852
+    WISCBWSP          -0.357      2.758     -0.129      0.897
+    CNTSPAN           -1.650      4.411     -0.374      0.708
+    ATTNSEL            3.947      1.616      2.443      0.015
+    ATTNDIV            1.781      1.275      1.396      0.163
+    ATTNOPP            2.699      1.169      2.310      0.021
+
+ Variances
+    F8AGE              1.000      0.000    999.000    999.000
+    F10AGE             1.000      0.000    999.000    999.000
+    WORKMEM            1.000      0.000    999.000    999.000
+
+ Residual Variances
+    WOLDCOMP           0.614      0.079      7.753      0.000
+    WOLDVCB            0.563      0.090      6.235      0.000
+    WISCVCB            0.726      0.073      9.914      0.000
+    WISCPCMP           0.763      0.079      9.655      0.000
+    WISCPARR           0.789      0.062     12.647      0.000
+    WISCBLOC           0.465      0.093      4.999      0.000
+    WISCOBJA           0.514      0.081      6.380      0.000
+    WISCBWSP           0.812      0.090      9.039      0.000
+    CNTSPAN            0.769      0.109      7.028      0.000
+    ATTNSEL            0.480      0.260      1.844      0.065
+    ATTNDIV            0.759      0.160      4.748      0.000
+    ATTNOPP            0.672      0.228      2.944      0.003
+    LANG               0.976      0.031     31.279      0.000
+    PERFIQ             0.985      0.024     40.567      0.000
+    ATTN               0.993      0.012     79.904      0.000
+
+
+R-SQUARE
+
+    Observed                                        Two-Tailed
+    Variable        Estimate       S.E.  Est./S.E.    P-Value
+
+    WOLDCOMP           0.386      0.079      4.873      0.000
+    WOLDVCB            0.437      0.090      4.845      0.000
+    WISCVCB            0.274      0.073      3.735      0.000
+    WISCPCMP           0.237      0.079      3.002      0.003
+    WISCPARR           0.211      0.062      3.390      0.001
+    WISCBLOC           0.535      0.093      5.743      0.000
+    WISCOBJA           0.486      0.081      6.037      0.000
+    WISCBWSP           0.188      0.090      2.095      0.036
+    CNTSPAN            0.231      0.109      2.110      0.035
+    ATTNSEL            0.520      0.260      1.999      0.046
+    ATTNDIV            0.241      0.160      1.510      0.131
+    ATTNOPP            0.328      0.228      1.436      0.151
+
+     Latent                                         Two-Tailed
+    Variable        Estimate       S.E.  Est./S.E.    P-Value
+
+    LANG               0.024      0.031      0.775      0.438
+    PERFIQ             0.015      0.024      0.616      0.538
+    ATTN               0.007      0.012      0.547      0.584
+
+
+QUALITY OF NUMERICAL RESULTS
+
+     Condition Number for the Information Matrix              0.360E-08
+       (ratio of smallest to largest eigenvalue)
+
+
+MODEL MODIFICATION INDICES
+
+NOTE:  Modification indices for direct effects of observed dependent variables
+regressed on covariates may not be included.  To include these, request
+MODINDICES (ALL).
+
+Minimum M.I. value for printing the modification index    10.000
+
+                                   M.I.     E.P.C.  Std E.P.C.  StdYX E.P.C.
+
+No modification indices above the minimum value.
+
+
+
+TECHNICAL 1 OUTPUT
+
+
+     PARAMETER SPECIFICATION
+
+
+           NU
+              WOLDCOMP      WOLDVCB       WISCVCB       WISCPCMP      WISCPARR
+              ________      ________      ________      ________      ________
+                  1             2             3             4             5
+
+
+           NU
+              WISCBLOC      WISCOBJA      WISCBWSP      CNTSPAN       ATTNSEL
+              ________      ________      ________      ________      ________
+                  6             7             0             0             8
+
+
+           NU
+              ATTNDIV       ATTNOPP       F8AGE         F10AGE
+              ________      ________      ________      ________
+                  9            10             0             0
+
+
+           LAMBDA
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+ WOLDCOMP           0             0             0             0             0
+ WOLDVCB           11             0             0             0             0
+ WISCVCB           12             0             0             0             0
+ WISCPCMP           0             0             0             0             0
+ WISCPARR           0            13             0             0             0
+ WISCBLOC           0            14             0             0             0
+ WISCOBJA           0            15             0             0             0
+ WISCBWSP           0             0             0             0             0
+ CNTSPAN            0             0             0             0             0
+ ATTNSEL            0             0             0             0             0
+ ATTNDIV            0             0             0            16             0
+ ATTNOPP            0             0             0            17             0
+ F8AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           LAMBDA
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+ WOLDCOMP           0             0             0
+ WOLDVCB            0             0             0
+ WISCVCB            0             0             0
+ WISCPCMP           0             0             0
+ WISCPARR           0             0             0
+ WISCBLOC           0             0             0
+ WISCOBJA           0             0             0
+ WISCBWSP           0             0             0
+ CNTSPAN            0             0             0
+ ATTNSEL            0             0             0
+ ATTNDIV            0             0             0
+ ATTNOPP            0             0             0
+ F8AGE              0             0             0
+ F10AGE             0             0             0
+
+
+           THETA
+              WOLDCOMP      WOLDVCB       WISCVCB       WISCPCMP      WISCPARR
+              ________      ________      ________      ________      ________
+ WOLDCOMP          18
+ WOLDVCB            0            19
+ WISCVCB            0             0            20
+ WISCPCMP           0             0             0            21
+ WISCPARR           0             0             0             0            22
+ WISCBLOC           0             0             0             0             0
+ WISCOBJA           0             0             0             0             0
+ WISCBWSP           0             0             0             0             0
+ CNTSPAN            0             0             0             0             0
+ ATTNSEL            0             0             0             0             0
+ ATTNDIV            0             0             0             0             0
+ ATTNOPP            0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           THETA
+              WISCBLOC      WISCOBJA      WISCBWSP      CNTSPAN       ATTNSEL
+              ________      ________      ________      ________      ________
+ WISCBLOC          23
+ WISCOBJA           0            24
+ WISCBWSP           0             0             0
+ CNTSPAN            0             0             0             0
+ ATTNSEL            0             0             0             0            25
+ ATTNDIV            0             0             0             0             0
+ ATTNOPP            0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           THETA
+              ATTNDIV       ATTNOPP       F8AGE         F10AGE
+              ________      ________      ________      ________
+ ATTNDIV           26
+ ATTNOPP            0            27
+ F8AGE              0             0             0
+ F10AGE             0             0             0             0
+
+
+           ALPHA
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+                  0             0             0             0            28
+
+
+           ALPHA
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+                 29            30            31
+
+
+           BETA
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+ LANG               0             0             0             0             0
+ PERFIQ             0             0             0             0             0
+ WORKMEM            0             0             0             0             0
+ ATTN               0             0             0             0             0
+ WISCBWSP           0             0             0             0             0
+ CNTSPAN            0             0            36             0             0
+ F8AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           BETA
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+ LANG               0            32             0
+ PERFIQ             0            33             0
+ WORKMEM            0             0             0
+ ATTN               0            34             0
+ WISCBWSP           0            35             0
+ CNTSPAN            0             0            37
+ F8AGE              0             0             0
+ F10AGE             0             0             0
+
+
+           PSI
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+ LANG              38
+ PERFIQ            39            40
+ WORKMEM           41            42            43
+ ATTN              44            45            46            47
+ WISCBWSP           0             0             0             0            48
+ CNTSPAN            0             0             0             0             0
+ F8AGE              0             0            50             0             0
+ F10AGE             0             0            52             0             0
+
+
+           PSI
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+ CNTSPAN           49
+ F8AGE              0            51
+ F10AGE             0            53            54
+
+
+     STARTING VALUES
+
+
+           NU
+              WOLDCOMP      WOLDVCB       WISCVCB       WISCPCMP      WISCPARR
+              ________      ________      ________      ________      ________
+                6.360         5.974         8.826         6.959         2.944
+
+
+           NU
+              WISCBLOC      WISCOBJA      WISCBWSP      CNTSPAN       ATTNSEL
+              ________      ________      ________      ________      ________
+                4.643         4.180         0.000         0.000         5.819
+
+
+           NU
+              ATTNDIV       ATTNOPP       F8AGE         F10AGE
+              ________      ________      ________      ________
+                0.358         1.322         0.000         0.000
+
+
+           LAMBDA
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+ WOLDCOMP       1.000         0.000         0.000         0.000         0.000
+ WOLDVCB        1.255         0.000         0.000         0.000         0.000
+ WISCVCB        1.439         0.000         0.000         0.000         0.000
+ WISCPCMP       0.000         1.000         0.000         0.000         0.000
+ WISCPARR       0.000         0.788         0.000         0.000         0.000
+ WISCBLOC       0.000         1.242         0.000         0.000         0.000
+ WISCOBJA       0.000         1.245         0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000         0.000         1.000
+ CNTSPAN        0.000         0.000         0.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000         1.000         0.000
+ ATTNDIV        0.000         0.000         0.000         0.092         0.000
+ ATTNOPP        0.000         0.000         0.000         0.211         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+ WOLDCOMP       0.000         0.000         0.000
+ WOLDVCB        0.000         0.000         0.000
+ WISCVCB        0.000         0.000         0.000
+ WISCPCMP       0.000         0.000         0.000
+ WISCPARR       0.000         0.000         0.000
+ WISCBLOC       0.000         0.000         0.000
+ WISCOBJA       0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000
+ CNTSPAN        1.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000
+ ATTNDIV        0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000
+ F8AGE          0.000         1.000         0.000
+ F10AGE         0.000         0.000         1.000
+
+
+           THETA
+              WOLDCOMP      WOLDVCB       WISCVCB       WISCPCMP      WISCPARR
+              ________      ________      ________      ________      ________
+ WOLDCOMP       1.217
+ WOLDVCB        0.000         1.961
+ WISCVCB        0.000         0.000         3.759
+ WISCPCMP       0.000         0.000         0.000         2.791
+ WISCPARR       0.000         0.000         0.000         0.000         1.862
+ WISCBLOC       0.000         0.000         0.000         0.000         0.000
+ WISCOBJA       0.000         0.000         0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000         0.000         0.000
+ CNTSPAN        0.000         0.000         0.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000         0.000         0.000
+ ATTNDIV        0.000         0.000         0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              WISCBLOC      WISCOBJA      WISCBWSP      CNTSPAN       ATTNSEL
+              ________      ________      ________      ________      ________
+ WISCBLOC       1.981
+ WISCOBJA       0.000         1.553
+ WISCBWSP       0.000         0.000         0.000
+ CNTSPAN        0.000         0.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000         0.000         4.146
+ ATTNDIV        0.000         0.000         0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              ATTNDIV       ATTNOPP       F8AGE         F10AGE
+              ________      ________      ________      ________
+ ATTNDIV        0.304
+ ATTNOPP        0.000         0.635
+ F8AGE          0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000
+
+
+           ALPHA
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         3.208
+
+
+           ALPHA
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+                3.083       103.565       127.448
+
+
+           BETA
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+ LANG           0.000         0.000         0.000         0.000         0.000
+ PERFIQ         0.000         0.000         0.000         0.000         0.000
+ WORKMEM        0.000         0.000         0.000         0.000         0.000
+ ATTN           0.000         0.000         0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         1.000         0.000         0.000
+ CNTSPAN        0.000         0.000         0.221         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+ LANG           0.000         0.000         0.000
+ PERFIQ         0.000         0.000         0.000
+ WORKMEM        0.000         0.000         0.000
+ ATTN           0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000
+ CNTSPAN        0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000
+
+
+           PSI
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+ LANG           0.050
+ PERFIQ         0.000         0.050
+ WORKMEM        0.000         0.000         0.050
+ ATTN           0.000         0.000         0.000         0.050
+ WISCBWSP       0.000         0.000         0.000         0.000         0.291
+ CNTSPAN        0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+ CNTSPAN        0.366
+ F8AGE          0.000         5.143
+ F10AGE         0.000         0.000         5.137
+
+
+TECHNICAL 4 OUTPUT
+
+
+     ESTIMATES DERIVED FROM THE MODEL
+
+
+           ESTIMATED MEANS FOR THE LATENT VARIABLES
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+                4.858         4.540         0.000        -5.520         3.202
+
+
+           ESTIMATED MEANS FOR THE LATENT VARIABLES
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+                3.071       103.573       127.455
+
+
+           S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+                2.915         3.621         0.000         4.294         0.055
+
+
+           S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+                0.059         0.229         0.215
+
+
+           EST./S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+                1.666         1.254         0.000        -1.285        58.188
+
+
+           EST./S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+               52.357       453.070       592.195
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+                0.096         0.210         1.000         0.199         0.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+                0.000         0.000         0.000
+
+
+           ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+ LANG           0.936
+ PERFIQ         0.501         1.322
+ WORKMEM        0.245         0.196         0.100
+ ATTN          -0.674        -1.216        -0.373         4.298
+ WISCBWSP       0.261         0.211         0.099        -0.391         0.581
+ CNTSPAN        0.318         0.255         0.126        -0.484         0.125
+ F8AGE          0.483         0.451        -0.041        -0.548         0.304
+ F10AGE         0.019         0.018        -0.117        -0.021        -0.104
+
+
+           ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+ CNTSPAN        0.739
+ F8AGE         -0.039        10.289
+ F10AGE         0.210         0.402        10.281
+
+
+           S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+ LANG           0.243
+ PERFIQ         0.184         0.455
+ WORKMEM        0.076         0.082         0.059
+ ATTN           0.255         0.404         0.157         3.468
+ WISCBWSP       0.076         0.082         0.059         0.154         0.100
+ CNTSPAN        0.086         0.095         0.056         0.294         0.056
+ F8AGE          0.314         0.401         0.148         0.456         0.215
+ F10AGE         0.044         0.047         0.197         0.052         0.195
+
+
+           S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+ CNTSPAN        0.092
+ F8AGE          0.174         2.018
+ F10AGE         0.175         0.966         1.722
+
+
+           EST./S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+ LANG           3.846
+ PERFIQ         2.722         2.906
+ WORKMEM        3.234         2.400         1.693
+ ATTN          -2.638        -3.007        -2.365         1.239
+ WISCBWSP       3.429         2.563         1.685        -2.535         5.822
+ CNTSPAN        3.676         2.693         2.254        -1.646         2.233
+ F8AGE          1.536         1.125        -0.276        -1.203         1.418
+ F10AGE         0.424         0.376        -0.595        -0.415        -0.533
+
+
+           EST./S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+ CNTSPAN        7.996
+ F8AGE         -0.223         5.099
+ F10AGE         1.199         0.416         5.969
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+ LANG           0.000
+ PERFIQ         0.006         0.004
+ WORKMEM        0.001         0.016         0.091
+ ATTN           0.008         0.003         0.018         0.215
+ WISCBWSP       0.001         0.010         0.092         0.011         0.000
+ CNTSPAN        0.000         0.007         0.024         0.100         0.026
+ F8AGE          0.124         0.260         0.783         0.229         0.156
+ F10AGE         0.671         0.707         0.552         0.678         0.594
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+ CNTSPAN        0.000
+ F8AGE          0.824         0.000
+ F10AGE         0.230         0.677         0.000
+
+
+           ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+ LANG           1.000
+ PERFIQ         0.450         1.000
+ WORKMEM        0.798         0.538         1.000
+ ATTN          -0.336        -0.510        -0.567         1.000
+ WISCBWSP       0.354         0.241         0.410        -0.247         1.000
+ CNTSPAN        0.382         0.258         0.462        -0.271         0.190
+ F8AGE          0.156         0.122        -0.040        -0.082         0.124
+ F10AGE         0.006         0.005        -0.115        -0.003        -0.042
+
+
+           ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+ CNTSPAN        1.000
+ F8AGE         -0.014         1.000
+ F10AGE         0.076         0.039         1.000
+
+
+           S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+ LANG           0.000
+ PERFIQ         0.112         0.000
+ WORKMEM        0.158         0.153         0.000
+ ATTN           0.091         0.202         0.144         0.000
+ WISCBWSP       0.078         0.069         0.108         0.052         0.000
+ CNTSPAN        0.077         0.078         0.117         0.083         0.078
+ F8AGE          0.100         0.099         0.146         0.075         0.083
+ F10AGE         0.014         0.013         0.186         0.008         0.079
+
+
+           S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+ CNTSPAN        0.000
+ F8AGE          0.063         0.000
+ F10AGE         0.061         0.094         0.000
+
+
+           EST./S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+ LANG         999.000
+ PERFIQ         4.023       999.000
+ WORKMEM        5.048         3.507       999.000
+ ATTN          -3.693        -2.521        -3.931       999.000
+ WISCBWSP       4.546         3.471         3.813        -4.729       999.000
+ CNTSPAN        4.962         3.287         3.945        -3.264         2.445
+ F8AGE          1.550         1.232        -0.276        -1.094         1.496
+ F10AGE         0.428         0.380        -0.620        -0.410        -0.536
+
+
+           EST./S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+ CNTSPAN      999.000
+ F8AGE         -0.222       999.000
+ F10AGE         1.241         0.416       999.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              LANG          PERFIQ        WORKMEM       ATTN          WISCBWSP
+              ________      ________      ________      ________      ________
+ LANG           0.000
+ PERFIQ         0.000         0.000
+ WORKMEM        0.000         0.000         0.000
+ ATTN           0.000         0.012         0.000         0.000
+ WISCBWSP       0.000         0.001         0.000         0.000         0.000
+ CNTSPAN        0.000         0.001         0.000         0.001         0.014
+ F8AGE          0.121         0.218         0.782         0.274         0.135
+ F10AGE         0.669         0.704         0.535         0.682         0.592
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              CNTSPAN       F8AGE         F10AGE
+              ________      ________      ________
+ CNTSPAN        0.000
+ F8AGE          0.824         0.000
+ F10AGE         0.215         0.678         0.000
+
+
+SAMPLE STATISTICS FOR ESTIMATED FACTOR SCORES
+
+
+     SAMPLE STATISTICS
+
+
+           Means
+              LANG          LANG_SE       PERFIQ        PERFIQ_S      WORKMEM
+              ________      ________      ________      ________      ________
+                4.858         0.608         4.540         0.683         0.000
+
+
+           Means
+              WORKMEM_      ATTN          ATTN_SE
+              ________      ________      ________
+                0.205        -5.520         1.328
+
+
+           Covariances
+              LANG          LANG_SE       PERFIQ        PERFIQ_S      WORKMEM
+              ________      ________      ________      ________      ________
+ LANG           0.547
+ LANG_SE        0.000         0.019
+ PERFIQ         0.394        -0.001         0.812
+ PERFIQ_S      -0.005         0.027        -0.006         0.044
+ WORKMEM        0.159        -0.001         0.149        -0.002         0.058
+ WORKMEM_       0.000         0.005        -0.001         0.007         0.000
+ ATTN          -0.560        -0.002        -0.922         0.004        -0.267
+ ATTN_SE        0.000         0.043        -0.011         0.065        -0.002
+
+
+           Covariances
+              WORKMEM_      ATTN          ATTN_SE
+              ________      ________      ________
+ WORKMEM_       0.001
+ ATTN           0.001         2.427
+ ATTN_SE        0.011         0.009         0.108
+
+
+           Correlations
+              LANG          LANG_SE       PERFIQ        PERFIQ_S      WORKMEM
+              ________      ________      ________      ________      ________
+ LANG           1.000
+ LANG_SE        0.000         1.000
+ PERFIQ         0.591        -0.009         1.000
+ PERFIQ_S      -0.035         0.960        -0.030         1.000
+ WORKMEM        0.896        -0.018         0.686        -0.049         1.000
+ WORKMEM_      -0.010         0.988        -0.028         0.969        -0.035
+ ATTN          -0.486        -0.010        -0.657         0.013        -0.712
+ ATTN_SE        0.002         0.950        -0.038         0.949        -0.022
+
+
+           Correlations
+              WORKMEM_      ATTN          ATTN_SE
+              ________      ________      ________
+ WORKMEM_       1.000
+ ATTN           0.013         1.000
+ ATTN_SE        0.966         0.018         1.000
+
+
+PLOT INFORMATION
+
+The following plots are available:
+
+  Histograms (sample values, estimated factor scores, estimated values, residuals)
+  Scatterplots (sample values, estimated factor scores, estimated values, residuals)
+  Latent variable distribution plots
+
+     Beginning Time:  12:01:42
+        Ending Time:  12:01:57
+       Elapsed Time:  00:00:15
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2020 Muthen & Muthen

@@ -1,0 +1,13 @@
+TITLE:
+Data check - Descriptive statistics;
+DATA:
+FILE = "./mplus_models/compprof/desc/cp_sim_0f0fa573ee7e720dab2a9d705c835f4d.dat";
+ 
+VARIABLE:
+NAMES = naraComp naraAcc combAcc woldComp f8age f9age f10age naraRate woldVcb
+     wiscVcb wiscPcmp wiscCode wiscParr wiscBloc wiscObja wiscBwsp cntspan attnSel
+     attnDiv attnOpp sdqHyp; 
+ MISSING=.;
+ 
+ANALYSIS:
+type = basic;

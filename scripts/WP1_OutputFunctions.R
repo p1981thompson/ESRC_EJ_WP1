@@ -5,52 +5,6 @@ if (!require("here")) install.packages("here", quiet = TRUE)
 ### function takes single argument of type mplus.model.list (created by readModels function)
 ### must also have MplusAutomation package loaded, and scientific notation turned off
 
-# lpa_enum_table <- function(output = NA){
-# 
-#   # Extract initial summary table from model output
-#   mm_summaries <- mixtureSummaryTable(output, keepCols = c("Title", "Classes", "Parameters", "Observations", 
-#    "LL", "AIC", "BIC", "aBIC", "T11_VLMR_PValue", "T11_LMR_PValue")) %>%
-# 
-#     # Exclude duplicates (e.g., if re-run to extract individual level data)
-#     #distinct(Title, .keep_all = TRUE) %>%
-# 
-#     # Order by number of classes
-#     arrange(Classes) %>%
-# 
-#     # Create information indices
-#     mutate(CAIC = -2*LL + Parameters*(log(Observations) + 1),
-#            AWE = -2*LL + Parameters*(log(Observations) + 1.5),
-#            SIC = -0.5*BIC,
-#            BF = round(exp(SIC-lag(SIC)), 3)) 
-# 
-#   # Use SIC to compute approximate correct model probability out of k-class models
-#     max_sic <- max(mm_summaries$SIC, na.rm = TRUE)
-# 
-#     # Step 1 of cmP computation (top half of equation)
-#     mm_summaries <- mm_summaries %>%
-#       mutate(cmp_top = exp(SIC - max_sic))
-# 
-#     cmp_bottom <- sum(mm_summaries$cmp_top, na.rm = TRUE)
-# 
-#   # Add cmP_k to table output, and format for output
-#   mm_summaries <- mm_summaries %>%
-#     mutate(cmP_k = round(cmp_top/cmp_bottom, 2)) %>% 
-#     select(Title, Classes, LL, Parameters, BIC, CAIC, AWE, T11_VLMR_PValue,
-#            T11_LMR_PValue, BF, cmP_k) %>%
-#     rename(Specification = Title,
-#            VLMR_p = T11_VLMR_PValue,
-#            LMR_p = T11_LMR_PValue) %>%
-#     mutate(across(where(is.numeric), round, 2)) %>%
-#     mutate(VLMR_p = pvalue(VLMR_p, accuracy = 0.01),
-#            LMR_p = pvalue(LMR_p, accuracy = 0.01),
-#            BF = ifelse(BF == 0.00, "<0.01",
-#                        ifelse(BF > 100, ">100", BF)))
-# 
-#   mm_summaries
-# }
-
-
-#### EDITED FOR K-1 CHECK
 lpa_enum_table <- function(output = NA, LMR_warn = FALSE){
   
   # Extract initial summary table from model output
@@ -103,47 +57,7 @@ lpa_enum_table <- function(output = NA, LMR_warn = FALSE){
 # fmm_enum_table: summarise output from class enumeration process ----
 ### function takes single argument of type mplus.model.list (created by readModels function)
 ### must also have MplusAutomation package loaded, and scientific notation turned off
-# fmm_enum_table <- function(output = NA){
-#   
-#   # Extract initial summary table from model output
-#   mm_summaries <- mixtureSummaryTable(output, keepCols = c("Title", "Classes", "Parameters", "Observations", 
-#                                                            "LL", "AIC", "BIC", "aBIC", "T11_VLMR_PValue", "T11_LMR_PValue")) %>% 
-#     
-#     # Exclude duplicates (e.g., if re-run to extract individual level data)
-#     distinct(Title, .keep_all = TRUE) %>% 
-#     
-#     # Order by number of classes
-#     arrange(Classes) %>% 
-#     
-#     # Create information indices
-#     mutate(SIC = -0.5*BIC,
-#            BF = round(exp(SIC-lag(SIC)), 3))               
-#   
-#   # Use SIC to compute approximate correct model probability out of k-class models
-#   max_sic <- max(mm_summaries$SIC, na.rm = TRUE) 
-#   
-#   # Step 1 of cmP computation (top half of equation)
-#   mm_summaries <- mm_summaries %>% 
-#     mutate(cmp_top = exp(SIC - max_sic))
-#   
-#   cmp_bottom <- sum(mm_summaries$cmp_top, na.rm = TRUE)
-#   
-#   # Add cmP_k to table output, and format for output
-#   mm_summaries <- mm_summaries %>% 
-#     mutate(cmP_k = round(cmp_top/cmp_bottom, 2)) %>% 
-#     select(Title, Classes, LL, Parameters, AIC, BIC, aBIC, T11_VLMR_PValue, 
-#            T11_LMR_PValue) %>% 
-#     rename(Specification = Title, 
-#            VLMR_p = T11_VLMR_PValue,
-#            LMR_p = T11_LMR_PValue) %>% 
-#     mutate(across(where(is.numeric), round, 2)) %>% 
-#     mutate(VLMR_p = pvalue(VLMR_p, accuracy = 0.01), 
-#            LMR_p = pvalue(LMR_p, accuracy = 0.01))
-#   
-#   mm_summaries
-# }
 
-# EDITED FOR K-1 STARTS
 fmm_enum_table <- function(output = NA, LMR_warn = FALSE){
   
   # Extract initial summary table from model output
@@ -654,6 +568,7 @@ class_diag <- function(output = NA){
         
         # Print model title 
         print(paste0("CLASSIFICATION DIAGNOSTICS FOR ", toupper(output[[model]]$input$title)))
+        print(paste0(substr(output[[model]]$input$variable$classes,3,3), "-class model"))
         
         # Entropy
         print(paste0("Entropy: ", output[[model]]$summaries$Entropy))

@@ -1,0 +1,33 @@
+TITLE:
+ FMM Benchmark
+DATA:
+FILE = "./mplus_models/compprof/fmm/cp_fmm_mbenchmark_f1f5740b50e453e48f335d5fc39f148a.dat";
+ 
+VARIABLE:
+NAMES = woldComp f8age f10age woldVcb wiscVcb wiscPcmp wiscParr wiscBloc wiscObja
+     wiscBwsp cntSpan attnSel attnDiv attnOpp; 
+ MISSING=.;
+ classes = c(1);
+DEFINE:
+wiscVcb = wiscVcb/2; 
+        wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
+        wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20;
+        attnOpp = attnOpp/4;
+ANALYSIS:
+estimator = mlr; type = mixture; starts = 500 50;
+              processors = 4(STARTS);
+MODEL:
+%OVERALL% 
+ 
+             f8age; f10age; 
+             lang perfiq wiscBwsp attn on f8age;
+             cntSpan on f10age; 
+                lang by woldComp wiscVcb woldVcb;
+                perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
+                workmem by wiscBwsp cntSpan; 
+                attn by attnSel attnDiv attnOpp;
+                 [lang@0]; [perfiq@0]; [workmem@0]; [attn@0];
+OUTPUT:
+TECH1; TECH8; TECH11;
+PLOT:
+TYPE = PLOT3;

@@ -1,0 +1,519 @@
+Mplus VERSION 8.5
+MUTHEN & MUTHEN
+08/06/2021  10:55 AM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+  Data check - Descriptive statistics;
+  DATA:
+  FILE = "./mplus_models/compprof/desc/cp_sim_0f0fa573ee7e720dab2a9d705c835f4d.dat";
+
+  VARIABLE:
+  NAMES = naraComp naraAcc combAcc woldComp f8age f9age f10age naraRate woldVcb
+       wiscVcb wiscPcmp wiscCode wiscParr wiscBloc wiscObja wiscBwsp cntspan attnSel
+       attnDiv attnOpp sdqHyp;
+   MISSING=.;
+
+  ANALYSIS:
+  type = basic;
+
+
+
+INPUT READING TERMINATED NORMALLY
+
+
+
+
+Data check - Descriptive statistics;
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                         248
+
+Number of dependent variables                                   21
+Number of independent variables                                  0
+Number of continuous latent variables                            0
+
+Observed dependent variables
+
+  Continuous
+   NARACOMP    NARAACC     COMBACC     WOLDCOMP    F8AGE       F9AGE
+   F10AGE      NARARATE    WOLDVCB     WISCVCB     WISCPCMP    WISCCODE
+   WISCPARR    WISCBLOC    WISCOBJA    WISCBWSP    CNTSPAN     ATTNSEL
+   ATTNDIV     ATTNOPP     SDQHYP
+
+
+Estimator                                                       ML
+Information matrix                                        OBSERVED
+Maximum number of iterations                                  1000
+Convergence criterion                                    0.500D-04
+Maximum number of steepest descent iterations                   20
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+
+Input data file(s)
+  ./mplus_models/compprof/desc/cp_sim_0f0fa573ee7e720dab2a9d705c835f4d.dat
+
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns            43
+
+
+SUMMARY OF MISSING DATA PATTERNS
+
+
+     MISSING DATA PATTERNS (x = not missing)
+
+           1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20
+ NARACOMP  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ NARAACC   x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ COMBACC   x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ WOLDCOMP  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ F8AGE     x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ F9AGE     x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ F10AGE    x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ NARARATE  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ WOLDVCB   x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ WISCVCB   x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ WISCPCMP  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ WISCCODE  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ WISCPARR  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x           x
+ WISCBLOC  x  x  x  x  x  x  x  x  x  x  x  x  x           x  x  x  x
+ WISCOBJA  x  x  x  x  x  x  x  x  x  x  x        x  x     x  x     x
+ WISCBWSP  x  x  x  x  x  x  x  x  x  x     x  x  x  x  x  x  x  x  x
+ CNTSPAN   x  x  x  x  x  x  x           x  x     x  x  x  x  x  x  x
+ ATTNSEL   x  x  x  x  x  x     x  x     x  x  x  x  x  x  x  x     x
+ ATTNDIV   x  x  x  x           x        x  x  x  x     x  x  x  x  x
+ ATTNOPP   x  x        x  x     x  x     x  x  x  x  x  x  x  x  x  x
+ SDQHYP    x     x     x     x  x  x  x  x  x  x  x        x     x  x
+
+          21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40
+ NARACOMP  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ NARAACC   x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ COMBACC   x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ WOLDCOMP  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ F8AGE     x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ F9AGE     x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+ F10AGE    x  x  x  x  x  x  x                       x  x  x  x  x  x
+ NARARATE  x  x  x  x  x  x     x  x  x  x  x  x  x  x  x  x  x  x  x
+ WOLDVCB   x  x  x  x        x  x  x  x  x  x  x
+ WISCVCB               x     x  x  x  x  x  x  x  x  x  x  x
+ WISCPCMP  x           x  x  x  x  x  x  x  x  x  x  x  x  x
+ WISCCODE  x           x     x  x  x  x  x  x  x  x  x  x  x
+ WISCPARR  x           x     x  x  x  x  x  x  x  x  x  x  x
+ WISCBLOC  x           x     x  x  x  x  x        x  x  x
+ WISCOBJA  x           x     x  x  x  x     x     x  x  x  x
+ WISCBWSP  x           x     x  x  x  x  x  x        x  x  x
+ CNTSPAN   x  x  x     x     x                       x  x  x  x  x
+ ATTNSEL   x  x     x  x     x  x  x  x  x  x  x     x  x  x
+ ATTNDIV   x  x        x     x  x  x     x  x  x     x  x  x
+ ATTNOPP   x  x     x  x     x  x  x  x  x  x  x  x  x  x  x
+ SDQHYP    x  x  x     x  x  x  x     x     x  x     x     x  x     x
+
+          41 42 43
+ NARACOMP  x  x  x
+ NARAACC   x  x  x
+ COMBACC   x  x  x
+ WOLDCOMP
+ F8AGE
+ F9AGE     x  x  x
+ F10AGE    x
+ NARARATE  x  x  x
+ WOLDVCB
+ WISCVCB
+ WISCPCMP
+ WISCCODE
+ WISCPARR
+ WISCBLOC
+ WISCOBJA
+ WISCBWSP
+ CNTSPAN
+ ATTNSEL
+ ATTNDIV
+ ATTNOPP
+ SDQHYP       x
+
+
+     MISSING DATA PATTERN FREQUENCIES
+
+    Pattern   Frequency     Pattern   Frequency     Pattern   Frequency
+          1         113          16           1          31           1
+          2          21          17           1          32           1
+          3           1          18           1          33           1
+          4           1          19           1          34           1
+          5           5          20           1          35           1
+          6           2          21           1          36           1
+          7           2          22           1          37           1
+          8           4          23           1          38          28
+          9           1          24           1          39          13
+         10           1          25           3          40           1
+         11           2          26           1          41           1
+         12           4          27           1          42           1
+         13           1          28           7          43           4
+         14           4          29           8
+         15           1          30           1
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT
+
+
+           Covariance Coverage
+              NARACOMP      NARAACC       COMBACC       WOLDCOMP      F8AGE
+              ________      ________      ________      ________      ________
+ NARACOMP       1.000
+ NARAACC        1.000         1.000
+ COMBACC        1.000         1.000         1.000
+ WOLDCOMP       0.794         0.794         0.794         0.794
+ F8AGE          0.806         0.806         0.806         0.794         0.806
+ F9AGE          1.000         1.000         1.000         0.794         0.806
+ F10AGE         0.899         0.899         0.899         0.714         0.726
+ NARARATE       0.996         0.996         0.996         0.790         0.802
+ WOLDVCB        0.774         0.774         0.774         0.774         0.774
+ WISCVCB        0.786         0.786         0.786         0.774         0.786
+ WISCPCMP       0.794         0.794         0.794         0.782         0.794
+ WISCCODE       0.786         0.786         0.786         0.774         0.786
+ WISCPARR       0.778         0.778         0.778         0.766         0.778
+ WISCBLOC       0.754         0.754         0.754         0.746         0.754
+ WISCOBJA       0.754         0.754         0.754         0.742         0.754
+ WISCBWSP       0.774         0.774         0.774         0.762         0.774
+ CNTSPAN        0.855         0.855         0.855         0.677         0.690
+ ATTNSEL        0.778         0.778         0.778         0.766         0.778
+ ATTNDIV        0.738         0.738         0.738         0.726         0.738
+ ATTNOPP        0.778         0.778         0.778         0.766         0.778
+ SDQHYP         0.770         0.770         0.770         0.641         0.649
+
+
+           Covariance Coverage
+              F9AGE         F10AGE        NARARATE      WOLDVCB       WISCVCB
+              ________      ________      ________      ________      ________
+ F9AGE          1.000
+ F10AGE         0.899         0.899
+ NARARATE       0.996         0.895         0.996
+ WOLDVCB        0.774         0.698         0.770         0.774
+ WISCVCB        0.786         0.706         0.782         0.758         0.786
+ WISCPCMP       0.794         0.714         0.790         0.762         0.786
+ WISCCODE       0.786         0.706         0.782         0.758         0.782
+ WISCPARR       0.778         0.698         0.774         0.750         0.774
+ WISCBLOC       0.754         0.681         0.750         0.730         0.750
+ WISCOBJA       0.754         0.681         0.750         0.726         0.750
+ WISCBWSP       0.774         0.702         0.770         0.750         0.770
+ CNTSPAN        0.855         0.855         0.851         0.665         0.677
+ ATTNSEL        0.778         0.702         0.774         0.754         0.766
+ ATTNDIV        0.738         0.665         0.734         0.714         0.730
+ ATTNOPP        0.778         0.698         0.774         0.750         0.766
+ SDQHYP         0.770         0.726         0.766         0.625         0.633
+
+
+           Covariance Coverage
+              WISCPCMP      WISCCODE      WISCPARR      WISCBLOC      WISCOBJA
+              ________      ________      ________      ________      ________
+ WISCPCMP       0.794
+ WISCCODE       0.786         0.786
+ WISCPARR       0.778         0.774         0.778
+ WISCBLOC       0.754         0.750         0.742         0.754
+ WISCOBJA       0.754         0.750         0.746         0.726         0.754
+ WISCBWSP       0.774         0.770         0.762         0.742         0.742
+ CNTSPAN        0.681         0.677         0.669         0.653         0.657
+ ATTNSEL        0.770         0.766         0.762         0.734         0.738
+ ATTNDIV        0.734         0.730         0.722         0.702         0.698
+ ATTNOPP        0.770         0.766         0.758         0.734         0.734
+ SDQHYP         0.641         0.633         0.629         0.609         0.609
+
+
+           Covariance Coverage
+              WISCBWSP      CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP
+              ________      ________      ________      ________      ________
+ WISCBWSP       0.774
+ CNTSPAN        0.673         0.855
+ ATTNSEL        0.758         0.673         0.778
+ ATTNDIV        0.722         0.645         0.734         0.738
+ ATTNOPP        0.754         0.669         0.770         0.730         0.778
+ SDQHYP         0.625         0.690         0.625         0.601         0.625
+
+
+           Covariance Coverage
+              SDQHYP
+              ________
+ SDQHYP         0.770
+
+
+
+
+
+RESULTS FOR BASIC ANALYSIS
+
+
+     ESTIMATED SAMPLE STATISTICS
+
+
+           Means
+              NARACOMP      NARAACC       COMBACC       WOLDCOMP      F8AGE
+              ________      ________      ________      ________      ________
+               14.137        50.778        12.448         6.344       103.645
+
+
+           Means
+              F9AGE         F10AGE        NARARATE      WOLDVCB       WISCVCB
+              ________      ________      ________      ________      ________
+              118.637       127.535        67.074         5.931        17.549
+
+
+           Means
+              WISCPCMP      WISCCODE      WISCPARR      WISCBLOC      WISCOBJA
+              ________      ________      ________      ________      ________
+               13.906        31.361        14.468        27.608        20.614
+
+
+           Means
+              WISCBWSP      CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP
+              ________      ________      ________      ________      ________
+                3.215         3.079         5.874         7.907         5.244
+
+
+           Means
+              SDQHYP
+              ________
+                3.902
+
+
+           Covariances
+              NARACOMP      NARAACC       COMBACC       WOLDCOMP      F8AGE
+              ________      ________      ________      ________      ________
+ NARACOMP       5.586
+ NARAACC        9.478       179.552
+ COMBACC        2.386        20.559         6.554
+ WOLDCOMP       0.447        -0.011         0.232         2.441
+ F8AGE          1.008        -1.317         0.259         0.356        10.423
+ F9AGE          0.840         4.871         0.372        -0.673         3.552
+ F10AGE         0.341         0.194        -0.059        -0.235         0.812
+ NARARATE      -2.457        44.766        12.814         3.670         1.183
+ WOLDVCB        0.347        -0.399         0.258         1.301         0.764
+ WISCVCB       -0.210        -3.097         0.206         2.925         1.473
+ WISCPCMP       1.190         0.497         0.889         1.985         1.571
+ WISCCODE       3.875        15.888         1.350         1.423         3.555
+ WISCPARR       0.551       -13.601         0.658         1.522        -2.938
+ WISCBLOC       1.683       -13.042         2.094         2.759         3.871
+ WISCOBJA       1.096        -2.809         2.175         2.285         2.760
+ WISCBWSP       0.360         2.866         0.508         0.307         0.301
+ CNTSPAN        0.293         0.868         0.248         0.287        -0.052
+ ATTNSEL       -0.340        -1.035        -0.601        -0.789        -0.679
+ ATTNDIV       -0.036         2.335        -0.390        -2.461        -0.136
+ ATTNOPP       -0.037         0.879         0.056        -1.305        -0.623
+ SDQHYP        -1.049        -5.101        -0.480        -0.756         0.955
+
+
+           Covariances
+              F9AGE         F10AGE        NARARATE      WOLDVCB       WISCVCB
+              ________      ________      ________      ________      ________
+ F9AGE         15.852
+ F10AGE         5.041        10.420
+ NARARATE       2.265         3.432       570.472
+ WOLDVCB       -0.935        -0.204         0.513         3.964
+ WISCVCB       -2.345        -0.863        11.175         3.682        30.183
+ WISCPCMP      -1.027         1.326         2.911         1.694         6.894
+ WISCCODE      -0.882        -2.243        25.805         3.496        -0.449
+ WISCPARR      -4.362        -2.671         4.018         1.689         8.996
+ WISCBLOC       0.576         5.669       -22.838         5.494        12.646
+ WISCOBJA      -4.659         0.725         4.704         2.638         8.502
+ WISCBWSP       0.208        -0.018         1.677         0.396         0.557
+ CNTSPAN        0.172         0.171         3.564         0.469         0.983
+ ATTNSEL        0.485         2.303         1.004        -0.943         0.288
+ ATTNDIV        8.359         0.480        52.300        -6.945       -12.277
+ ATTNOPP       -1.031        -0.682        -0.205        -1.076        -1.481
+ SDQHYP         2.233         0.941        -2.122        -1.116        -0.915
+
+
+           Covariances
+              WISCPCMP      WISCCODE      WISCPARR      WISCBLOC      WISCOBJA
+              ________      ________      ________      ________      ________
+ WISCPCMP      22.239
+ WISCCODE       5.262        79.273
+ WISCPARR      11.126         7.727        93.592
+ WISCBLOC      16.141         3.180        38.959       142.074
+ WISCOBJA      14.874        10.200        26.762        55.681        77.781
+ WISCBWSP       0.579         0.567         0.972         1.765         0.977
+ CNTSPAN        0.588         0.611         1.053         2.336         0.541
+ ATTNSEL       -2.324        -6.088        -5.459        -7.683        -6.223
+ ATTNDIV      -21.596       -23.244       -24.676       -57.025       -38.705
+ ATTNOPP       -3.621        -4.345        -5.757       -10.903        -3.104
+ SDQHYP        -1.928        -4.032        -0.394        -3.109        -2.756
+
+
+           Covariances
+              WISCBWSP      CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP
+              ________      ________      ________      ________      ________
+ WISCBWSP       0.587
+ CNTSPAN        0.115         0.741
+ ATTNSEL       -0.323        -0.562         8.371
+ ATTNDIV       -1.632        -0.893        11.212       248.304
+ ATTNOPP       -0.440        -0.824         5.690         7.300        20.216
+ SDQHYP        -0.479        -0.428         0.736         7.663         0.451
+
+
+           Covariances
+              SDQHYP
+              ________
+ SDQHYP         5.772
+
+
+           Correlations
+              NARACOMP      NARAACC       COMBACC       WOLDCOMP      F8AGE
+              ________      ________      ________      ________      ________
+ NARACOMP       1.000
+ NARAACC        0.299         1.000
+ COMBACC        0.394         0.599         1.000
+ WOLDCOMP       0.121        -0.001         0.058         1.000
+ F8AGE          0.132        -0.030         0.031         0.071         1.000
+ F9AGE          0.089         0.091         0.037        -0.108         0.276
+ F10AGE         0.045         0.004        -0.007        -0.047         0.078
+ NARARATE      -0.044         0.140         0.210         0.098         0.015
+ WOLDVCB        0.074        -0.015         0.051         0.418         0.119
+ WISCVCB       -0.016        -0.042         0.015         0.341         0.083
+ WISCPCMP       0.107         0.008         0.074         0.269         0.103
+ WISCCODE       0.184         0.133         0.059         0.102         0.124
+ WISCPARR       0.024        -0.105         0.027         0.101        -0.094
+ WISCBLOC       0.060        -0.082         0.069         0.148         0.101
+ WISCOBJA       0.053        -0.024         0.096         0.166         0.097
+ WISCBWSP       0.199         0.279         0.259         0.257         0.122
+ CNTSPAN        0.144         0.075         0.113         0.213        -0.019
+ ATTNSEL       -0.050        -0.027        -0.081        -0.174        -0.073
+ ATTNDIV       -0.001         0.011        -0.010        -0.100        -0.003
+ ATTNOPP       -0.003         0.015         0.005        -0.186        -0.043
+ SDQHYP        -0.185        -0.158        -0.078        -0.201         0.123
+
+
+           Correlations
+              F9AGE         F10AGE        NARARATE      WOLDVCB       WISCVCB
+              ________      ________      ________      ________      ________
+ F9AGE          1.000
+ F10AGE         0.392         1.000
+ NARARATE       0.024         0.045         1.000
+ WOLDVCB       -0.118        -0.032         0.011         1.000
+ WISCVCB       -0.107        -0.049         0.085         0.337         1.000
+ WISCPCMP      -0.055         0.087         0.026         0.180         0.266
+ WISCCODE      -0.025        -0.078         0.121         0.197        -0.009
+ WISCPARR      -0.113        -0.086         0.017         0.088         0.169
+ WISCBLOC       0.012         0.147        -0.080         0.232         0.193
+ WISCOBJA      -0.133         0.025         0.022         0.150         0.175
+ WISCBWSP       0.068        -0.007         0.092         0.260         0.132
+ CNTSPAN        0.050         0.061         0.173         0.274         0.208
+ ATTNSEL        0.042         0.247         0.015        -0.164         0.018
+ ATTNDIV        0.133         0.009         0.139        -0.221        -0.142
+ ATTNOPP       -0.058        -0.047        -0.002        -0.120        -0.060
+ SDQHYP         0.233         0.121        -0.037        -0.233        -0.069
+
+
+           Correlations
+              WISCPCMP      WISCCODE      WISCPARR      WISCBLOC      WISCOBJA
+              ________      ________      ________      ________      ________
+ WISCPCMP       1.000
+ WISCCODE       0.125         1.000
+ WISCPARR       0.244         0.090         1.000
+ WISCBLOC       0.287         0.030         0.338         1.000
+ WISCOBJA       0.358         0.130         0.314         0.530         1.000
+ WISCBWSP       0.160         0.083         0.131         0.193         0.145
+ CNTSPAN        0.145         0.080         0.126         0.228         0.071
+ ATTNSEL       -0.170        -0.236        -0.195        -0.223        -0.244
+ ATTNDIV       -0.291        -0.166        -0.162        -0.304        -0.279
+ ATTNOPP       -0.171        -0.109        -0.132        -0.203        -0.078
+ SDQHYP        -0.170        -0.188        -0.017        -0.109        -0.130
+
+
+           Correlations
+              WISCBWSP      CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP
+              ________      ________      ________      ________      ________
+ WISCBWSP       1.000
+ CNTSPAN        0.175         1.000
+ ATTNSEL       -0.145        -0.226         1.000
+ ATTNDIV       -0.135        -0.066         0.246         1.000
+ ATTNOPP       -0.128        -0.213         0.437         0.103         1.000
+ SDQHYP        -0.260        -0.207         0.106         0.202         0.042
+
+
+           Correlations
+              SDQHYP
+              ________
+ SDQHYP         1.000
+
+
+     MAXIMUM LOG-LIKELIHOOD VALUE FOR THE UNRESTRICTED (H1) MODEL IS -12167.801
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     NARACOMP             14.137      -1.738       4.000    1.21%      13.000     14.000     15.000
+             248.000       5.586       3.848      17.000    6.05%      15.000     16.000
+     NARAACC              50.778       0.717      16.000    0.40%      40.000     46.000     49.000
+             248.000     179.552       0.752      96.000    0.40%      52.000     60.000
+     COMBACC              12.448       0.293       8.000    5.65%      10.000     12.000     12.000
+             248.000       6.554      -0.508      19.000    0.40%      13.000     15.000
+     WOLDCOMP              6.360      -0.217       2.000    1.52%       5.000      6.000      6.000
+             197.000       2.434       0.263      10.000    2.03%       7.000      8.000
+     F8AGE               103.565       2.190      99.000    2.50%     102.000    102.000    103.000
+             200.000      10.286       5.717     117.000    1.50%     103.000    105.000
+     F9AGE               118.637       0.864     110.000    0.40%     115.000    117.000    118.000
+             248.000      15.852       0.512     135.000    0.40%     118.000    122.000
+     F10AGE              127.448       1.799     120.000    0.45%     125.000    126.000    127.000
+             223.000      10.274       4.244     142.000    0.45%     127.000    129.000
+     NARARATE             67.077       2.376      28.000    0.40%      50.000     57.000     61.000
+             247.000     570.873       9.107     217.000    0.40%      67.000     79.000
+     WOLDVCB               5.974      -0.435       0.000    0.52%       4.000      6.000      6.000
+             192.000       3.921      -0.090      10.000    1.56%       7.000      8.000
+     WISCVCB              17.651       0.138       0.000    1.03%      14.000     16.000     18.000
+             195.000      30.073       1.525      36.000    1.03%      18.000     22.000
+     WISCPCMP             13.919      -0.464       0.000    0.51%      10.000     14.000     14.000
+             197.000      22.328      -0.133      24.000    2.03%      16.000     18.000
+     WISCCODE             31.344       1.974       2.000    0.51%      25.000     30.000     31.000
+             195.000      79.508      16.196      99.000    0.51%      33.000     37.000
+     WISCPARR             14.720       0.683       3.000    5.70%       4.000     11.000     12.000
+             193.000      93.082      -0.226      44.000    0.52%      16.000     22.000
+     WISCBLOC             27.861       0.119       5.000    0.53%      16.000     24.000     28.000
+             187.000     142.633      -0.458      59.000    0.53%      32.000     38.000
+     WISCOBJA             20.898       0.174       3.000    0.53%      13.000     17.000     18.000
+             187.000      77.663      -1.132      38.000    1.60%      22.000     31.000
+     WISCBWSP              3.208       0.898       1.000    1.04%       3.000      3.000      3.000
+             192.000       0.582       3.695       7.000    0.52%       3.000      4.000
+     CNTSPAN               3.083      -0.404       0.500    3.30%       2.500      3.000      3.000
+             212.000       0.733       1.281       5.000    3.77%       3.500      3.500
+     ATTNSEL               5.819       3.824       0.000    0.52%       4.195      4.928      5.316
+             193.000       8.292      22.909      27.900    0.52%       5.809      6.794
+     ATTNDIV               7.152       5.688      -3.672    0.55%       0.197      1.700      2.932
+             183.000     243.006      42.130     150.111    0.55%       4.167      9.131
+     ATTNOPP               5.288       4.445      -2.000    0.52%       2.500      4.000      4.500
+             193.000      20.320      32.683      45.500    0.52%       5.000      7.000
+     SDQHYP                3.832       0.434       0.000    7.33%       2.000      3.000      4.000
+             191.000       5.616      -0.177      10.000    2.09%       4.000      6.000
+
+
+     Beginning Time:  10:55:44
+        Ending Time:  10:55:44
+       Elapsed Time:  00:00:00
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2020 Muthen & Muthen

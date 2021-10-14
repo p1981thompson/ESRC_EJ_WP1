@@ -1,6 +1,6 @@
 Mplus VERSION 8.5
 MUTHEN & MUTHEN
-08/23/2021  10:14 AM
+10/12/2021   4:20 PM
 
 INPUT INSTRUCTIONS
 
@@ -194,17 +194,19 @@ Final stage loglikelihood values at local maxima, seeds, and initial stage start
           -54786.966  163626           4023
           -54786.966  249323           3587
           -54786.966  50005            5940
+          -54873.965  356951           2178
           -54873.965  699810           571
-          -54873.965  447667           2408
           -54873.965  26390            5673
           -54873.965  331924           5768
           -54873.965  670281           721
           -54873.965  412899           5206
           -54873.965  867690           3543
           -54873.965  489974           3631
+          -54873.965  447667           2408
           -54873.965  695155           150
           -54873.965  945212           3769
           -54873.965  494115           2634
+          -54873.965  678595           5688
           -54873.965  563584           657
           -54873.965  938019           5562
           -54873.965  149841           2987
@@ -216,6 +218,7 @@ Final stage loglikelihood values at local maxima, seeds, and initial stage start
           -54873.965  626490           4476
           -54930.689  124829           1292
           -55501.652  unperturbed      0
+          -55501.652  186047           1513
           -55501.652  615941           4923
           -55501.652  443917           60
           -55501.652  711854           5727
@@ -239,6 +242,7 @@ Final stage loglikelihood values at local maxima, seeds, and initial stage start
           -55532.315  416712           5106
           -55532.315  777248           1669
           -55532.315  910765           2935
+          -55532.315  580959           4630
           -56155.954  346088           4885
           -56155.954  252020           1585
           -56155.954  71911            5934
@@ -978,9 +982,9 @@ Final stage loglikelihood values at local maxima, seeds, and initial stage start
           -56155.954  941049           4346
           -56155.954  798842           4406
           -56155.954  947754           4411
+          -56155.954  76974            16
           -56155.954  658955           4462
           -56155.954  451638           4497
-          -56155.954  76974            16
           -56155.954  211281           292
           -56155.954  417035           149
           -56155.954  424280           1245
@@ -1244,7 +1248,7 @@ Final stage loglikelihood values at local maxima, seeds, and initial stage start
           -56155.954  132336           362
           -56155.954  140806           1001
 
-445 perturbed starting value run(s) did not converge or were rejected in the third stage.
+441 perturbed starting value run(s) did not converge or were rejected in the third stage.
 
 
 
@@ -24578,8 +24582,8 @@ TECHNICAL 8 OUTPUT
              70 -0.55510646D+05    1.5658007    0.0000282  EM
              71 -0.55509229D+05    1.4172425    0.0000255  EM
              72 -0.55507969D+05    1.2598614    0.0000227  EM
-             73 -0.55501655D+05    6.3144952    0.0001138  QN
-             74 -0.55501652D+05    0.0026075    0.0000000  EM
+             73 -0.55501655D+05    6.3144951    0.0001138  QN
+             74 -0.55501652D+05    0.0026077    0.0000000  EM
              75 -0.55501652D+05    0.0001157    0.0000000  EM
 
 
@@ -27697,9 +27701,9 @@ The following plots are available:
   Latent variable distribution plots
   Estimated overall and class-specific distributions
 
-     Beginning Time:  10:14:25
-        Ending Time:  10:17:42
-       Elapsed Time:  00:03:17
+     Beginning Time:  16:20:21
+        Ending Time:  16:23:39
+       Elapsed Time:  00:03:18
 
 
 

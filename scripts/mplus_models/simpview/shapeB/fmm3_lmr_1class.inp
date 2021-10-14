@@ -12,6 +12,7 @@ ANALYSIS:
                                                    starts = 0;
                                                    optseed = 349263;
                                                    k-1starts = 20 4;
+                                                   STSCALE = 5;
 MODEL:
 %OVERALL%
            f8age; f9age;
@@ -32,7 +33,5 @@ MODEL:
   [naraComp naraAcc combAcc woldComp];
 OUTPUT:
  TECH7 TECH11;
-SAVEDATA:
- FILE IS fmm3_1class.dat; SAVE = cprobabilities;
 PLOT:
 TYPE = PLOT3;

@@ -1,6 +1,6 @@
 Mplus VERSION 8.5
 MUTHEN & MUTHEN
-08/26/2021   9:17 AM
+10/11/2021   8:38 PM
 
 INPUT INSTRUCTIONS
 
@@ -224,6 +224,7 @@ Final stage loglikelihood values at local maxima, seeds, and initial stage start
           -43728.949  371737           532
           -43735.525  60547            2590
           -44324.656  237742           1219
+          -44324.932  979276           3085
           -44324.932  346843           1316
           -44324.932  826811           1721
           -44325.211  579134           3931
@@ -233,7 +234,7 @@ Final stage loglikelihood values at local maxima, seeds, and initial stage start
 
 Unperturbed starting value run did not converge or was rejected in the third stage.
 
-979 perturbed starting value run(s) did not converge or were rejected in the third stage.
+978 perturbed starting value run(s) did not converge or were rejected in the third stage.
 
 
 
@@ -32888,7 +32889,7 @@ TECHNICAL 8 OUTPUT
              62 -0.44372612D+05    2.6567613    0.0000599  EM
              63 -0.44370293D+05    2.3187041    0.0000523  EM
              64 -0.44368274D+05    2.0192196    0.0000455  EM
-             65 -0.44348867D+05   19.4073452    0.0004374  QN
+             65 -0.44348867D+05   19.4073453    0.0004374  QN
              66 -0.44348542D+05    0.3244914    0.0000073  EM
              67 -0.44348455D+05    0.0872408    0.0000020  EM
              68 -0.44348387D+05    0.0680412    0.0000015  EM
@@ -32911,9 +32912,9 @@ The following plots are available:
   Estimated probabilities for a categorical latent variable as a
     function of its covariates
 
-     Beginning Time:  09:17:10
-        Ending Time:  09:31:28
-       Elapsed Time:  00:14:18
+     Beginning Time:  20:38:56
+        Ending Time:  20:58:19
+       Elapsed Time:  00:19:23
 
 
 

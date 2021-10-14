@@ -12,8 +12,8 @@ ANALYSIS:
                                                    starts = 0; stscale = 5;
                                                    optseed = 985544;
                                                    processors = 4(starts); 
-                                                   lrtbootstrap = 100;
-                                                   lrtstarts = 0 0 2000 200;
+                                                   lrtbootstrap = 500;
+                                                   lrtstarts = 0 0 1000 250;
 MODEL:
 %OVERALL%
            f8age; f9age;

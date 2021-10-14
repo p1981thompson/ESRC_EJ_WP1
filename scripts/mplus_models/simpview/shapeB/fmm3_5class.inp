@@ -46,8 +46,5 @@ MODEL:
   [naraComp naraAcc combAcc woldComp];
 OUTPUT:
 TECH1 TECH8;
- stdyx ENTROPY
-SAVEDATA:
- FILE IS fmm3_5class.dat; SAVE = cprobabilities;
 PLOT:
 TYPE = PLOT3;

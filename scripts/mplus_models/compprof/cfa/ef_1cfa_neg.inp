@@ -1,0 +1,21 @@
+TITLE:
+CFA - ExecFun one factor 
+DATA:
+FILE = "./mplus_models/compprof/cfa/ef_1cfa_neg_36f8581a64af1091a8661bfd76b67164.dat";
+ 
+VARIABLE:
+NAMES = f8age f10age wiscBwsp cntspan attnSel1 attnDiv1 attnOpp1; 
+ MISSING=.;
+ 
+DEFINE:
+attnDiv1 = attnDiv1/20;
+          attnOpp1 = attnOpp1/4;
+ANALYSIS:
+estimator = mlr; type = general; starts = 20;
+MODEL:
+ f8age; f10age;
+            wiscBwsp attnSel1 attnDiv1 attnOpp1 on f8age;
+            cntSpan on f10age;
+            execfun by wiscBwsp cntSpan attnSel1 attnDiv1 attnOpp1
+OUTPUT:
+TECH1; TECH4; stdyx; modindices;
