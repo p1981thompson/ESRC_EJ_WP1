@@ -1,7 +1,7 @@
 TITLE:
  Confirmatory Factor Analysis - modification1 comprehension tasks;
 DATA:
-FILE = "./mplus_models/simpview/shapeB/cfa_scores_5d1661a61d02e40cc3ff92203e61da3c.dat";
+FILE = "./mplus_models/simpview/shapeB/cfa_scores1_5d1661a61d02e40cc3ff92203e61da3c.dat";
  
 VARIABLE:
 NAMES = cidB3153 naraComp naraAcc combAcc woldComp f8age f9age; 

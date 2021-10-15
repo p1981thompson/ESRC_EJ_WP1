@@ -12,7 +12,7 @@ ANALYSIS:
                                                    starts = 0; stscale = 5;
                                                    optseed = 701525;
                                                    processors = 4(starts); 
-                                                   lrtbootstrap = 100;
+                                                   lrtbootstrap = 500;
                                                    lrtstarts = 0 0 1000 250;
 MODEL:
 %OVERALL%

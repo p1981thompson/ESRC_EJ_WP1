@@ -1,6 +1,6 @@
 Mplus VERSION 8.5
 MUTHEN & MUTHEN
-08/23/2021   9:33 AM
+10/12/2021   2:44 PM
 
 INPUT INSTRUCTIONS
 
@@ -36,9 +36,6 @@ INPUT INSTRUCTIONS
     [naraComp naraAcc combAcc woldComp];
   OUTPUT:
   TECH1 TECH8;
-   stdyx ENTROPY
-  SAVEDATA:
-   FILE IS fmm3nn_1class.dat; SAVE = cprobabilities;
   PLOT:
   TYPE = PLOT3;
 
@@ -366,82 +363,6 @@ Latent Class 1
     NARACOMP          19.817      0.522     37.965      0.000
     WOLDCOMP           3.456      0.093     37.040      0.000
     COMBACC            6.722      0.170     39.463      0.000
-
-
-STANDARDIZED MODEL RESULTS
-
-
-STDYX Standardization
-
-                                                    Two-Tailed
-                    Estimate       S.E.  Est./S.E.    P-Value
-
-Latent Class 1
-
- G        BY
-    COMBACC            0.831      0.006    139.738      0.000
-    NARAACC            0.999      0.001   1223.947      0.000
-    NARACOMP           0.824      0.006    134.936      0.000
-    WOLDCOMP           0.292      0.017     16.765      0.000
-
- COMBACC    ON
-    F9AGE              0.018      0.017      1.016      0.310
-
- NARAACC    ON
-    F9AGE              0.046      0.018      2.636      0.008
-
- NARACOMP   ON
-    F9AGE              0.053      0.017      3.086      0.002
-
- WOLDCOMP   ON
-    F8AGE              0.059      0.018      3.361      0.001
-
- F8AGE    WITH
-    G                  0.000      0.000    999.000    999.000
-
- F9AGE    WITH
-    G                  0.000      0.000    999.000    999.000
-
- NARACOMP WITH
-    WOLDCOMP           0.333      0.016     20.493      0.000
-
- F9AGE    WITH
-    F8AGE              0.249      0.027      9.230      0.000
-
- Means
-    F8AGE             30.773      0.916     33.596      0.000
-    F9AGE             30.729      0.555     55.403      0.000
-    G                  0.000      0.000    999.000    999.000
-
- Intercepts
-    NARAACC            1.821      0.540      3.369      0.001
-    NARACOMP           1.550      0.526      2.947      0.003
-    WOLDCOMP           2.026      0.540      3.748      0.000
-    COMBACC            2.197      0.538      4.083      0.000
-
- Variances
-    F8AGE              1.000      0.000    999.000    999.000
-    F9AGE              1.000      0.000    999.000    999.000
-    G                  1.000      0.000    999.000    999.000
-
- Residual Variances
-    NARAACC            0.000    999.000    999.000    999.000
-    NARACOMP           0.319      0.010     32.087      0.000
-    WOLDCOMP           0.911      0.011     86.512      0.000
-    COMBACC            0.310      0.010     31.439      0.000
-
-
-R-SQUARE
-
-Class 1
-
-    Observed                                        Two-Tailed
-    Variable        Estimate       S.E.  Est./S.E.    P-Value
-
-    NARAACC            1.000    999.000    999.000    999.000
-    NARACOMP           0.681      0.010     68.558      0.000
-    WOLDCOMP           0.089      0.011      8.400      0.000
-    COMBACC            0.690      0.010     70.022      0.000
 
 
 QUALITY OF NUMERICAL RESULTS
@@ -1958,37 +1879,9 @@ The following plots are available:
   Latent variable distribution plots
   Estimated overall and class-specific distributions
 
-SAVEDATA INFORMATION
-
-
-  Save file
-    fmm3nn_1class.dat
-
-  Order and format of variables
-
-    NARAACC        F10.3
-    NARACOMP       F10.3
-    WOLDCOMP       F10.3
-    COMBACC        F10.3
-    F8AGE          F10.3
-    F9AGE          F10.3
-    G              F10.3
-    C_G            F10.3
-    CPROB1         F10.3
-    C              F10.3
-    CIDB3153       I6
-
-  Save file format
-    10F10.3 I6
-
-  Save file record length    10000
-
-  Save missing symbol        *
-
-
-     Beginning Time:  09:33:06
-        Ending Time:  09:33:12
-       Elapsed Time:  00:00:06
+     Beginning Time:  14:44:56
+        Ending Time:  14:45:03
+       Elapsed Time:  00:00:07
 
 
 

@@ -8,7 +8,7 @@ NAMES = cidB3153 f8age f9age naraAcc naraComp woldComp combAcc;
  MISSING=.;
   idvariable = cidb3153; classes = c(4);
 ANALYSIS:
- estimator = mlr; type = mixture; starts = 6000 1500;
+estimator = mlr; type = mixture; starts = 500 50; 
               processors = 4(STARTS);
 MODEL:
 %OVERALL%

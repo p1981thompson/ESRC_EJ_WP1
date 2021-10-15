@@ -1,0 +1,36 @@
+TITLE:
+Confirmatory Factor Analysis - 4-factor (with rate);
+DATA:
+FILE = "./mplus_models/compprof/cfa/cp_cfa_4fRnoSDQ_f7a2f8e87202daa7e4588ef4efe5d027.dat";
+ 
+VARIABLE:
+NAMES = woldComp f8age f9age f10age naraRate woldVcb wiscVcb wiscPcmp wiscParr
+     wiscBloc wiscObja wiscBwsp cntspan attnSel attnDiv attnOpp; 
+ MISSING=.;
+ 
+DEFINE:
+wiscVcb = wiscVcb/2; naraRate = naraRate/8;
+          wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
+          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20;
+          attnOpp = attnOpp/4;
+ANALYSIS:
+estimator = mlr; type = general; starts = 20; distribution = skewnormal;
+MODEL:
+ f8age; f9age; f10age;
+            lang perfiq wiscBwsp attn on f8age;
+            naraRate on f9age;
+            cntSpan on f10age;
+            naraRate;
+            lang by woldComp wiscVcb woldVcb;
+            perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
+            workmem by wiscBwsp cntSpan; 
+            attn by attnSel attnDiv attnOpp;
+            naraRate with lang; naraRate with perfiq;
+            naraRate with workmem; naraRate with attn;
+            lang with perfiq; lang with attn; lang with workmem;
+            perfiq with workmem; perfiq with attn;
+            workmem with attn;
+OUTPUT:
+TECH1; TECH4; stdyx; modindices;
+PLOT:
+TYPE = PLOT3;

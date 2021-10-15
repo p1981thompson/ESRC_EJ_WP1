@@ -1,0 +1,370 @@
+Mplus VERSION 8.5
+MUTHEN & MUTHEN
+08/05/2021   2:41 PM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+  EFA;
+  DATA:
+  FILE = "./mplus_models/compprof/cfa/ef_efa_b0025545a63bd9cd76239e2a6f4b09b8.dat";
+
+  VARIABLE:
+  NAMES = wiscBwsp cntspan attnSel1 attnDiv1 attnOpp;
+   MISSING=.;
+
+  ANALYSIS:
+  estimator = mlr; type = EFA 1 2;
+
+
+
+*** WARNING
+  Data set contains cases with missing on all variables.
+  These cases were not included in the analysis.
+  Number of cases with missing on all variables:  8
+   1 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
+
+
+
+
+EFA;
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                         240
+
+Number of dependent variables                                    5
+Number of independent variables                                  0
+Number of continuous latent variables                            0
+
+Observed dependent variables
+
+  Continuous
+   WISCBWSP    CNTSPAN     ATTNSEL1    ATTNDIV1    ATTNOPP
+
+
+Estimator                                                      MLR
+Rotation                                                    GEOMIN
+Row standardization                                    CORRELATION
+Type of rotation                                           OBLIQUE
+Epsilon value                                               Varies
+Information matrix                                        OBSERVED
+Maximum number of iterations                                  1000
+Convergence criterion                                    0.500D-04
+Maximum number of steepest descent iterations                   20
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+Optimization Specifications for the Exploratory Factor Analysis
+Rotation Algorithm
+  Number of random starts                                       30
+  Maximum number of iterations                               10000
+  Derivative convergence criterion                       0.100D-04
+
+Input data file(s)
+  ./mplus_models/compprof/cfa/ef_efa_b0025545a63bd9cd76239e2a6f4b09b8.dat
+
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns            13
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT
+
+
+           Covariance Coverage
+              WISCBWSP      CNTSPAN       ATTNSEL1      ATTNDIV1      ATTNOPP
+              ________      ________      ________      ________      ________
+ WISCBWSP       0.800
+ CNTSPAN        0.696         0.883
+ ATTNSEL1       0.783         0.696         0.804
+ ATTNDIV1       0.746         0.667         0.758         0.762
+ ATTNOPP        0.779         0.692         0.796         0.754         0.804
+
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     WISCBWSP              3.208       0.898       1.000    1.04%       3.000      3.000      3.000
+             192.000       0.582       3.695       7.000    0.52%       3.000      4.000
+     CNTSPAN               3.083      -0.404       0.500    3.30%       2.500      3.000      3.000
+             212.000       0.733       1.281       5.000    3.77%       3.500      3.500
+     ATTNSEL1             -5.819      -3.824     -27.900    0.52%      -6.800     -5.828     -5.316
+             193.000       8.292      22.909       0.000    0.52%      -4.950     -4.197
+     ATTNDIV1             -7.152      -5.688    -150.111    0.55%      -9.333     -4.263     -2.932
+             183.000     243.006      42.130       3.672    0.55%      -1.932     -0.239
+     ATTNOPP               5.288       4.445      -2.000    0.52%       2.500      4.000      4.500
+             193.000      20.320      32.683      45.500    0.52%       5.000      7.000
+
+
+     CHI-SQUARE TEST COULD NOT BE COMPUTED.
+     PROBLEM OCCURRED IN EXPLORATORY FACTOR ANALYSIS WITH 2 FACTOR(S).
+
+
+
+
+SUMMARY OF MODEL FIT INFORMATION
+
+
+                   Number of                   Degrees of
+     Model        Parameters      Chi-Square    Freedom     P-Value
+
+     1-factor          15              7.028         5       0.2186
+     2-factor         N/A
+
+
+RESULTS FOR EXPLORATORY FACTOR ANALYSIS
+
+
+           EIGENVALUES FOR SAMPLE CORRELATION MATRIX
+                  1             2             3             4             5
+              ________      ________      ________      ________      ________
+                1.867         1.005         0.851         0.740         0.536
+
+
+EXPLORATORY FACTOR ANALYSIS WITH 1 FACTOR(S):
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                       15
+
+Loglikelihood
+
+          H0 Value                       -2256.972
+          H0 Scaling Correction Factor      4.7355
+            for MLR
+          H1 Value                       -2254.631
+          H1 Scaling Correction Factor      3.7181
+            for MLR
+
+Information Criteria
+
+          Akaike (AIC)                    4543.943
+          Bayesian (BIC)                  4596.153
+          Sample-Size Adjusted BIC        4548.606
+            (n* = (n + 2) / 24)
+
+Chi-Square Test of Model Fit
+
+          Value                              7.028*
+          Degrees of Freedom                     5
+          P-Value                           0.2186
+          Scaling Correction Factor         0.6662
+            for MLR
+
+*   The chi-square value for MLM, MLMV, MLR, ULSMV, WLSM and WLSMV cannot be used
+    for chi-square difference testing in the regular way.  MLM, MLR and WLSM
+    chi-square difference testing is described on the Mplus website.  MLMV, WLSMV,
+    and ULSMV difference testing is done using the DIFFTEST option.
+
+RMSEA (Root Mean Square Error Of Approximation)
+
+          Estimate                           0.041
+          90 Percent C.I.                    0.000  0.105
+          Probability RMSEA <= .05           0.511
+
+CFI/TLI
+
+          CFI                                0.959
+          TLI                                0.917
+
+Chi-Square Test of Model Fit for the Baseline Model
+
+          Value                             58.933
+          Degrees of Freedom                    10
+          P-Value                           0.0000
+
+SRMR (Standardized Root Mean Square Residual)
+
+          Value                              0.034
+
+
+
+MINIMUM ROTATION FUNCTION VALUE       1.22282
+
+
+
+           GEOMIN ROTATED LOADINGS (* significant at 5% level)
+                  1
+              ________
+ WISCBWSP       0.223*
+ CNTSPAN        0.310*
+ ATTNSEL1       0.744*
+ ATTNDIV1       0.418*
+ ATTNOPP       -0.591*
+
+
+           GEOMIN FACTOR CORRELATIONS (* significant at 5% level)
+                  1
+              ________
+      1         1.000
+
+
+           ESTIMATED RESIDUAL VARIANCES
+              WISCBWSP      CNTSPAN       ATTNSEL1      ATTNDIV1      ATTNOPP
+              ________      ________      ________      ________      ________
+                0.950         0.904         0.447         0.825         0.651
+
+
+           S.E. GEOMIN ROTATED LOADINGS
+                  1
+              ________
+ WISCBWSP       0.093
+ CNTSPAN        0.091
+ ATTNSEL1       0.159
+ ATTNDIV1       0.199
+ ATTNOPP        0.179
+
+
+           S.E. GEOMIN FACTOR CORRELATIONS
+                  1
+              ________
+      1         0.000
+
+
+           S.E. ESTIMATED RESIDUAL VARIANCES
+              WISCBWSP      CNTSPAN       ATTNSEL1      ATTNDIV1      ATTNOPP
+              ________      ________      ________      ________      ________
+                0.041         0.057         0.236         0.166         0.212
+
+
+           Est./S.E. GEOMIN ROTATED LOADINGS
+                  1
+              ________
+ WISCBWSP       2.396
+ CNTSPAN        3.384
+ ATTNSEL1       4.685
+ ATTNDIV1       2.105
+ ATTNOPP       -3.292
+
+
+           Est./S.E. GEOMIN FACTOR CORRELATIONS
+                  1
+              ________
+      1         0.000
+
+
+           Est./S.E. ESTIMATED RESIDUAL VARIANCES
+              WISCBWSP      CNTSPAN       ATTNSEL1      ATTNDIV1      ATTNOPP
+              ________      ________      ________      ________      ________
+               22.966        15.960         1.890         4.976         3.072
+
+
+EXPLORATORY FACTOR ANALYSIS WITH 2 FACTOR(S):
+
+
+
+MINIMUM ROTATION FUNCTION VALUE       0.11401
+
+
+
+           GEOMIN ROTATED LOADINGS (* significant at 5% level)
+                  1             2
+              ________      ________
+ WISCBWSP       0.072         0.276
+ CNTSPAN       -0.001         0.657
+ ATTNSEL1       0.817*       -0.004
+ ATTNDIV1       0.402         0.002
+ ATTNOPP       -0.483        -0.154
+
+
+           GEOMIN FACTOR CORRELATIONS (* significant at 5% level)
+                  1             2
+              ________      ________
+      1         1.000
+      2         0.382         1.000
+
+
+           ESTIMATED RESIDUAL VARIANCES
+              WISCBWSP      CNTSPAN       ATTNSEL1      ATTNDIV1      ATTNOPP
+              ________      ________      ________      ________      ________
+                0.904         0.569         0.336         0.838         0.686
+
+
+           S.E. GEOMIN ROTATED LOADINGS
+                  1             2
+              ________      ________
+ WISCBWSP       0.356         0.482
+ CNTSPAN        0.010         0.843
+ ATTNSEL1       0.176         0.042
+ ATTNDIV1       0.257         0.182
+ ATTNOPP        0.344         0.310
+
+
+           S.E. GEOMIN FACTOR CORRELATIONS
+                  1             2
+              ________      ________
+      1         0.000
+      2         0.445         0.000
+
+
+           S.E. ESTIMATED RESIDUAL VARIANCES
+              WISCBWSP      CNTSPAN       ATTNSEL1      ATTNDIV1      ATTNOPP
+              ________      ________      ________      ________      ________
+                0.190         1.112         0.268         0.172         0.194
+
+
+           Est./S.E. GEOMIN ROTATED LOADINGS
+                  1             2
+              ________      ________
+ WISCBWSP       0.202         0.572
+ CNTSPAN       -0.138         0.779
+ ATTNSEL1       4.648        -0.089
+ ATTNDIV1       1.565         0.013
+ ATTNOPP       -1.405        -0.495
+
+
+           Est./S.E. GEOMIN FACTOR CORRELATIONS
+                  1             2
+              ________      ________
+      1         0.000
+      2         0.859         0.000
+
+
+           Est./S.E. ESTIMATED RESIDUAL VARIANCES
+              WISCBWSP      CNTSPAN       ATTNSEL1      ATTNDIV1      ATTNOPP
+              ________      ________      ________      ________      ________
+                4.763         0.512         1.254         4.867         3.541
+
+
+           FACTOR STRUCTURE
+                  1             2
+              ________      ________
+ WISCBWSP       0.177         0.303
+ CNTSPAN        0.250         0.656
+ ATTNSEL1       0.815         0.308
+ ATTNDIV1       0.403         0.156
+ ATTNOPP       -0.542        -0.338
+
+
+     Beginning Time:  14:41:46
+        Ending Time:  14:41:46
+       Elapsed Time:  00:00:00
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2020 Muthen & Muthen

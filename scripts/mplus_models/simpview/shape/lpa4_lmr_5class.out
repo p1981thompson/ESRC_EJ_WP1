@@ -1,6 +1,6 @@
 Mplus VERSION 8.5
 MUTHEN & MUTHEN
-08/24/2021  12:33 PM
+09/29/2021  11:46 AM
 
 INPUT INSTRUCTIONS
 
@@ -18,6 +18,7 @@ INPUT INSTRUCTIONS
                                                      starts = 0;
                                                      optseed = 985544;
                                                      k-1starts = 20 4;
+                                                     STSCALE = 5;
   MODEL:
   %OVERALL%
              f8age; f9age;
@@ -786,8 +787,8 @@ The following plots are available:
   Estimated probabilities for a categorical latent variable as a
     function of its covariates
 
-     Beginning Time:  12:33:57
-        Ending Time:  12:34:03
+     Beginning Time:  11:46:21
+        Ending Time:  11:46:27
        Elapsed Time:  00:00:06
 
 

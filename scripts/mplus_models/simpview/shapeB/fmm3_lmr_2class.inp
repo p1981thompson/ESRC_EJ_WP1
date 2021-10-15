@@ -8,8 +8,11 @@ NAMES = cidB3153 f8age f9age naraAcc naraComp woldComp combAcc;
  MISSING=.;
   idvariable = cidb3153; classes = c(2);
 ANALYSIS:
- estimator = mlr; type = mixture; starts = 2000 200;
-              processors = 4(STARTS); STSCALE = 1;
+ estimator = mlr; type = mixture; 
+                                                   starts = 0;
+                                                   optseed = 669639;
+                                                   k-1starts = 20 4;
+                                                   STSCALE = 1;
 MODEL:
 %OVERALL%
            f8age; f9age;
@@ -33,7 +36,6 @@ MODEL:
   naraComp naraAcc@0 combAcc woldComp;
   [naraComp naraAcc combAcc woldComp];
 OUTPUT:
-TECH1 TECH8;
- TECH11
+ TECH7 TECH11;
 PLOT:
 TYPE = PLOT3;

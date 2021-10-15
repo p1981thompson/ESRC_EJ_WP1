@@ -1,0 +1,635 @@
+---
+title: 'WP1: Simple View - Focusing on shape over level - Subsample B'
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+date: '30/09/2021'
+    
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_dir = "../output/analysis/") })
+---
+
+This script is used for running the mixture models, with an attempt to identify reading profile differences in shape rather than just level. This process is exploratory and was not pre-registered (the original pre-registration can be found [here](https://osf.io/4zahf)).
+
+The models are based on those proposed by [Morin & Marsh (2015)](https://www.tandfonline.com/doi/pdf/10.1080/10705511.2014.919825). The models were initially run on the "exploratory" or "calibration" half of the dataset (subsample A; **WP1_SimpView_LPA_shape.Rmd**), but the best model selected showed a significantly poorer fit when fitted with subsample B (**WP1_SimpView_ShapeValidation.Rmd**)---although the profiles looked similar in shape. This script repeats the class enumeration process with subsample B, to ensure that we have selected the best model specification overall.
+
+# Set-up
+
+## Libraries
+
+*Package versions were up-to-date as of 12/08/2021. Version information can be found at the [end of the output file](#version).*
+
+*Models were run using Mplus Version 8.5.*
+
+```{r libraries, message = FALSE, warning = FALSE}
+# Specify packages
+pkgs <- c("tidyverse", "MplusAutomation", "texreg", "DiagrammeR", "kableExtra", "ggalluvial", "scales", "rlist")
+
+# Load all packages
+invisible(lapply(pkgs, library, character.only = TRUE))
+```
+
+## Directories
+
+```{r create-dir}
+# Create subdirectories for storing mplus scripts, data files, and output, if do not already exist
+if(dir.exists("./mplus_models/")==FALSE){dir.create("./mplus_models/")}
+if(dir.exists("./mplus_models/simpview/")==FALSE){dir.create("./mplus_models/simpview/")}
+if(dir.exists("./mplus_models/simpview/shapeB")==FALSE){dir.create("./mplus_models/simpview/shapeB")} 
+if(dir.exists("../output/")==FALSE){dir.create("../output/")}
+if(dir.exists("../output/figures")==FALSE){dir.create("../output/figures")}
+if(dir.exists("../output/tables")==FALSE){dir.create("../output/tables")}
+```
+
+## Functions
+
+Functions for processing the output are stored in a separate script.
+
+```{r output-functions, message=FALSE}
+source("WP1_OutputFunctions.R")
+```
+
+## Data
+
+This analysis is developed on half of the dataset, for subsequent cross-validation with the remaining half (WP1_SimpView_CrossValidation.Rmd).
+
+```{r load-data}
+sv_data <- read.csv("../data/processed/WP1_data_subB.csv")  %>%       # ALSPAC data
+  
+  # Select and format relevant variables
+  select(yp_id, cidB3153, age_m_f8, age_m_f9, 
+                nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9,  # reading accuracy variables
+                nara_comp_raw_f9, wold_comp_raw_f8) %>%               # comprehension variables
+  mutate(combAcc = read_word_raw_f9 + read_nonw_raw_f9) %>%           # create combined item accuracy score
+  select(-read_word_raw_f9, -read_nonw_raw_f9) %>%                    # remove other measures
+  
+  # Rename for Mplus character limit
+  rename(naraComp = nara_comp_raw_f9,
+         naraAcc = nara_acc_raw_f9,
+         woldComp = wold_comp_raw_f8,
+         f8age = age_m_f8,
+         f9age = age_m_f9) %>% 
+  
+  # Change ID to a factor
+  mutate(yp_id = as.factor(yp_id))
+                
+```
+
+# Class enumeration
+
+**Aim: to fit mixture models with different numbers of classes, aimed at identifying reading profiles that vary in shape beyond differences in level (Morin & Marsh, 2015).**
+
+As an exploratory process, we try fitting both Models 3 and 4 from Morin & Marsh (2015). In Model 3, differences in performance level are incorporated into the model using a single continuous latent variable, so that the level and shape of profiles are estimated *simultaneously* in a factor mixture model. In Model 4, global factor score is estimated separately and entered into the model as a control variable in a latent profile analysis, allowing for the estimation of differently shaped profiles *beyond* differences in performance level.
+
+## Set-up
+
+*Note: Models were edited to increase starts if best log-likelihood value not replicated. Initial plan to increase to 2000 200 (Lubke & Luningham, 2017), but increased further where necessary.*
+
+Create base model with basic set-up, including age covariates. Specify other model elements for use in different models.
+
+```{r lpa-base}
+# Create base model
+m_base <- mplusObject(
+  TITLE = "Latent Profile Analysis;",
+  ANALYSIS = "estimator = mlr; type = mixture; starts = 500 50; 
+              processors = 4(STARTS);",
+  VARIABLE = "idvariable = cidB3153; classes = c(1);",
+  MODEL = "%OVERALL%
+           f8age; f9age;
+           combAcc naraAcc naraComp on f9age;
+           woldcomp on f8age;",
+  OUTPUT = "TECH1 TECH8;",
+  PLOT = "TYPE = PLOT3;",
+  usevariables = colnames(sv_data[,!names(sv_data) %in% c("yp_id")]),
+  rdata = sv_data)
+
+# Specify all variances - note this fixes naraAcc residual variance to 0 for the initial LPA model
+vars <- "
+  naraComp naraAcc@0 combAcc woldComp;"
+
+# Specify all means 
+means <- "
+  [naraComp naraAcc combAcc woldComp];"
+
+# Specify all covariances 
+covars <- "
+  naraComp with naraAcc;
+  naraComp with combAcc; 
+  naraComp with woldComp; 
+  naraAcc with combAcc; 
+  naraAcc with woldComp; 
+  combAcc with woldComp;  "
+
+# Specify no covariances 
+no_covars <- "
+  naraComp with naraAcc@0;
+  naraComp with combAcc@0; 
+  naraComp with woldComp@0; 
+  naraAcc with combAcc@0; 
+  naraAcc with woldComp@0; 
+  combAcc with woldComp@0;  "
+```
+
+## Model 3: Factor Mixture Model
+
+Model 3 is a factor mixture model with a class-invariant higher order latent factor. The class-invariance of the factor allows for a measure of global ability across all measures, defined in the same way across all classes. We allowed for correlated errors between the comprehension variables in the global ability factor.
+
+### Specification
+
+**Steps 1-3)** Fit series of increasing *k*-class models.
+
+*Note: Started by fitting up to 6-class models, but increased the number of classes after adjusted LRTs implied they might improve model fit.*
+
+```{r fmm3-fit}
+# Fit initial models
+m_fmm3 <- lapply(c(1:8), function(k) {
+  
+  # Update model spec 1: overall model estimates (global performance factor estimation)
+  body <- update(m_base,
+              MODEL = as.formula(sprintf("~ . + '%s \n %s
+              G by combAcc* naraAcc naraComp woldComp;
+              naraComp with woldComp;
+              [G@0]; G@1;
+              f8age with G@0; f9age with G@0;
+              '", vars, means)))
+  
+  # Create class-level specifications (means and variances only)
+  class_spec <- paste0("%c#1% \n ", vars, means)
+  if (k > 1){
+    for (i in 2:k){
+      class_spec <- paste0(class_spec, "\n %c#", i, "% \n ", vars, means)
+    }
+  }
+  
+  # ...Update model spec 2: class estimates
+  body <- update(body,
+     TITLE = as.formula(sprintf("~ 'Model 3 (FMM): %d classes;'", k)),
+     VARIABLE = as.formula(sprintf("~ 'idvariable = cidb3153; classes = c(%d);'", k)),
+     MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
+  
+  # Run model
+  mplusModeler(body, sprintf("mplus_models/simpview/shapeB/fmm3_%dclass.dat", k), run = FALSE)
+ })
+
+# Read in output
+fmm3_out <- readModels(target = "./mplus_models/simpview/shapeB", filefilter = "(fmm3_)([1-8])")
+```
+
+```{r fmm3-fit-starts, include = FALSE}
+# # # Read in output
+# fmm3_out <- readModels(target = "./mplus_models/simpview/shapeB", filefilter = "(fmm3_)([1-8])")
+# #
+# # # Check warnings
+# for (model in 1:length(fmm3_out)){
+#   print(fmm3_out[[model]]$input[[2]])
+#   print(fmm3_out[[model]]$warnings)
+# }
+# #
+# # # Re-run models indicative of local maxima with increased starts
+# m_fmm3_starts <- lapply(c(6), function(k) {
+# 
+#   # Update model spec 1: overall model estimates (variances and covariances)
+#   body <- update(m_base,
+#               MODEL = as.formula(sprintf("~ . + '%s \n %s
+#               G by combAcc* naraAcc naraComp woldComp;
+#               naraComp with woldComp;
+#               [G@0]; G@1;
+#               f8age with G@0; f9age with G@0;
+#               '", vars, means)),)
+# 
+#   # Create class-level specifications (variances only)
+#   class_spec <- paste0("%c#1% \n ", vars, means)
+#   if (k > 1){
+#     for (i in 2:k){
+#       class_spec <- paste0(class_spec, "\n %c#", i, "% \n ", vars, means)
+#     }
+#   }
+# 
+#   # ...Update model spec 2: class estimates
+#   body <- update(body,
+#      TITLE = as.formula(sprintf("~ 'Model 3 (FMM): %d classes;'", k)),
+#      ANALYSIS = ~ "estimator = mlr; type = mixture; starts = 8000 2000;
+#               processors = 4(STARTS); STSCALE = 1;",
+#      VARIABLE = as.formula(sprintf("~ 'idvariable = cidb3153; classes = c(%d);'", k)),
+#      MODEL = as.formula(sprintf("~ . + '%s'", class_spec)))
+# 
+#   # Run model
+#   mplusModeler(body, sprintf("mplus_models/simpview/shapeB/fmm3_%dclass.dat", k), run = FALSE)
+#  })
+
+```
+*Note that the 6-class model LL was not replicated (tried up to 8000 2000 starts)*
+
+Use optseed to compute adjusted LRT tests (Lo-Mendell-Rubin; Vuong-Lo-Mendell-Rubin). This was estimated after initial fitting for computational efficiency, and also to permit re-running of the test with increased k-1starts if the k-1 model does not have the same loglikelihood as the model fitted above ([Asparouhov & Muthen, 2012](https://www.statmodel.com/examples/webnotes/webnote14.pdf)).
+
+```{r fmm3-lmr}
+# # Read in output
+fmm3_out <- readModels(target = "./mplus_models/simpview/shapeB", filefilter = "(fmm3_)([1-8])")
+
+fmm3_lmr <- recomp_LMR(orig_mods = m_fmm3, 
+                        orig_output = fmm3_out, 
+                        mods = c(1:length(fmm3_out)),
+                        #mods = c(7),
+                        #kstarts = "500 50",
+                        filepath = "mplus_models/simpview/shapeB",
+                        rerun = FALSE
+                        )
+
+fmm_enum_table(fmm3_lmr, LMR_warn = TRUE) %>% 
+  select(Specification, Classes, LMR_check) %>% 
+  filter(!is.na(LMR_check))
+```
+*The k-1 model for the 5-class LMR test did not match the LL achieved by the 4-class model initially fit, but this could not be resolved. The 6- and 7- class tests can also not be relied upon, given that the 6-class model suffered issues of local maxima that could not be resolved. We take these issues to indicate that these model specifications are not well suited to the data---in line with our previous findings with subsample A that profiles were arbitrarily formed at different levels of ability.* 
+
+### Indices
+
+**Steps 4-5)** Extract fit indices, and use to select smaller subset of candidate models.
+
+```{r fmm3-output}
+# Read in output
+fmm3_lmr <- readModels(target = "./mplus_models/simpview/shapeB", filefilter = "(fmm3_lmr_)([1-8])")
+
+# Print table 
+fmm3_summary <- lpa_enum_table(output = fmm3_lmr) %>% 
+  mutate(Specification = "Shape FMM")
+fmm3_summary %>% kable("pipe")
+
+# Elbow plots for information criteria
+lpa_enum_elbow(fmm3_summary)  # use the same metrics for comparison as LPA model
+```
+
+Best model for:
+
+| **a) Absolute fit** (fewest classes with better LL than benchmark)**:** 2-class (assuming benchmark as 1-class model)
+| **b) Information heuristics** (diminishing gains from elbow plots)**:** 2- or 5-class
+| **c) Adjusted LRTs** (fewest classes not sig improved by additional classes)**:** 5-class, but note that this comparison is inaccurate and the 4-class model unstable. 
+| **d) Approximate BF** (fewest classes with moderate-strong evidence compared to previous model): 8-class/NA
+| **e) Approximate correct model probability:** 8-class/NA
+
+### Inspection
+
+**Step 6)** View classification diagnostics for candidate models. Can also inspect how the classes correspond across models.
+
+```{r fmm3-candidates, warning = FALSE}
+# Extract participant level data
+fmm3_cand <- mm_extract_data(orig_mods = m_fmm3, orig_output = fmm3_out, 
+                               candidate_mods = c(3,5),                         
+                               filepath = "mplus_models/simpview/shapeB",
+                               lrtstarts = "0 0 0 0", # bLRTs removed from process after previous issues
+                               rerun = FALSE, optseed = TRUE, 
+                               one_fit = TRUE)
+
+# Print table, and append bLRT values to main output 
+fmm3_summary %>% kable("pipe")
+
+# Compute classification diagnostics
+class_diag(fmm3_cand)
+
+# Plot class means
+plotMixtures_simpView(fmm3_cand[1])
+plotMixtures_simpView(fmm3_cand[2])
+
+
+# Inspect transitions 
+extract_classes(fmm3_cand, type = "lpa")
+```
+
+**Comments:**
+
+-   **Classification diagnostics:** Both models have good assignment accuracy, 5-class model has higher entropy.
+-   **Interpretability:** Neither model succeeded in differentiating profiles of different shapes (i.e., dissociated strengths and weaknesses in decoding and comprehension skills); neither stand out as the key best choice. Select 5-class model on basis of fit indices.
+
+### Selection
+
+**Step 7)** Select final model in class enumeration process, for Model 3.
+
+```{r fmm3-selected}
+fmm3_final_nclass <- 5
+fmm3_final_m <- fmm3_cand$sv_fmm3_rerun_5class.out
+```
+
+## Model 4: LPA with global covariate
+
+In this model, the global factor score is estimated separately and entered into the model as a control variable on the measures, leaving the residuals of those predictions for the class estimates. Thus, overall ability is treated as a bias, and the classes extract profile shape beyond overall ability.
+
+### Global factor scores {#cfa}
+
+First check that model with correlated errors for the comprehension tasks still an appropriate model for this subsample. 
+
+```{r cfa-scores}
+# Run single factor model (including age covariates)
+m_cfa <- mplusObject(
+  TITLE = "Confirmatory Factor Analysis - Extract factor scores;",
+  ANALYSIS = "estimator = mlr; type = general;",                  
+  MODEL = "f8age; f9age;
+           G by combAcc naraAcc naraComp woldComp;
+           combAcc naraAcc naraComp on f9age;
+           woldComp on f8age;",  
+  VARIABLE = "idvariable = cidB3153;",
+  OUTPUT = "sampstat; TECH1; TECH4; stdyx; modindices; ",
+  PLOT = "TYPE = PLOT3;",
+  usevariables = c("cidB3153", "naraComp", "naraAcc", "combAcc", "woldComp", "f8age", "f9age"),
+  rdata = sv_data,
+  SAVEDATA = "FILE IS shape_cfa_scores.dat; SAVE = fscores;")
+
+m_cfa_fit <- mplusModeler(m_cfa,
+                           modelout = "./mplus_models/simpview/shapeB/cfa_scores1.inp",
+                           check = TRUE, run = FALSE)
+
+# Fit model with additional covariance between the comprehension measures (theoretically sound)
+m_cfa1m <- update(m_cfa,
+                 TITLE = ~ "Confirmatory Factor Analysis - modification1 comprehension tasks;",
+                 MODEL = ~. + "woldComp with naraComp;",
+                 SAVEDATA = ~ "FILE IS shape_cfa_scores2.dat; SAVE = fscores;")
+
+m_cfa1m_fit <- mplusModeler(m_cfa1m,
+                           modelout = "./mplus_models/simpview/shapeB/cfa_scores2.inp",
+                           check = TRUE, run = FALSE)
+
+# Inspect model outputs
+cfa_out <- readModels(target = "./mplus_models/simpview/shapeB", filefilter = "cfa")
+SummaryTable(cfa_out, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
+
+# The modified CFA is a much better fit, and good fit overall - use these scores for analysis
+g_data <- as.data.frame(cfa_out$cfa_scores2.out$savedata) %>% 
+  select(-G_SE)
+```
+
+### Specification
+
+**Steps 1-3)** Fit series of increasing *k*-class models.
+
+```{r lpa4-fit}
+# Re-add naraAcc variance 
+vars <- "
+  naraComp naraAcc combAcc woldComp;"
+
+# Fit models
+m_lpa4 <- lapply(1:8, function(k) {
+  
+  # Update model spec 1: overall model estimates (variances and covariances)
+  body <- update(m_base,
+              MODEL = as.formula(sprintf("~ . + '%s \n %s 
+              combAcc naraAcc naraComp woldComp ON G;
+              %s'", vars, means, no_covars)))   
+  
+  # Create class-level specifications (variances only)
+  class_spec <- paste0("%c#1% \n ", vars, means)
+  if (k > 1){
+    for (i in 2:k){
+      class_spec <- paste0(class_spec, "\n %c#", i, "% \n ", vars, means)
+    }
+  }
+  
+  # ...Update model spec 2: class estimates
+  body <- update(body,
+     TITLE = as.formula(sprintf("~ 'Model 4 (LPA and G covariate): %d classes;'", k)),
+     VARIABLE = as.formula(sprintf("~ 'idvariable = cidb3153; classes = c(%d);'", k)),
+     MODEL = as.formula(sprintf("~ . + '%s'", class_spec)),
+     rdata = g_data,
+     usevariables = names(g_data))
+  
+  # Run model
+  mplusModeler(body, sprintf("mplus_models/simpview/shapeB/lpa4_%dclass.dat", k), run = FALSE)
+ })
+
+# Read in output
+lpa4_out <- readModels(target = "./mplus_models/simpview/shapeB", filefilter = "(lpa4_)([1-9])")
+```
+
+```{r lpa4-fit-starts, include = FALSE}
+# # Read in output
+# lpa4_out <- readModels(target = "./mplus_models/simpview/shapeB", filefilter = "(lpa4_)([1-9])")
+# 
+# # # Check warnings
+# for (model in 1:length(lpa4_out)){
+#   print(lpa4_out[[model]]$input[2])
+#   print(lpa4_out[[model]]$warnings)
+# }
+# 
+# m_lpa4_starts <- lapply(c(2), function(k) {
+# 
+#   # Update model spec 1: overall model estimates (variances and covariances)
+#   body <- update(m_base,
+#               MODEL = as.formula(sprintf("~ . + '%s \n %s
+#               combAcc naraAcc naraComp woldComp ON G;
+#               %s'", vars, means, no_covars)))
+# 
+#   # Create class-level specifications (variances only)
+#   class_spec <- paste0("%c#1% \n ", vars, means)
+#   if (k > 1){
+#     for (i in 2:k){
+#       class_spec <- paste0(class_spec, "\n %c#", i, "% \n ", vars, means)
+#     }
+#   }
+# 
+#   # ...Update model spec 2: class estimates
+#   body <- update(body,
+#      TITLE = as.formula(sprintf("~ 'Model 4 (LPA and G covariate): %d classes;'", k)),
+#      VARIABLE = as.formula(sprintf("~ 'idvariable = cidb3153; classes = c(%d);'", k)),
+#      ANALYSIS = ~ "estimator = mlr; type = mixture; starts = 2000 200;
+#                    processors = 4(STARTS);",
+#      MODEL = as.formula(sprintf("~ . + '%s'", class_spec)),
+#      rdata = g_data,
+#      usevariables = names(g_data))
+# 
+#   # Run model
+#   mplusModeler(body, sprintf("mplus_models/simpview/shapeB/lpa4_%dclass.dat", k), run = FALSE)
+#  })
+```
+
+Use optseed to compute adjusted LRT tests (Lo-Mendell-Rubin; Vuong-Lo-Mendell-Rubin). This was estimated after initial fitting for computational efficiency, and also to permit re-running of the test with increased k-1starts if the k-1 model does not have the same loglikelihood as the model fitted above ([Asparouhov & Muthen, 2012](https://www.statmodel.com/examples/webnotes/webnote14.pdf)).
+
+```{r lpa4-lmr}
+lpa4_lmr <- recomp_LMR(orig_mods = m_lpa4, 
+                        orig_output = lpa4_out, 
+                        mods = c(1:length(lpa4_out)),
+                        #mods = c(7),
+                        #kstarts = "10000 2500",
+                        filepath = "mplus_models/simpview/shapeB",
+                        rerun = FALSE
+                        )
+
+# Check that LL of k-1 model in LMR test matches LL of initial model fit
+lpa_enum_table(lpa4_lmr, LMR_warn = TRUE) %>% 
+  select(Specification, Classes, LMR_check)
+```
+
+*Note that the 7-class LMR test is not accurate (tried re-running up to 10000 starts)*
+
+### Indices
+
+**Steps 4-5)** Extract fit indices, and use to select smaller subset of candidate models.
+
+```{r lpa4-output}
+# Read in output
+lpa4_lmr <- readModels(target = "./mplus_models/simpview/shapeB", filefilter = "(lpa4_lmr_)([1-9])")
+
+# Print table 
+lpa4_summary <- lpa_enum_table(output = lpa4_lmr) %>% 
+  mutate(Specification = "Shape LPA")
+lpa4_summary %>%kable("pipe")
+
+# Elbow plots for information criteria
+lpa_enum_elbow(lpa4_summary)# benchmark_stats = lpa_benchmark)
+```
+
+Best model for:
+
+| **a) Absolute fit** (fewest classes with better LL than benchmark)**:**
+| **b) Information heuristics** (diminishing gains from elbow plots)**:** *Not clear, possibly 3 but substantial improvements beyond*
+| **c) Adjusted LRTs** (fewest classes not sig improved by additional classes)**:** *5-class*
+| **d) Approximate BF** (fewest classes with moderate-strong evidence compared to next model): *NA/8-class*
+| **e) Approximate correct model probability:** *NA/8-class*
+
+### Inspection
+
+**Step 6)** View classification diagnostics for candidate models.
+
+```{r lpa4-candidates, warning = FALSE}
+# Extract participant level data
+lpa4_cand <- mm_extract_data(orig_mods = m_lpa4, orig_output = lpa4_out, 
+                               candidate_mods = c(5:6),                          
+                               filepath = "mplus_models/simpview/shapeB",
+                               lrtstarts = "0 0 0 0",  # remove bLRT given previous issues
+                               rerun = FALSE, optseed = TRUE, 
+                               one_fit = TRUE)
+
+#Print table, and append bLRT values to main output 
+lpa4_summary <- add_bLRT(lpa4_cand, lpa4_summary)
+lpa4_summary %>% kable("pipe")
+
+# Compute classification diagnostics
+class_diag(lpa4_cand)
+
+# Plot class means
+plotMixtures_simpView(lpa4_cand[1])
+plotMixtures_simpView(lpa4_cand[2])
+
+# Inspect transitions 
+extract_classes(lpa4_cand, type = "lpa")
+```
+
+Comments:
+
+-   **Classification diagnostics:** Both have good classification diagnostics, no problems with very small classes. Entropy slightly higher in higher-class model.
+-   **Interpretability:** The two models show  differentiation by shape, although with less stability in profiles between models than was seen for sub-sample A. Although the 5-class model is favoured by the LMR tests, the addition of classes beyond this still show continued improvements in the fit indices. The 5-class model does not succeed in identifying a poor comprehender group---our theoretical focus---and the profiles do not correspond as well to the 5-class model fitted on subsample A. In contrast, the 6-class model shows very similar profiles to those identified initially, including a poor comprehender group, suggesting that this model is both relatively stable and well-aligned with our theoretical motivation. 
+
+### Selection
+
+**Step 7)** Select final model in class enumeration process, for model specification B.
+
+```{r lpa4-selected}
+lpa4_final_nclass <- 6           
+lpa4_final_m <- lpa4_cand$sv_lpa4_rerun_6class.out
+```
+
+# Best models
+
+**Aim: Inspect the best 2 candidate models from above alongside the best model from the pre-registered analyses. Select the best overall model.**
+
+## Final candidates
+
+Use the 3 best candidate models identified above to recalculate the approximate correct model probability.
+
+```{r final-candidates}
+
+# Select best models
+best_fits <- list(fmm3_final_m, lpa4_final_m)
+
+# Compute cMP for each
+best_summaries <- lpa_enum_table(best_fits) %>% 
+  select(-c(VLMR_p, LMR_p, BF)) %>% 
+  rename(cmP_best = cmP_k) %>% 
+  arrange(Specification) %>% 
+  mutate(Specification = ifelse(Parameters == 61, "FMM (shape): 4 classes", # Manual relabelling as not specified above
+                                        ifelse(Parameters == 76, "LPA (shape): 6 classes", NA)))
+best_summaries %>% kable("pipe")
+
+best_cmP <- best_summaries %>% 
+  select(Specification, Classes, cmP_best)
+  
+# Compute classification diagnostics (called separately as different mplus folders/files)
+class_diag(fmm3_final_m) # Shape factor mixture model
+class_diag(lpa4_final_m) # Shape LPA model (with covariate)
+
+# Plot class means (called separately as different mplus folders/files)
+plotMixtures_simpView(fmm3_final_m)
+plotMixtures_simpView(lpa4_final_m)
+```
+
+## All model summaries
+
+Combine all model fit indices into a single table, highlighting the best candidate models. Given the vast majority of bLRT values were inaccurate, remove these from the summary table. Bayes factors and approximate correct model probabilities also rarely distinguished between models (favouring higher class models regardless) and could not inform model decisions, so additionally remove these from the table. VLMR and LMR were identical across all models, so present only one. 
+
+```{r shape-all-table}
+# Combine all summary tables
+all_summaries <- bind_rows( fmm3_summary, lpa4_summary) 
+
+# Extract number of classes modelled in class enumeration process
+k_classes_modelled <- max(all_summaries$Classes, na.rm = TRUE)
+
+# Specify table row for selected models for each spec
+a_row <- fmm3_final_nclass
+b_row <- (1*k_classes_modelled) + lpa4_final_nclass
+
+# Format table, highlight class model of best fit in each specification
+summary_table <- all_summaries %>% 
+  select(-bLRT_p, -VLMR_p, -BF, -cmP_k) %>% 
+  mutate(across(where(is.numeric), round, 2)) %>% 
+  mutate(LMR_p = ifelse(LMR_p == 0, "<0.01", LMR_p)) %>%
+  replace(is.na(.), "-") 
+
+summary_table %>% 
+  mutate(Specification = " ") %>%  
+  kbl(align = c("l", "c", "r", "c", "r", "r", "r","r")) %>% 
+  kable_classic(html_font = "Cambria") %>% 
+  pack_rows(index = c("Shape FMM" = k_classes_modelled, "Shape LPA" = k_classes_modelled)) %>%
+  row_spec(c(a_row, b_row, bold = T))  # edit for row numbers of selected models within each model spec 
+
+# Save table as pdf for later viewing
+write.csv(summary_table, "../output/tables/shapeB_model_indices.csv", row.names = FALSE)
+```
+
+Combine the fit indices into a single plot.
+
+```{r shape-all-elbow}
+# Grouped elbow plots
+all_summaries %>%
+    mutate(model_spec = Specification) %>% 
+    select(model_spec, Classes, LL, BIC, CAIC, AWE) %>%
+    pivot_longer(LL:AWE, names_to = "statistic", values_to = "value") %>%
+    mutate(statistic_relevel = factor(statistic, levels = c("LL", "BIC", "CAIC", "AWE"))) %>% 
+    ggplot(aes(x = as.factor(Classes), y = value)) +
+    geom_point(aes(shape = model_spec)) +
+    geom_line(aes(group = model_spec, linetype = model_spec)) +
+    xlab("n classes") +
+    theme_bw() +
+    theme(panel.grid.major.x = element_blank(),
+          panel.grid.minor.y = element_blank()) +
+    facet_wrap(statistic_relevel ~., scales = "free") + 
+    labs(shape = "Model spec:", linetype = "Model spec:")
+
+# save out
+ggsave("../output/figures/shapeB_all_indices.tiff", dpi = 600, width = 7, height = 4, units = "in")
+```
+
+## Final model
+
+*As with the initial models on subset A, the LPA with general ability included as a covariate showed better fit to the data than the factor mixture alternative. The 6-class model successfully identified a poor comprehender group, and the profiles looked stable in comparison to initial model fitting. We are therefore reassured that the 6-class model is robust, and take this model forward to our next research question.*  
+
+```{r final-model}
+readModels("mplus_models/simpview/shapeB/sv_lpa4_rerun_6class.out", what="parameters")$parameters$r2 %>% kable("pipe")
+readModels("mplus_models/simpview/shapeB/sv_lpa4_rerun_6class.out", what="parameters")$parameters$stdyx.standardized %>% kable("pipe")
+```
+
+This model is returned to the cross-validation procedure for final fitting (WP1_SimpView_ShapeValidation.Rmd).
+
+# Version info {#version}
+
+*Package versions were up-to-date as of 12/08/2021.* *LPA models were run using Mplus Version 8.5.*
+
+```{r version}
+sessionInfo()
+```

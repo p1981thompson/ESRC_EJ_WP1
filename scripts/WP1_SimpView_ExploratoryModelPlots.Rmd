@@ -30,14 +30,14 @@ Read in selected model file that contains class assignment data, and data file o
 
 ```{r read-data}
 # Read in and extract class data
-final_mod <- readModels(target = "./mplus_models/simpview/shape/crossval", filefilter = "lpa4_full")  # final model file
+final_mod <- readModels(target = "./mplus_models/simpview/shapeB", filefilter = "lpa4_rerun_5class")  # final model file
 class_data <- as.data.frame(final_mod$savedata) %>% 
   rename_all(tolower) %>% 
   select(cidb3153, naraacc:c, f8age, f9age) %>%   # keep age data for additional checking during merge
   rename(cidB3153 = cidb3153)
 
 # Read in and extract relevant variables from data file
-ppt_data <- read.csv("../data/processed/WP1_data_all.csv") %>%
+ppt_data <- read.csv("../data/processed/WP1_data_subB.csv") %>%
   select(cidB3153, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8,
          nara_comp_std_f9, nara_acc_std_f9) %>% 
   mutate(read_comb_raw_f9 = (read_word_raw_f9 + read_nonw_raw_f9))
@@ -176,7 +176,7 @@ ggplot(plot_data, aes(x = task, y = class_mean, group = c, colour = c)) +
   scale_y_continuous(name = "Class mean (+/- 1SD)") +
   geom_hline(yintercept = 100, linetype = "longdash") 
 
-ggsave("../output/figures/lpa4full_6class_desc.tiff", dpi = 600, width = 7, height = 5)
+ggsave("../output/figures/lpa4_B_5class_desc.tiff", dpi = 600, width = 7, height = 5)
 
 # Raw data
 ggplot(plot_data, aes(x = task, y = class_mean, group = c)) +
@@ -189,7 +189,7 @@ ggplot(plot_data, aes(x = task, y = class_mean, group = c)) +
   scale_y_continuous(name = "Individual scores") +
   geom_hline(yintercept = 100, linetype = "longdash")
 
-ggsave("../output/figures/lpa4full_6class_raw.tiff", dpi = 600, width = 7, height = 5)
+#ggsave("../output/figures/lpa4full_6class_raw.tiff", dpi = 600, width = 7, height = 5)
 
 # Scatterplot - item accuracy by reading comprehension
 ggplot(std_data, aes(read_comb_bstd_f9, nara_comp_bstd_f9, color = as.factor(c))) + 
@@ -199,7 +199,7 @@ ggplot(std_data, aes(read_comb_bstd_f9, nara_comp_bstd_f9, color = as.factor(c))
   geom_vline(xintercept = 85, linetype = "longdash") + 
   xlab("Item accuracy") + 
   ylab("Reading comprehension")
-ggsave("../output/figures/lpa4full_6class_itemXcomp.tiff", dpi = 600, width = 7, height = 5)
+#ggsave("../output/figures/lpa4full_6class_itemXcomp.tiff", dpi = 600, width = 7, height = 5)
 
 # Scatterplot - passage accuracy by passage comprehension
 ggplot(std_data, aes(nara_acc_bstd_f9, nara_comp_bstd_f9, color = as.factor(c))) + 
@@ -209,7 +209,7 @@ ggplot(std_data, aes(nara_acc_bstd_f9, nara_comp_bstd_f9, color = as.factor(c)))
   geom_vline(xintercept = 85, linetype = "longdash") + 
   xlab("Passage accuracy") +
   ylab("Reading comprehension")
-ggsave("../output/figures/lpa4full_6class_passXcomp.tiff", dpi = 600, width = 7, height = 5)
+#ggsave("../output/figures/lpa4full_6class_passXcomp.tiff", dpi = 600, width = 7, height = 5)
 ```
 
 ```{r}

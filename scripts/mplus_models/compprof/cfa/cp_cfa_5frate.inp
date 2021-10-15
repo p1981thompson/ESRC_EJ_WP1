@@ -1,0 +1,41 @@
+TITLE:
+Confirmatory Factor Analysis - 5-factor (split execfun, no wiscode, no sdqHyp);
+DATA:
+FILE = "./mplus_models/compprof/cfa/cp_cfa_5f+rate_bd59f7f7b020b4d0f27f28f1b68e4e31.dat";
+ 
+VARIABLE:
+NAMES = naraAcc combAcc woldComp f8age f9age f10age naraRate woldVcb wiscVcb
+     wiscPcmp wiscParr wiscBloc wiscObja wiscBwsp cntspan attnSel attnDiv attnOpp; 
+ MISSING=.;
+ 
+DEFINE:
+ naraAcc = naraAcc/5;naraRate = naraRate/8; wiscVcb = wiscVcb/2;
+          wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
+          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20; 
+          attnOpp = attnOpp/4;
+ANALYSIS:
+estimator = mlr; type = general; starts = 20;
+MODEL:
+ f8age; f9age; f10age;
+            lang perfiq wiscBwsp attn on f8age;
+            cntSpan on f10age;
+            acc naraRate on f9age;
+            acc by combAcc naraAcc;
+            nararate;
+            lang by woldComp wiscVcb woldVcb;
+            perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
+            workmem by wiscBwsp cntSpan; 
+            attn by attnSel attnDiv attnOpp;
+            acc with lang; acc with naraRate; 
+            acc with perfiq; acc with workmem;
+            acc with attn;
+            naraRate with lang; naraRate with perfiq;
+            naraRate with workmem; naraRate with attn;
+            lang with perfiq; 
+            lang with workmem; lang with attn;
+            perfiq with workmem; perfiq with attn;
+            workmem with attn;
+OUTPUT:
+TECH1; TECH4; stdyx; modindices;
+PLOT:
+TYPE = PLOT3;

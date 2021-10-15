@@ -1,0 +1,79 @@
+TITLE:
+LPA with covariate: Final model full dataset with auxiliary variables
+DATA:
+FILE = "mplus_models/simpview/final_model/lpa_aux_51d816339892cd5c09390f01cd7be683.dat";
+ 
+VARIABLE:
+NAMES = cidB3153 f8age f9age naraAcc naraComp woldComp ethn mAge home mEdu combAcc
+     G_x G_y; 
+ MISSING=.;
+ idvariable = cidB3153; classes = c(6);
+ANALYSIS:
+estimator = mlr; type = mixture; starts = 2000 200; 
+              processors = 4(STARTS);
+MODEL:
+%OVERALL%
+      f8age; f9age;
+      combAcc naraAcc naraComp on f9age;
+      woldcomp on f8age;
+ 
+      f8age with ethn mAge home mEdu;
+      f9age with ethn mAge home mEdu;
+
+      ethn with mAge home mEdu;
+      mAge with home mEdu;
+      home with mEdu;
+
+      woldcomp with ethn mAge 
+      home mEdu;
+
+      combacc with ethn mAge 
+      home mEdu;
+
+      naraacc with ethn mAge 
+      home mEdu;
+
+      naracomp with ethn mAge 
+      home mEdu;
+
+    naraComp combAcc woldComp naraAcc;
+
+    [naraComp naraAcc combAcc woldComp];
+    combAcc naraAcc naraComp woldComp ON G;
+
+    naraComp with naraAcc@0;
+    naraComp with combAcc@0;
+    naraComp with woldComp@0;
+    naraAcc with combAcc@0;
+    naraAcc with woldComp@0;
+    combAcc with woldComp@0;
+  
+  %c#1%
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#2% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#3% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#4% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#5% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#6% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+OUTPUT:
+TECH1 TECH8 stdyx CINTERVAL ENTROPY;
+SAVEDATA:
+FILE IS lpa_aux.dat; SAVE = cprobabilities;
+PLOT:
+TYPE = PLOT3;

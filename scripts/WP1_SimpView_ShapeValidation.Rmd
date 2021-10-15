@@ -9,17 +9,15 @@ knit: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding, output_dir = "../output/analysis/") })
 ---
 
-This script is used for split-half cross validation. It takes the final model selected from WP1_SimpView_LPA_comp.Rmd (developed on sub-sample A) and tests it on sub-sample B, before re-running on the full dataset for reporting. The last section checks that this final model does not differ when auxiliary variables are included to support the MAR assumption.
+This script is used for split-half cross validation. It takes the final model selected from **WP1_SimpView_LPA_shape.Rmd** (developed on sub-sample A) and tests it on sub-sample B. For reassurance, we then take a model fitted to sub-sample (**WP1_SimpView_LPA_shape_B.Rmd**) and tests it on sub-sample A. 
 
-The model running chunks are manually specified for the final model (E4) but the parameter-extraction is scripted, so requires (fairly minimal) editing if a different model is used.  
-
-***EDITION FOR VALIDATING SHAPE MODELS - BOTH STATISTICALLY AND THEORETICALLY***
+The final model is re-run on the full dataset for reporting. The last section checks that this final model does not differ when auxiliary variables are included to support the MAR assumption.
 
 # Set-up 
 
-```{r libraries}
+```{r libraries, message = FALSE, warning = FALSE}
 # Specify packages
-pkgs <- c("tidyverse", "MplusAutomation", "texreg", "kableExtra")
+pkgs <- c("tidyverse", "MplusAutomation", "texreg", "kableExtra", "scales")
 
 # Use groundhog package to load correct package versions
 # if (!require("groundhog")) install.packages("groundhog")
@@ -34,8 +32,11 @@ invisible(lapply(pkgs, library, character.only = TRUE))
 # Create subdirectories for storing mplus scripts, data files, and output, if do not already exist
 if(dir.exists("./mplus_models/")==FALSE){dir.create("./mplus_models/")}
 if(dir.exists("./mplus_models/simpview/")==FALSE){dir.create("./mplus_models/simpview/")}
-if(dir.exists("./mplus_models/simpview/lpa_comp")==FALSE){dir.create("./mplus_models/simpview/shape")} 
-if(dir.exists("./mplus_models/simpview/lpa_comp/crossval")==FALSE){dir.create("./mplus_models/simpview/shape/crossval")}
+if(dir.exists("./mplus_models/simpview/shape")==FALSE){dir.create("./mplus_models/simpview/shape")} 
+if(dir.exists("./mplus_models/simpview/shape/crossval")==FALSE){dir.create("./mplus_models/simpview/shape/crossval")}
+if(dir.exists("./mplus_models/simpview/shapeB")==FALSE){dir.create("./mplus_models/simpview/shapeB")} 
+if(dir.exists("./mplus_models/simpview/shapeB/crossval")==FALSE){dir.create("./mplus_models/simpview/shapeB/crossval")}
+if(dir.exists("./mplus_models/simpview/final_model")==FALSE){dir.create("./mplus_models/simpview/final_model")}
 if(dir.exists("../output/")==FALSE){dir.create("../output/")}
 if(dir.exists("../output/figures")==FALSE){dir.create("../output/figures")}
 if(dir.exists("../output/tables")==FALSE){dir.create("../output/tables")}
@@ -47,12 +48,12 @@ Read in selected model file that contains class assignment data, and data file o
 
 ```{r read-model}
 # Read in and extract class data
-final_mod <- readModels(target = "./mplus_models/simpview/shape", filefilter = "lpa4_6class")  # final model file
+final_mod <- readModels(target = "./mplus_models/simpview/shape", filefilter = "lpa4_rerun_6class")  # final model file
 ```
 
 ###  Load and prepare confirmatory subsample for Mplus
 
-```{r load-data}
+```{r load-data-B}
 data_B <- read.csv("../data/processed/WP1_data_subB.csv")  %>%        # ALSPAC data sub B
   dplyr::select(yp_id, cidB3153, age_m_f8, age_m_f9, 
                 nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9,  # reading accuracy variables
@@ -69,8 +70,10 @@ data_B <- read.csv("../data/processed/WP1_data_subB.csv")  %>%        # ALSPAC d
 
 ### Extract factor scores from CFA model
 
-```{r}
-# Run single factor model (including age covariates)
+The final model uses general ability factor scores as a covariate, so first need to extract these for subsample B. 
+
+```{r cfa-scores}
+# Run single factor model (including age covariates & correlated residuals for comprehension measures)
 m_cfa <- mplusObject(
   TITLE = "Confirmatory Factor Analysis - Extract factor scores;",
   ANALYSIS = "estimator = mlr; type = general;",                  
@@ -88,22 +91,21 @@ m_cfa <- mplusObject(
 
 m_cfa_fit <- mplusModeler(m_cfa,
                            modelout = "./mplus_models/simpview/shape/crossval/cfa_B.inp",
-                           check = TRUE, run = TRUE)
+                           check = TRUE, run = FALSE)
 
 # Inspect model output
 cfa_out <- readModels(target = "./mplus_models/simpview/shape/crossval", filefilter = "cfa")
-SummaryTable(cfa_out, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
+SummaryTable(cfa_out, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR")) %>% kable("pipe")
 
-# The modified CFA is a much better fit, and good fit overall. Use these scores for analysis
+# The CFA is a good fit - use these scores for analysis
 g_data <- as.data.frame(cfa_out$savedata) %>% 
   select(-G_SE)
-
 ```
 
 ### Functions
 
 Functions for processing the output are stored in a separate script, used for initial model fitting.
-Also create new function for filling in Mplus model parameters with those extracted from exploratory model fitting. This is based on script from Grimm et al. (2017), downloaded from [first author's website](https://sites.google.com/site/longitudinalmethods/downloads?authuser=0)
+Also create new function for filling in Mplus model parameters with those extracted from exploratory model fitting. This is based on script from Grimm et al. (2017), downloaded from the [first author's website](https://sites.google.com/site/longitudinalmethods/downloads?authuser=0).
 
 ```{r functions}
 # Output Processing functions
@@ -118,11 +120,13 @@ loopReplace <- function(text, replacements) {
 }
 ```
 
-# Step 1A: Evaluate model with fixed parameters from subsample A
+# A: Cross-validation of model from subsample A
+
+## Step 1A: Evaluate model with fixed parameters from subsample A
 
 Based on script from Grimm et al. (2017), downloaded from [first author's website](https://sites.google.com/site/longitudinalmethods/downloads?authuser=0)
 
-Extract model parameter estimates from final model selected in exploratory class enumeration process on subsample A (WP1_LPA_composite.Rmd)
+Extract model parameter estimates from final model selected in exploratory class enumeration process on subsample A (WP1_SimpView_LPA_shape.Rmd)
 
 ```{r extract-subA-params}
 params <- final_mod$parameters
@@ -136,12 +140,12 @@ named_params <- df_params %>%
 ```
 
 Create new model script fixing all parameters to estimated values above, and run with subsample B.
-*Note that the model spec itself is written out manually, so will need editing if the final model set-up differs*
+*Note that the model spec itself is written out manually.*
 
 ```{r run-fixed-model}
 fixed_model <- mplusObject(
   TITLE = "LPA: Confirmatory model (subB fixed parameters)",
-  ANALYSIS = "estimator = mlr; type = mixture; starts = 500 50; 
+  ANALYSIS = "estimator = mlr; type = mixture; starts = 2000 200; 
               processors = 4(STARTS); STSCALE = 1;",
   VARIABLE = "idvariable = cidB3153; classes = c(6);",
   MODEL = loopReplace("
@@ -211,26 +215,24 @@ fixed_model <- mplusObject(
      naraComp naraAcc combAcc woldComp;
 
   ", named_params), 
-  OUTPUT = "TECH1 TECH8 TECH11 TECH14 stdyx CINTERVAL ENTROPY;",
+  OUTPUT = "TECH1 TECH8 TECH11 stdyx CINTERVAL ENTROPY;",
   PLOT = "TYPE = PLOT3;",
   usevariables = colnames(g_data[,!names(g_data) %in% c("yp_id")]),
   rdata = g_data,
   SAVEDATA = "FILE IS fixed.dat; SAVE = cprobabilities;")
 
-fixed_results <- mplusModeler(fixed_model, "mplus_models/simpview/shape/crossval/fixed.dat", run = TRUE)
+fixed_results <- mplusModeler(fixed_model, "mplus_models/simpview/shape/crossval/fixed.dat", run = FALSE)
 ```
 
-Evaluate overall fit of model.
-*except no good measures of absolute fit to use here? can only inspect general output and check for issues*
+There are no good measures of absolute fit for this type of model, but inspect general output. 
 
-```{r fixed-out}
+```{r fixed-out-A}
 # Read in output
 fixed_out <- readModels(target = "./mplus_models/simpview/shape/crossval", filefilter = "fixed")
 
 # Print table 
 fixed_out_summary <- lpa_enum_table(output = fixed_out)
-#fixed_out_summary <- mixtureSummaryTable(fixed_out)
-fixed_out_summary
+fixed_out_summary %>%  kable("pipe")
 
 # Compute classification diagnostics
 class_diag(fixed_out)
@@ -239,19 +241,15 @@ class_diag(fixed_out)
 plotMixtures_simpView(fixed_out)
 ```
 
-
-# Step 2A: Compare fit of fixed and freely estimated parameter models 
+## Step 2A: Compare fit of fixed and freely estimated parameter models 
 
 Fit the model to subsample B, allowing parameters to be freely estimated. 
-
-Use previous parameters as starting values to guide the model into ordering the classes in the same way for comparison.
-(*Not sure if I've done this correctly? Also could ignore this part if only interested in overall model fit*)
 
 ```{r free-model}
 free_model <- mplusObject(
   TITLE = "LPA: Confirmatory model (subB free estimation)",
-  ANALYSIS = "estimator = mlr; type = mixture; starts = 500 50; 
-              processors = 4(STARTS);",
+  ANALYSIS = "estimator = mlr; type = mixture; starts = 2000 200; 
+              processors = 4(STARTS); STSCALE = 1;",
   VARIABLE = "idvariable = cidB3153; classes = c(6);",
   MODEL = loopReplace("
     %OVERALL%
@@ -274,7 +272,7 @@ free_model <- mplusObject(
   %c#1%
      [naraComp naraAcc combAcc woldComp];
      naraComp naraAcc combAcc woldComp;
-  
+
   %c#2% 
      [naraComp naraAcc combAcc woldComp];
      naraComp naraAcc combAcc woldComp;
@@ -296,54 +294,98 @@ free_model <- mplusObject(
      naraComp naraAcc combAcc woldComp;
 
 ", named_params), 
-  OUTPUT = "TECH1 TECH8 TECH11 TECH14 stdyx CINTERVAL ENTROPY;",
+  OUTPUT = "TECH1 TECH8 TECH11 stdyx CINTERVAL ENTROPY;",
   PLOT = "TYPE = PLOT3;",
   usevariables = colnames(g_data[,!names(g_data) %in% c("yp_id")]),
   rdata = g_data,
   SAVEDATA = "FILE IS free.dat; SAVE = cprobabilities;")
 
-free_results <- mplusModeler(free_model, "mplus_models/simpview/shape/crossval/free.dat", run = TRUE)
+free_results <- mplusModeler(free_model, "mplus_models/simpview/shape/crossval/free.dat", run = FALSE)
 ```
 
-```{r compare-fit}
+Compare overall model fit from the fixed and freely estimated models. 
+
+```{r compare-fit-A}
 # Use readModels to create extract all info for both models
 all_mods <- readModels("./mplus_models/simpview/shape/crossval")
 
 compareModels(all_mods[["fixed.out"]], all_mods[["free.out"]],
-              show = c("diff", "pdiff", "summaries", "unique"),
-              equalityMargin = c(param = .05, pvalue = .02),
-              sort = "type", diffTest = TRUE, showNS = FALSE)
+              show = c("summaries"),
+              diffTest = TRUE) 
 
-plotMixtures_simpView(all_mods)
+plotMixtures_simpView(all_mods$fixed.out)
+plotMixtures_simpView(all_mods$free.out)
 ```
 
+*The models estimated with free versus fixed parameters significantly differ in model fit, although the shape of the profiles look reassuringly similar across the two models.* 
 
-**Given difference in model fit, model selection was repeated independently with subsample B to ensure the same model was selected. The resultant classes looked very similar across subsamples for the 6-class model. Test here whether model fit is similar if constraining parameters derived this way.** - ????????????? is this sensible ?? 
+*Given difference in model fit, model selection was repeated independently with subsample B to ensure the same model was selected (WP1_SimpView_LPA_shapeB.Rmd).* 
 
-# Step 1B: Evaluate model with fixed parameters from subsample A
+# B: Cross-validation of model from subsample B
 
-Based on script from Grimm et al. (2017), downloaded from [first author's website](https://sites.google.com/site/longitudinalmethods/downloads?authuser=0)
+## Set-up
 
-Extract model parameter estimates from final model selected in exploratory class enumeration process on subsample A (WP1_LPA_composite.Rmd)
+### Read in final model from subsample B
 
-```{r extract-subA-params}
-params <- final_mod$parameters
-df_params <- data.frame(params[[1]]$paramHeader,params[[1]]$param, params[[1]]$est, params[[1]]$LatentClass)
-names(df_params) <- c("header", "param", "est", "class")
+Read in selected model file that contains class assignment data, and data file of descriptive statistics. Merge and check. 
 
-named_params <- df_params %>% 
+```{r read-modelB}
+# Read in and extract class data
+final_mod_B <- readModels(target = "./mplus_models/simpview/shapeB", filefilter = "lpa4_rerun_6class")  # final model file
+```
+
+###  Load in subsample A data
+
+```{r load-data-A}
+data_A <- read.csv("../data/processed/WP1_data_subA.csv")  %>%        # ALSPAC data sub A
+  dplyr::select(yp_id, cidB3153, age_m_f8, age_m_f9, 
+                nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9,  # reading accuracy variables
+                nara_comp_raw_f9, wold_comp_raw_f8) %>%               # comprehension variables
+  mutate(combAcc = read_word_raw_f9 + read_nonw_raw_f9) %>%           # create combined single item accuracy score
+  select(-read_word_raw_f9, -read_nonw_raw_f9) %>%                    # remove other measures
+  rename(naraComp = nara_comp_raw_f9,                                 # rename within mplus character limit
+         naraAcc = nara_acc_raw_f9,
+         woldComp = wold_comp_raw_f8,
+         f8age = age_m_f8,
+         f9age = age_m_f9) %>% 
+  mutate(yp_id = as.factor(yp_id))
+```
+
+### Extract factor scores from CFA model
+
+The final model uses general ability factor scores as a covariate, so first need to extract these for subsample B. 
+
+```{r cfa-scoresA}
+# Load in scores from previously fitted CFA model, and check model
+cfa_out_A <- readModels(target = "./mplus_models/simpview/shape", filefilter = "cfa_scores2")
+SummaryTable(cfa_out_A, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR")) %>% kable("pipe")
+
+# Extract scores for analysis
+g_data_A <- as.data.frame(cfa_out_A$savedata) %>% 
+  select(-G_SE)
+```
+
+## Step 1B: Evaluate model with fixed parameters from subsample B
+
+Extract model parameter estimates from final model selected in exploratory class enumeration process on subsample B (WP1_SimpView_LPA_shape_B.Rmd).
+
+```{r extract-subB-params}
+params_B <- final_mod_B$parameters
+df_params_B <- data.frame(params_B[[1]]$paramHeader,params_B[[1]]$param, params_B[[1]]$est, params_B[[1]]$LatentClass)
+names(df_params_B) <- c("header", "param", "est", "class")
+
+named_params_B <- df_params_B %>% 
   mutate(parameter_name = paste(header, param, class, sep = "_")) %>% 
   select(-c(header, param, class)) %>% 
   pivot_wider(names_from = parameter_name, values_from = est)
 ```
 
 Create new model script fixing all parameters to estimated values above, and run with subsample B.
-*Note that the model spec itself is written out manually, so will need editing if the final model set-up differs*
 
-```{r run-fixed-model}
-fixed_model <- mplusObject(
+```{r run-fixedB-model}
+fixed_model_B <- mplusObject(
   TITLE = "LPA: Confirmatory model (subB fixed parameters)",
-  ANALYSIS = "estimator = mlr; type = mixture; starts = 500 50; 
+  ANALYSIS = "estimator = mlr; type = mixture; starts = 2000 200; 
               processors = 4(STARTS); STSCALE = 1;",
   VARIABLE = "idvariable = cidB3153; classes = c(6);",
   MODEL = loopReplace("
@@ -412,125 +454,52 @@ fixed_model <- mplusObject(
      [woldComp@[[Intercepts_WOLDCOMP_6]]];
      naraComp naraAcc combAcc woldComp;
 
-  ", named_params), 
+  ", named_params_B), 
   OUTPUT = "TECH1 TECH8 TECH11 TECH14 stdyx CINTERVAL ENTROPY;",
   PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(g_data[,!names(g_data) %in% c("yp_id")]),
-  rdata = g_data,
+  usevariables = colnames(g_data_A[,!names(g_data_A) %in% c("yp_id")]),
+  rdata = g_data_A,
   SAVEDATA = "FILE IS fixed.dat; SAVE = cprobabilities;")
 
-fixed_results <- mplusModeler(fixed_model, "mplus_models/simpview/shape/crossval/fixed.dat", run = TRUE)
+fixed_results_B <- mplusModeler(fixed_model_B, "mplus_models/simpview/shapeB/crossval/fixed.dat", run = FALSE)
 ```
 
-Evaluate overall fit of model.
-*except no good measures of absolute fit to use here? can only inspect general output and check for issues*
+Inspect model output
 
-```{r fixed-out}
+```{r fixed-out-B}
 # Read in output
-fixed_out <- readModels(target = "./mplus_models/simpview/shape/crossval", filefilter = "fixed")
+fixed_out_B <- readModels(target = "./mplus_models/simpview/shapeB/crossval", filefilter = "fixed")
 
 # Print table 
-fixed_out_summary <- lpa_enum_table(output = fixed_out)
-#fixed_out_summary <- mixtureSummaryTable(fixed_out)
-fixed_out_summary
+fixed_out_summary_B <- lpa_enum_table(output = fixed_out_B)
+fixed_out_summary_B %>% kable("pipe")
 
 # Compute classification diagnostics
-class_diag(fixed_out)
+class_diag(fixed_out_B)
 
 # Plot class means
-plotMixtures_simpView(fixed_out)
-```
-# Step 2B: Compare fit of fixed and freely estimated parameter models 
-
-Fit the model to subsample B, allowing parameters to be freely estimated. 
-
-Use previous parameters as starting values to guide the model into ordering the classes in the same way for comparison.
-(*Not sure if I've done this correctly? Also could ignore this part if only interested in overall model fit*)
-
-```{r free-model}
-free_model <- mplusObject(
-  TITLE = "LPA: Confirmatory model (subB free estimation)",
-  ANALYSIS = "estimator = mlr; type = mixture; starts = 500 50; 
-              processors = 4(STARTS);",
-  VARIABLE = "idvariable = cidB3153; classes = c(6);",
-  MODEL = loopReplace("
-    %OVERALL%
-      f8age; f9age;
-      combAcc naraAcc naraComp on f9age;
-      woldcomp on f8age;
-
-    naraComp combAcc woldComp naraAcc;
-
-    [naraComp naraAcc combAcc woldComp];
-    combAcc naraAcc naraComp woldComp ON G;
-
-    naraComp with naraAcc@0;
-    naraComp with combAcc@0;
-    naraComp with woldComp@0;
-    naraAcc with combAcc@0;
-    naraAcc with woldComp@0;
-    combAcc with woldComp@0;
-  
-  %c#1%
-     [naraComp naraAcc combAcc woldComp];
-     naraComp naraAcc combAcc woldComp;
-  
-  %c#2% 
-     [naraComp naraAcc combAcc woldComp];
-     naraComp naraAcc combAcc woldComp;
-  
-  %c#3% 
-     [naraComp naraAcc combAcc woldComp];
-     naraComp naraAcc combAcc woldComp;
-  
-  %c#4% 
-     [naraComp naraAcc combAcc woldComp];
-     naraComp naraAcc combAcc woldComp;
-  
-  %c#5% 
-     [naraComp naraAcc combAcc woldComp];
-     naraComp naraAcc combAcc woldComp;
-  
-  %c#6% 
-     [naraComp naraAcc combAcc woldComp];
-     naraComp naraAcc combAcc woldComp;
-
-", named_params), 
-  OUTPUT = "TECH1 TECH8 TECH11 TECH14 stdyx CINTERVAL ENTROPY;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(g_data[,!names(g_data) %in% c("yp_id")]),
-  rdata = g_data,
-  SAVEDATA = "FILE IS free.dat; SAVE = cprobabilities;")
-
-free_results <- mplusModeler(free_model, "mplus_models/simpview/shape/crossval/free.dat", run = TRUE)
+plotMixtures_simpView(fixed_out_B)
 ```
 
-```{r compare-fit}
-# Use readModels to create extract all info for both models
-all_mods <- readModels("./mplus_models/simpview/shape/crossval")
+## Step 2B: Compare fit of fixed and freely estimated parameter models 
 
-compareModels(all_mods[["fixed.out"]], all_mods[["free.out"]],
-              show = c("diff", "pdiff", "summaries", "unique"),
-              equalityMargin = c(param = .05, pvalue = .02),
-              sort = "type", diffTest = TRUE, showNS = FALSE)
+Compare the fixed parameter model of subsample A with the model that was previously freely estimated ()
 
-plotMixtures_simpView(all_mods)
+```{r compare-fit-B}
+compareModels(final_mod, fixed_out_B,
+              show = c("summaries"),
+              diffTest = TRUE) 
 ```
 
-If difference in fit, should probably repeat class enumeration process with subset B, see if arrive at same model? 
+Perhaps unsurprisingly, the fixed and freely estimated models again show a statistically significant difference in fit. This looks to be largely due to the difference in intercepts for each profile, whereas the shape of the profiles look relatively stable. 
 
-*****************************************************************************************
-TO HERE - remaining script not run/tested yet 
-*****************************************************************************************
+# Full data model 
 
+## Fit final model to full dataset
 
+Fit the selected final model to the full dataset. 
 
-
-
-
-# Step 3: Re-fit the model on the full dataset for reporting 
-
-```{r full-data}
+```{r load-data-full}
 data_all <- read.csv("../data/processed/WP1_data_all.csv")  %>%       # ALSPAC data
   dplyr::select(yp_id, cidB3153, age_m_f8, age_m_f9, 
                 nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9,  # reading accuracy variables
@@ -568,24 +537,27 @@ m_cfa <- mplusObject(
   SAVEDATA = "FILE IS cfa_full.dat; SAVE = fscores;")
 
 m_cfa_fit <- mplusModeler(m_cfa,
-                           modelout = "./mplus_models/simpview/shape/crossval/full.inp",
-                           check = TRUE, run = TRUE)
+                           modelout = "./mplus_models/simpview/final_model/cfa_full.inp",
+                           check = TRUE, run = FALSE)
 
 # Inspect model output
-cfa_out <- readModels(target = "./mplus_models/simpview/shape/crossval", filefilter = "full")
-SummaryTable(cfa_out, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
+cfa_full <- readModels(target = "./mplus_models/simpview/final_model", filefilter = "cfa_full")
+SummaryTable(cfa_full, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR")) %>% kable("pipe")
 
-# The modified CFA is a much better fit, and good fit overall. Use these scores for analysis
-g_full <- as.data.frame(cfa_out$savedata) %>% 
-  select(-G_SE)
+# Extract scores for analysis
+g_full <- as.data.frame(cfa_full$savedata) %>% 
+  select(CIDB3153, G)
+
+data_all <- data_all %>% 
+  left_join(g_full, by = c("cidB3153" = "CIDB3153"))
 ```
 
 
 ```{r full-model}
 full_model <- mplusObject(
  TITLE = "LPA with covariate: Final model full dataset",
-  ANALYSIS = "estimator = mlr; type = mixture; starts = 2000 500; 
-              processors = 4(STARTS);",
+  ANALYSIS = "estimator = mlr; type = mixture; starts = 2000 200; 
+              processors = 4(STARTS); STSCALE = 1;",
   VARIABLE = "idvariable = cidB3153; classes = c(6);",
   MODEL = 
     "%OVERALL%
@@ -628,53 +600,123 @@ full_model <- mplusObject(
   %c#6% 
      [naraComp naraAcc combAcc woldComp];
      naraComp naraAcc combAcc woldComp;", 
-  OUTPUT = "TECH1 TECH8 TECH11 TECH14 stdyx CINTERVAL ENTROPY;",
+  OUTPUT = "TECH1 TECH8 stdyx CINTERVAL ENTROPY;",
   PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(g_data[,!names(g_data) %in% c("yp_id", "ethn", "mAge", "home", "mEdu")]),
-  rdata = g_full,
-  SAVEDATA = "FILE IS lpa4_full.dat; SAVE = cprobabilities;")
+  usevariables = colnames(data_all[,!names(data_all) %in% c("yp_id", "ethn", "mAge", "home", "mEdu")]),
+  rdata = data_all,
+  SAVEDATA = "FILE IS lpa_full.dat; SAVE = cprobabilities;")
 
-full_results <- mplusModeler(full_model, "mplus_models/simpview/shape/crossval/lpa4_full.dat", run = TRUE)
-
+full_results <- mplusModeler(full_model, "mplus_models/simpview/final_model/lpa_full.dat", run = FALSE)
 ```
 
-# Check that auxiliary variables do not influence results
+## Final model parameters 
 
-```{r auxiliary}
-# Single-factor model with manual implementation of auxiliary variables (all)
-m_aux_manual_full <- update(full_model,
-                 TITLE = ~ "Confirmatory Factor Analysis - Final model with auxiliary variables (full spec)",
-                 MODEL = ~ . + "f8age with ethn mAge home mEdu;
-                                f9age with ethn mAge home mEdu;
-                 
-                                ethn with mAge home mEdu;
-                                mAge with home mEdu;
-                                home with mEdu;
-                 
-                                woldcomp with ethn mAge 
-                                home mEdu;
-                 
-                                combacc with ethn mAge 
-                                home mEdu;
-                 
-                                naraacc with ethn mAge 
-                                home mEdu;
-                 
-                                naracomp with ethn mAge 
-                                home mEdu;
-                 
-                                ",
-                 usevariables = names(sv_data[!names(sv_data) %in% c("yp_id", "cidB3153")]),
-                 rdata = data_full)
+```{r final-model}
+readModels("mplus_models/simpview/final_model/lpa_full.out", what="parameters")$parameters$r2 %>% kable("pipe")
+readModels("mplus_models/simpview/final_model/lpa_full.out", what="parameters")$parameters$stdyx.standardized %>% kable("pipe")
+```
 
-aux_results <- mplusModeler(free_model, "mplus_models/simpview/lpa_comp/crossval/aux.dat", run = TRUE)
+# Missing data check 
+
+Preliminary exploration of missing data indicated that missingness on any given variable could be predicted by other variables in the model (MAR assumption), and thus that missingness could be adequately addressed using full information maximum likelihood. However, given that some socio-demographic variables predicted missingness when explored independently, check here that adding auxiliary variables does not change the model results. 
+
+******** To revisit/check with PT ***********
+
+
+```{r auxiliary, include = FALSE}
+# Join the G scores to the full dataset (includes auxiliary variables)
+data_all <- data_all %>% 
+  left_join(g_full, by = c("cidB3153" = "CIDB3153"))
+
+# Manual implementation of auxiliary variables 
+aux_full <- mplusObject(
+ TITLE = "LPA with covariate: Final model full dataset with auxiliary variables",
+  ANALYSIS = "estimator = mlr; type = mixture; starts = 2000 200; 
+              processors = 4(STARTS);",
+  VARIABLE = "idvariable = cidB3153; classes = c(6);",
+  MODEL = 
+    "%OVERALL%
+      f8age; f9age;
+      combAcc naraAcc naraComp on f9age;
+      woldcomp on f8age;
+ 
+      f8age with ethn mAge home mEdu;
+      f9age with ethn mAge home mEdu;
+
+      ethn with mAge home mEdu;
+      mAge with home mEdu;
+      home with mEdu;
+
+      woldcomp with ethn mAge 
+      home mEdu;
+
+      combacc with ethn mAge 
+      home mEdu;
+
+      naraacc with ethn mAge 
+      home mEdu;
+
+      naracomp with ethn mAge 
+      home mEdu;
+
+    naraComp combAcc woldComp naraAcc;
+
+    [naraComp naraAcc combAcc woldComp];
+    combAcc naraAcc naraComp woldComp ON G;
+
+    naraComp with naraAcc@0;
+    naraComp with combAcc@0;
+    naraComp with woldComp@0;
+    naraAcc with combAcc@0;
+    naraAcc with woldComp@0;
+    combAcc with woldComp@0;
+  
+  %c#1%
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#2% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#3% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#4% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#5% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;
+  
+  %c#6% 
+     [naraComp naraAcc combAcc woldComp];
+     naraComp naraAcc combAcc woldComp;", 
+  OUTPUT = "TECH1 TECH8 stdyx CINTERVAL ENTROPY;",
+  PLOT = "TYPE = PLOT3;",
+  usevariables = colnames(data_all[,!names(data_all) %in% c("yp_id")]),
+  rdata = data_all,
+  SAVEDATA = "FILE IS lpa_aux.dat; SAVE = cprobabilities;")
+  
+aux_results <- mplusModeler(aux_full, "mplus_models/simpview/final_model/lpa_aux.dat", run = FALSE)
 
 
 # Compare fit ???? Or just look at general interpretability?? 
-all_mods <- readModels("../mplus_models/simpview/lpa_comp/crossval/")
+all_mods <- readModels("./mplus_models/simpview/final_model")
 
-compareModels(all_mods[["full.out"]], all_mods[["aux.out"]],
+compareModels(all_mods[["lpa_full.out"]], all_mods[["lpa_aux.out"]],
               show = c("diff", "pdiff", "summaries", "unique"),
               equalityMargin = c(param = .05, pvalue = .02),
               sort = "type", diffTest = TRUE, showNS = FALSE)
 ```
+
+# Version info {#version}
+
+*Package versions were up-to-date as of 12/08/2021.* *LPA models were run using Mplus Version 8.5.*
+
+```{r version}
+sessionInfo()
+```
+
