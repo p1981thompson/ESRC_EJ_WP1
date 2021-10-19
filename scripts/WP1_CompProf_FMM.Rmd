@@ -18,13 +18,8 @@ This script is used for running the factor mixture models. This analysis is cond
 # Specify packages
 pkgs <- c("tidyverse", "MplusAutomation", "texreg", "DiagrammeR", "kableExtra", "ggalluvial", "scales", "ggpubr")
 
-# Use groundhog package to load correct package versions
-if (!require("groundhog")) install.packages("groundhog")
-groundhog.day <- "2021-03-01"
-groundhog::groundhog.library(pkgs, groundhog.day)
-
-# Or if not using groundhog package - load currently installed package versions separately (faster; reproducibility not guaranteed)
-# invisible(lapply(pkgs, library, character.only = TRUE))
+# Load packages
+invisible(lapply(pkgs, library, character.only = TRUE))
 ```
 
 ```{r create-dir}
@@ -48,16 +43,30 @@ source("WP1_OutputFunctions.R")
 Read in the original data file extracted for WP1 (contains all variables) and the classes extracted from the previous analysis. Filter dataset to include only the classes of interest for this analysis (those with poor comprehension in the context of relatively good reading accuracy). 
 
 ```{r load-data}
-cp_data <- read.csv("../data/simulated/WP1_CompProf_sim_raw_n694_k3.csv")   # for script checking
+# Load all variables
+cp_data <- read.csv("../data/processed/WP1_data_all.csv") %>% 
+  select(cidB3153, yp_id,
+         nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8,
+         age_m_f8, age_m_f9, age_m_f10,
+         nara_rate_raw_f9,
+         wold_vcb_raw_f8, wisc_vcb_raw_f8,
+         wisc_pcmp_raw_f8, wisc_code_raw_f8, wisc_parr_raw_f8, wisc_bloc_raw_f8, wisc_obja_raw_f8,
+         wisc_bwsp_raw_f8, cntsp_span_raw_f10,
+         teach_slct_raw_f8, teach_divd_raw_f8, teach_ctr_diff_f8,
+         sdq_hyp_prnt_ku) %>% 
+  mutate(read_comb_raw_f9 = (read_word_raw_f9 + read_nonw_raw_f9)) %>% 
+  select(- c(read_word_raw_f9, read_nonw_raw_f9))
 
-# cp_data <- read.csv("../data/processed/WP1_data_all.csv")      # dataset containing all participants/variables
-# groups <- read.csv("../data/processed/WP1_classes.csv") %>%    # classes extracted from SimpView model
-#   select()
+# Load class data
+class_data <- read.csv("../data/processed/WP1_data_profiles.csv")  
 
-# cp_data <- cp_data %>%
-#   left_join(groups, by = "") %>% 
-#   filter(C == ) %>% 
-#   select(yp_id:)
+# Merge class data and filter for group of interest 
+cp_data <- cp_data %>% 
+  left_join(class_data, by = c("cidB3153",
+                             "age_m_f8" = "f8age",
+                             "age_m_f9" = "f9age")) %>% 
+  filter(c == 1) %>% 
+  mutate(yp_id = as.factor(yp_id))  # re-format as factor
 ```
 
 Mplus has an 8-character limit, so rename relevant variables with short names for modelling. 
@@ -67,8 +76,7 @@ Mplus has an 8-character limit, so rename relevant variables with short names fo
 cp_data <- cp_data %>% 
   rename(naraComp = nara_comp_raw_f9,
          naraAcc = nara_acc_raw_f9,
-         wordAcc = read_word_raw_f9,
-         nonwAcc = read_nonw_raw_f9,
+         combAcc = read_comb_raw_f9,
          woldComp = wold_comp_raw_f8,
          f8age = age_m_f8,
          f9age = age_m_f9,
@@ -82,7 +90,7 @@ cp_data <- cp_data %>%
          wiscBloc = wisc_bloc_raw_f8,
          wiscObja = wisc_obja_raw_f8,
          wiscBwsp = wisc_bwsp_raw_f8,
-         cntSpan = cntsp_span_raw_f10,
+         cntspan = cntsp_span_raw_f10,
          attnSel = teach_slct_raw_f8,
          attnDiv = teach_divd_raw_f8,
          attnOpp = teach_ctr_diff_f8,
@@ -92,12 +100,6 @@ cp_data <- cp_data %>%
 str_sub(names(cp_data), 1, 8)
 ```
 
-Variable format problematic for mplus data conversion, change ID to factor.
-
-```{r mplus-formatting}
-cp_data <- cp_data %>%
-  mutate(yp_id = as.factor(yp_id))
-```
 
 # Factor Mixture Model to extract latent classes
 
@@ -110,58 +112,53 @@ Set up initial model, based on the final model from the WP1_CompProf_CFA.Rmd scr
 ```{r model-spec}
 # Age regressors
 age_spec <- " 
-             wordAcc nonwAcc naraAcc naraComp naraRate on f9age;
-             woldComp woldVcb wiscVcb wiscPcmp wiscCode wiscParr 
-             wiscBloc wiscObja wiscBwsp attnSel attnDiv attnOpp on f8age;
-             cntSpan on f10age;"
+            f8age; f9age; f10age;
+            acc naraComp naraRate on f9age;
+            perfiq woldComp wiscBwsp attnSel attnDiv attnOpp on f8age;
+            wiscVcb woldVcb on f8age;
+            cntSpan on f10age;"
 
 # Factor specification (for overall statement)
 factor_spec <- " 
-                acc by nonwAcc wordAcc naraAcc; 
-                comp by naraComp woldComp; 
+                acc by combAcc naraAcc naraComp; 
+                combAcc with naraAcc;
+                lang by woldComp naraComp wiscVcb woldVcb;
                 naraRate;
-                vocab by wiscVcb woldVcb ;
                 perfiq by wiscPcmp wiscCode wiscParr wiscBloc wiscObja;
-                execfun by wiscBwsp cntSpan attnSel attnDiv attnOpp sdqHyp;"
+                execfun by wiscBwsp cntSpan attnSel attnDiv attnOpp sdqHyp wiscCode;"
 
 # Factor specification (for class statements; remove first loading as already fixed to 1)
 factor_spec_class <- " 
-                acc by wordAcc naraAcc; 
-                comp by woldComp;
+                acc by naraAcc naraComp; 
+                combAcc with naraAcc;
+                lang by naraComp wiscVcb woldVcb;
                 naraRate;
-                vocab by woldVcb ;
                 perfiq by wiscCode wiscParr wiscBloc wiscObja;
-                execfun by cntSpan attnSel attnDiv attnOpp sdqHyp;"
+                execfun by cntSpan attnSel attnDiv attnOpp sdqHyp wiscCode;"
 
 # Set factor means to 0 for identifiability
 factor_means <- "
-                 [comp@0]; [acc@0]; [vocab@0]; [perfiq@0]; [execfun@0];"
+                 [acc@0]; [lang@0]; [perfiq@0]; [execfun@0];"
 
 # Factor variances
 factor_vars <- " 
-                acc; comp; vocab; perfiq; execfun;" 
+                acc; lang; perfiq; execfun;" 
 
 # Factor covariances  
 factor_covars <- " 
-                  acc with comp; acc with naraRate; acc with vocab; 
+                  acc with lang; acc with naraRate; 
                   acc with perfiq; acc with execfun;
-                  comp with naraRate; comp with vocab; 
-                  comp with perfiq; comp with execfun;
-                  naraRate with vocab; naraRate with perfiq; 
-                  naraRate with execfun; 
-                  vocab with perfiq; vocab with execfun;
+                  lang with naraRate; 
+                  lang with perfiq; lang with execfun;
+                  naraRate with perfiq; naraRate with execfun; 
                   perfiq with execfun;"
 
 # Means of indicator variables
 ind_means <- " 
-              [wordAcc nonwAcc naraAcc naraComp naraRate 
+              [combAcc naraAcc naraComp naraRate 
               woldComp woldVcb wiscVcb wiscPcmp wiscCode 
               wiscParr wiscBloc wiscObja wiscBwsp 
               attnSel attnDiv attnOpp cntSpan];"
-
-# Additional covariances between indicator variables (determined by initial CFA model)
-# ind_covars <- "
-#                cntSpan with wiscBwsp;"        # TO BE EDITED
 ```
 
 *Note:* Increase starts to 2000 200 for a model if best log-likelihood value not replicated (Lubke & Luningham, 2017)
@@ -171,8 +168,7 @@ ind_means <- "
 model_spec <- paste0("%OVERALL% \n ",
                      age_spec,
                      factor_spec,
-                     factor_means,
-                     ind_covars)
+                     factor_means)
 
 # Create base model
 m_fmm_base <- mplusObject(
@@ -183,7 +179,7 @@ m_fmm_base <- mplusObject(
   MODEL = model_spec,
   OUTPUT = "TECH1; TECH8; TECH11;",
   PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "yp_no")]),
+  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "c", "g")]),
   rdata = cp_data)
 ```
 
@@ -304,7 +300,7 @@ n->f3
 Steps 1-3) Fit series of increasing *k*-class models.
 
 ```{r fmm-a-fit}
-m_fmm_a <- lapply(2:6, function(k) {
+m_fmm_a <- lapply(2, function(k) {
   
   # Update model spec 1: overall model estimates (variances and covariances)
   body<-update(m_fmm_base,

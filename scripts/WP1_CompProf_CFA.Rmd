@@ -4,28 +4,27 @@ output:
   html_document:
     toc: true
     toc_float: true
-date: '29/07/2021'
+date: '18/10/2021'
     
 knit: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding, output_dir = "../output/analysis/") })
 ---
 
-This script computes basic summary statistics for the data, ensures that they align with Mplus output, and tests the factor structure to be used for subsequent analyses. This analysis was originally planned to be conducted using the group(s) with poor reading comprehension, extracted in WP1_SimpView_FinalModel.Rmd. However, given the classes extracted in that model only differentiated by overall ability (i.e., they did not separate by decoding and comprehension skills), we conduct this analysis on a poor comprehender group selected using traditional cutoff criteria. 
+This script computes basic summary statistics for the data, ensures that they align with Mplus output, and tests the factor structure to be used for subsequent analyses. This analysis is conducted on the poor comprehender group extracted from the SimpView analysis; the final profiles are documented in WP1_SimpView_FinalProfiles.Rmd. The pre-registration for this analysis can be found [here](https://osf.io/4zahf).
 
 # Set-up
 
-```{r libraries}
+## Libraries
+
+```{r libraries, message = FALSE, warnings = FALSE}
 # List packages
-pkgs <- c("tidyverse", "psych", "naniar", "MplusAutomation", "texreg", "semPlot")
+pkgs <- c("tidyverse", "psych", "naniar", "kableExtra", "MplusAutomation", "texreg", "semPlot")
 
-# Use groundhog package to load correct package versions
-# if (!require("groundhog")) install.packages("groundhog")
-# groundhog.day <- "2021-03-01"
-# groundhog::groundhog.library(pkgs, groundhog.day)
-
-# Or if not using groundhog package - load currently installed package versions separately (faster; reproducibility not guaranteed)
+# Load packages (version info detailed at the end of the script)
 invisible(lapply(pkgs, library, character.only = TRUE))
 ```
+
+## Directories
 
 ```{r create-dir}
 # Create subdirectories for storing mplus scripts, data files, and output, if do not already exist
@@ -35,23 +34,34 @@ if(dir.exists("./mplus_models/compprof/desc")==FALSE){dir.create("./mplus_models
 if(dir.exists("./mplus_models/compprof/cfa")==FALSE){dir.create("./mplus_models/compprof/cfa")} 
 ```
 
-###  Load and prepare data for Mplus
+##  Data
 
 Read in the original data file extracted for WP1 (contains all variables) and the classes extracted from the previous analysis. Filter dataset to include only the classes of interest for this analysis (those with poor comprehension in the context of relatively good reading accuracy). 
 
 ```{r load-data}
-#cp_data <- read.csv("../data/simulated/WP1_CompProf_sim_raw_n694_k3.csv")   # for script checking
-
-cp_data <- read.csv("../data/processed/WP1_data_PCcutoff.csv") %>% 
+# Load all variables
+cp_data <- read.csv("../data/processed/WP1_data_all.csv") %>% 
   select(cidB3153, yp_id,
-         nara_comp_raw_f9, nara_acc_raw_f9, read_comb_raw_f9, wold_comp_raw_f8,
+         nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8,
          age_m_f8, age_m_f9, age_m_f10,
          nara_rate_raw_f9,
          wold_vcb_raw_f8, wisc_vcb_raw_f8,
          wisc_pcmp_raw_f8, wisc_code_raw_f8, wisc_parr_raw_f8, wisc_bloc_raw_f8, wisc_obja_raw_f8,
          wisc_bwsp_raw_f8, cntsp_span_raw_f10,
          teach_slct_raw_f8, teach_divd_raw_f8, teach_ctr_diff_f8,
-         sdq_hyp_prnt_ku)
+         sdq_hyp_prnt_ku) %>% 
+  mutate(read_comb_raw_f9 = (read_word_raw_f9 + read_nonw_raw_f9)) %>% 
+  select(- c(read_word_raw_f9, read_nonw_raw_f9))
+
+# Load class data
+class_data <- read.csv("../data/processed/WP1_data_profiles.csv")  
+
+# Merge class data and filter for group of interest 
+cp_data <- cp_data %>% 
+  left_join(class_data, by = c("cidB3153",
+                             "age_m_f8" = "f8age",
+                             "age_m_f9" = "f9age")) %>% 
+  filter(c == 1)
 ```
 
 Mplus has an 8-character limit, so rename relevant variables with short names for modelling. 
@@ -79,17 +89,11 @@ cp_data <- cp_data %>%
          attnSel = teach_slct_raw_f8,
          attnDiv = teach_divd_raw_f8,
          attnOpp = teach_ctr_diff_f8,
-         sdqHyp = sdq_hyp_prnt_ku) 
+         sdqHyp = sdq_hyp_prnt_ku) %>% 
+  mutate(yp_id = as.factor(yp_id))  # re-format as factor
 
 # Check compatibility with mplus
 str_sub(names(cp_data), 1, 8)
-```
-
-Variable format problematic for mplus data conversion, change ID to factor.
-
-```{r mplus-formatting}
-cp_data <- cp_data %>% 
-  mutate(yp_id = as.factor(yp_id))
 ```
 
 
@@ -98,13 +102,28 @@ cp_data <- cp_data %>%
 Extract summary statistics for each variable.
 
 ```{r summary-stats}
-describe(cp_data)
+# Summary statistics
+cp_data %>%
+  select(-cidB3153, -yp_id, -c) %>%
+  describe() %>% 
+  kable("pipe")
+
+# Visualise missingness
 vis_miss(cp_data, cluster = TRUE)
 ```
 
-Patterns of missingness are more thoroughly explored for all WP1 variables in the initial data processing script. We anticipate more missingness than in the SimpView analysis as there were more measures collected from across three different clinics. 
+Patterns of missingness are more thoroughly explored for all WP1 variables in the initial data processing script. There is a higher proportion of missingness than in the SimpView analysis as there were more measures collected from across three different clinics. 
 
-### Check that mplus reading data as expected
+```{r correlations}
+# Correlations
+cp_data %>% 
+  select(-c, -yp_id, -cidB3153, -g, -f8age, -f9age, -f10age) %>% 
+  cor(use = "pairwise.complete.obs") %>% 
+  round(digits = 2) %>% 
+  kable("pipe")
+```
+
+### Check that Mplus reading data as expected
 
 Extract descriptive statistics as check.
 
@@ -113,14 +132,15 @@ Extract descriptive statistics as check.
 m_desc <- mplusObject(
   TITLE = "Data check - Descriptive statistics;",
   ANALYSIS = "type = basic;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153")]),
+  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "c")]),
   rdata = cp_data)
+
 
 # Fit model 
 m_desc_fit <- mplusModeler(m_desc,
                             dataout = "./mplus_models/compprof/desc/cp_sim.dat",
                             modelout = "./mplus_models/compprof/desc/cp_check.inp",
-                            check = TRUE, run = TRUE, hashfilename = TRUE)
+                            check = TRUE, run = FALSE, hashfilename = TRUE)
 
 # Read mplus output
 m_desc_out <- readModels("./mplus_models/compprof/desc/cp_check.out")
@@ -145,22 +165,23 @@ if (any((r_summ - mplus_summ) > abs(0.01))){
   }
 ```
 
+
 # Confirmatory Factor Analysis
 
-### Testing the factor structure
+## Testing the 5-factor structure
 
 Fit the proposed factorial model.
 
 ```{r cfa-initial-fit}
 # Proposed factor structure: 5 factors + rate
-m_cfa1 <- mplusObject(
+m_cfa1a <- mplusObject(
   TITLE = "Confirmatory Factor Analysis - 5-factor + rate;",
   ANALYSIS = "estimator = mlr; type = general; starts = 20;",
   MODEL = " f8age; f9age; f10age;
             acc naraRate naraComp on f9age;
             vocab perfiq woldComp wiscBwsp attnSel attnDiv attnOpp on f8age;
             cntSpan on f10age;
-            acc by combAcc naraAcc naraComp; 
+            acc by combAcc naraAcc; 
             comp by woldComp naraComp;
             naraRate;
             vocab by wiscVcb woldVcb;
@@ -180,696 +201,277 @@ m_cfa1 <- mplusObject(
             attnOpp = attnOpp/4;",
   OUTPUT = "TECH1; TECH4; stdyx; modindices;",
   PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153")]),
+  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "c", "g")]),
   rdata = cp_data)
 
-# Try with language factor
-m_cfa1 <- mplusObject(
+m_cfa1a_fit <- mplusModeler(m_cfa1a,
+                           modelout = "./mplus_models/compprof/cfa/cp_cfa1a.inp",
+                           check = TRUE, run = TRUE)
+m_cfa1a_fit$results$warnings
+
+# Model gives error with naraAcc residual variance >> constrain to 0
+m_cfa1b <- update(m_cfa1a, 
+                  TITLE = ~ "Confirmatory Factor Analysis - 5-factor + rate (naraAcc constrained);",
+                  MODEL = ~ . + "naraAcc@0;")
+
+m_cfa1b_fit <- mplusModeler(m_cfa1b,
+                           modelout = "./mplus_models/compprof/cfa/cp_cfa1b.inp",
+                           check = TRUE, run = TRUE)
+m_cfa1b_fit$results$warnings
+
+# Inspect model output
+SummaryTable(m_cfa1b_fit, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR")) %>%
+  kable("pipe")
+
+# Inspect modification indices
+m_cfa1b_fit$results$mod_indices %>%
+  arrange(desc(MI)) %>% 
+  head(10) %>%
+  kable("pipe") 
+```
+
+Although the MIs indicate that correlated residuals between the accuracy variables could improve model fit, doing so would lead to a non-identified model (need to remove constraint first from naraAcc residual variance). The problem seems to lie in the high correlation between the naraComp and naraAcc variables (taken from the same measure;; accuracy errors corrected to assess comprehension independently but still highly influenced by accuracy). Consider a model with a cross-loading between naraComp and the accuracy latent variable. 
+
+```{cfa-crossload}
+m_cfa1c <- update(m_cfa1b, 
+                  TITLE = ~ "Confirmatory Factor Analysis - 5-factor + rate (naraComp cross-load);",
+                  MODEL = ~ . + "acc by naraComp;")
+m_cfa1c_fit <- mplusModeler(m_cfa1c,
+                           modelout = "./mplus_models/compprof/cfa/cp_cfa1c.inp",
+                           check = TRUE, run = TRUE)
+m_cfa1c_fit$results$warnings
+```
+
+## Testing a 4-factor structure
+
+The proposed factor structure is not a good fit, as vocabulary and comprehension measures are highly correlated. From a Simple View perspective, the vocabulary measures are a component language skill that support comprehension ability, and we would expect them to correlate highly with the listening comprehension measure. Combine the comprehension and vocabulary measures into a single latent variable for language skills. 
+
+```{r cfa-4f}
+m_cfa2a <- mplusObject(
   TITLE = "Confirmatory Factor Analysis - 4-factor + rate;",
   ANALYSIS = "estimator = mlr; type = general; starts = 20;",
   MODEL = " f8age; f9age; f10age;
-            acc naraRate on f9age;
-            lang perfiq wiscBwsp attnSel attnDiv attnOpp on f8age;
+            acc naraRate naraComp on f9age;
+            perfiq woldComp wiscBwsp attnSel attnDiv attnOpp on f8age;
+            wiscVcb woldVcb on f8age;
             cntSpan on f10age;
-            acc by combAcc naraAcc; 
-            lang by woldComp wiscVcb woldVcb;;
+            acc by combAcc naraAcc naraComp; 
+            naraAcc@0;
+            lang by woldComp naraComp wiscVcb woldVcb;
             naraRate;
             perfiq by wiscPcmp wiscCode wiscParr wiscBloc wiscObja;
             execfun by wiscBwsp cntSpan attnSel attnDiv attnOpp sdqHyp;
             acc with lang; acc with naraRate; 
             acc with perfiq; acc with execfun;
-            lang with naraRate;  
+            lang with naraRate; 
             lang with perfiq; lang with execfun;
             naraRate with perfiq; naraRate with execfun; 
             perfiq with execfun;",
   DEFINE = "naraAcc = naraAcc/5; naraRate = naraRate/8; wiscVcb = wiscVcb/2;
-          wiscPcmp = wiscPcmp/2; wiscCode = wiscCode/5; wiscParr = wiscParr/5;
-          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20; 
-          attnOpp = attnOpp/4;",
+            wiscPcmp = wiscPcmp/2; wiscCode = wiscCode/5; wiscParr = wiscParr/5;
+            wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20; 
+            attnOpp = attnOpp/4;",
   OUTPUT = "TECH1; TECH4; stdyx; modindices;",
   PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "naraComp")]),
+  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "c", "g")]),
   rdata = cp_data)
 
-# Try with language factor, no accuracy
-m_cfa1 <- mplusObject(
-  TITLE = "Confirmatory Factor Analysis - 3-factor + rate;",
+m_cfa2a_fit <- mplusModeler(m_cfa2a,
+                           modelout = "./mplus_models/compprof/cfa/cp_cfa2a.inp",
+                           check = TRUE, run = TRUE)
+m_cfa2a_fit$results$warnings
+
+# Inspect model output
+SummaryTable(m_cfa2a_fit, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR")) %>%
+  kable("pipe")
+
+# Inspect modification indices
+m_cfa2a_fit$results$mod_indices %>%
+  arrange(desc(MI)) %>%
+  head(10) %>%
+  kable("pipe")
+
+# Add correlated residuals between the two accuracy measures (guided by MIs; theoretically sensible as original proposed measures of decoding skill)
+m_cfa2b <- update(m_cfa2a, 
+                  TITLE = ~ "Confirmatory Factor Analysis - 4-factor + rate (correlated acc residuals);",
+                  MODEL = ~ . + "combAcc with naraAcc;")
+m_cfa2b_fit <- mplusModeler(m_cfa2b,
+                           modelout = "./mplus_models/compprof/cfa/cp_cfa2b.inp",
+                           check = TRUE, run = TRUE)
+m_cfa2b_fit$results$warnings
+
+# The correlated residuals are incompatible with the constrained residuals previous included, remove the constraint
+m_cfa2c <- mplusObject(
+  TITLE = "Confirmatory Factor Analysis - 4-factor + rate (unconstrained naraAcc);",
   ANALYSIS = "estimator = mlr; type = general; starts = 20;",
   MODEL = " f8age; f9age; f10age;
-            naraRate on f9age;
-            lang perfiq wiscBwsp attnSel attnDiv attnOpp on f8age;
+            acc naraComp naraRate on f9age;
+            perfiq woldComp wiscBwsp attnSel attnDiv attnOpp on f8age;
+            wiscVcb woldVcb on f8age;
             cntSpan on f10age;
-            lang by woldComp wiscVcb woldVcb;;
+            acc by combAcc naraAcc naraComp; 
+            combAcc with naraAcc;
+            lang by woldComp naraComp wiscVcb woldVcb;
             naraRate;
             perfiq by wiscPcmp wiscCode wiscParr wiscBloc wiscObja;
             execfun by wiscBwsp cntSpan attnSel attnDiv attnOpp sdqHyp;
-            lang with naraRate;  
+            acc with lang; acc with naraRate; 
+            acc with perfiq; acc with execfun;
+            lang with naraRate; 
             lang with perfiq; lang with execfun;
             naraRate with perfiq; naraRate with execfun; 
             perfiq with execfun;",
-  DEFINE = "naraRate = naraRate/8; wiscVcb = wiscVcb/2;
-          wiscPcmp = wiscPcmp/2; wiscCode = wiscCode/5; wiscParr = wiscParr/5;
-          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20; 
-          attnOpp = attnOpp/4;",
+  DEFINE = "naraAcc = naraAcc/5; naraRate = naraRate/8; wiscVcb = wiscVcb/2;
+            wiscPcmp = wiscPcmp/2; wiscCode = wiscCode/5; wiscParr = wiscParr/5;
+            wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20; 
+            attnOpp = attnOpp/4;",
   OUTPUT = "TECH1; TECH4; stdyx; modindices;",
   PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "naraComp", "naraAcc", "combAcc")]),
+  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "c", "g")]),
   rdata = cp_data)
 
-# Try with language factor, no accuracy, split execfun
-m_cfa1 <- mplusObject(
-  TITLE = "Confirmatory Factor Analysis - 4-factor (split execfun, no wiscode);",
-  ANALYSIS = "estimator = mlr; type = general; starts = 20;",
-  MODEL = " f8age; f10age;
-            lang perfiq wiscBwsp attnSel attnDiv attnOpp on f8age;
-            cntSpan on f10age;
-            lang by woldComp wiscVcb woldVcb;;
-            perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
-            workmem by wiscBwsp cntSpan; 
-            attn by attnSel attnDiv attnOpp sdqHyp;
-            lang with perfiq; 
-            lang with workmem; lang with attn;
-            perfiq with workmem; perfiq with attn;
-            workmem with attn;",
-  DEFINE = " wiscVcb = wiscVcb/2;
-          wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
-          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20; 
-          attnOpp = attnOpp/4;",
-  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "f9age", "naraComp", "naraRate", "naraAcc", "combAcc", "wiscCode")]),
-  rdata = cp_data)
-
-
-# Try with language factor, split execfun (accuracy back in, no rate)
-m_cfa1 <- mplusObject(
-  TITLE = "Confirmatory Factor Analysis - 5-factor (split execfun, no wiscode);",
-  ANALYSIS = "estimator = mlr; type = general; starts = 20;",
-  MODEL = " f8age; f9age; f10age;
-            acc on f9age;
-            lang perfiq wiscBwsp attnSel attnDiv attnOpp on f8age;
-            cntSpan on f10age;
-            acc by combAcc naraAcc;
-            lang by woldComp wiscVcb woldVcb;;
-            perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
-            workmem by wiscBwsp cntSpan; 
-            attn by attnSel attnDiv attnOpp sdqHyp;
-            acc with lang; 
-            acc with perfiq; acc with workmem;
-            acc with attn;
-            lang with perfiq; 
-            lang with workmem; lang with attn;
-            perfiq with workmem; perfiq with attn;
-            workmem with attn;",
-  DEFINE = "naraAcc = naraAcc/5; wiscVcb = wiscVcb/2;
-          wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
-          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20; 
-          attnOpp = attnOpp/4;",
-  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "naraComp" , "wiscCode", "naraRate")]),
-  rdata = cp_data)
-
-m_cfa1 <- mplusObject(
-  TITLE = "Confirmatory Factor Analysis - 5-factor (split execfun, no wiscode or sdq);",
-  ANALYSIS = "estimator = mlr; type = general; starts = 20;",
-  MODEL = " f8age; f9age; f10age;
-            acc on f9age;
-            lang perfiq wiscBwsp attnSel attnDiv attnOpp on f8age;
-            cntSpan on f10age;
-            acc by combAcc naraAcc;
-            lang by woldComp wiscVcb woldVcb;;
-            perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
-            workmem by wiscBwsp cntSpan; 
-            attn by attnSel attnDiv attnOpp;
-            acc with lang; 
-            acc with perfiq; acc with workmem;
-            acc with attn;
-            lang with perfiq; 
-            lang with workmem; lang with attn;
-            perfiq with workmem; perfiq with attn;
-            workmem with attn;",
-  DEFINE = "naraAcc = naraAcc/5; wiscVcb = wiscVcb/2;
-          wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
-          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20; 
-          attnOpp = attnOpp/4;",
-  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "naraComp" , "wiscCode", "naraRate","sdqHyp")]),
-  rdata = cp_data)
-
-
-m_cfa1_fit <- mplusModeler(m_cfa1,
-                           modelout = "./mplus_models/compprof/cfa/cp_cfa_5fnoSDQ.inp",
+m_cfa2c_fit <- mplusModeler(m_cfa2c,
+                           modelout = "./mplus_models/compprof/cfa/cp_cfa2c.inp",
                            check = TRUE, run = TRUE)
+m_cfa2c_fit$results$warnings
 
-
-# Inspect initial model fit
-cfa1_out <- readModels(target = "./mplus_models/compprof/cfa", filefilter = "cp_cfa")
-SummaryTable(cfa1_out, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
-
-
-corr_matrix <- cor(cp_data[3:23], use = "pairwise.complete.obs") %>%  round(., 2)
-write.csv(corr_matrix, "../output/tables/cutoff_corr_matrix.csv", row.names = FALSE)
-```
-
-
-PT best models
-
-```{r}
-# Try with language factor, no accuracy, split execfun
-m_cfa1a <- mplusObject(
-  TITLE = "Confirmatory Factor Analysis - 4-factor (split execfun, no wiscode);",
-  ANALYSIS = "estimator = mlr; type = general; starts = 20;",
-  MODEL = " f8age; f10age;
-            lang perfiq wiscBwsp attnSel attnDiv attnOpp on f8age;
-            cntSpan on f10age;
-            lang by woldComp wiscVcb woldVcb;;
-            perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
-            workmem by wiscBwsp cntSpan; 
-            attn by attnSel attnDiv attnOpp sdqHyp;
-            lang with perfiq; 
-            lang with workmem; lang with attn;
-            perfiq with workmem; perfiq with attn;
-            workmem with attn;",
-  DEFINE = " wiscVcb = wiscVcb/2;
-          wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
-          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20; 
-          attnOpp = attnOpp/4;",
-  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "f9age", "naraComp", "naraRate", "naraAcc", "combAcc", "wiscCode")]),
-  rdata = cp_data)
-
-m_cfa1_fit <- mplusModeler(m_cfa1a,
-                           modelout = "./mplus_models/compprof/cfa/cp_cfa_4fnoRate.inp",
-                           check = TRUE, run = TRUE)
-
-
-
-# # Try with language factor, with accuracy, split execfun ,no sdqHyp - ERROR
-# m_cfa1b <- mplusObject(
-#   TITLE = "Confirmatory Factor Analysis - 5-factor (split execfun, no wiscode, no sdqHyp);",
-#   ANALYSIS = "estimator = mlr; type = general; starts = 20;",
-#   MODEL = " f8age; f9age; f10age;
-#             lang perfiq wiscBwsp attn on f8age;
-#             cntSpan on f10age;
-#             acc naraRate on f9age;
-#             acc by combAcc naraAcc;
-#             nararate;
-#             lang by woldComp wiscVcb woldVcb;
-#             perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
-#             workmem by wiscBwsp cntSpan;
-#             attn by attnSel attnDiv attnOpp;
-#             acc with lang; acc with naraRate;
-#             acc with perfiq; acc with workmem;
-#             acc with attn;
-#             naraRate with lang; naraRate with perfiq;
-#             naraRate with workmem; naraRate with attn;
-#             lang with perfiq;
-#             lang with workmem; lang with attn;
-#             perfiq with workmem; perfiq with attn;
-#             workmem with attn;",
-#   DEFINE = " naraAcc = naraAcc/5;naraRate = naraRate/8; wiscVcb = wiscVcb/2;
-#           wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
-#           wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20;
-#           attnOpp = attnOpp/4;",
-#   OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-#   PLOT = "TYPE = PLOT3;",
-#   usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "naraComp", "wiscCode", "sdqHyp")]),
-#   rdata = cp_data)
-# 
-# 
-# m_cfa1_fit <- mplusModeler(m_cfa1b,
-#                            modelout = "./mplus_models/compprof/cfa/cp_cfa_5frate.inp",
-#                            check = TRUE, run = TRUE)
-
-# EJ # Try with language factor, no accuracy, split execfun
-m_cfa1c <- mplusObject(
-  TITLE = "Confirmatory Factor Analysis - 4-factor + rate (split execfun, no wiscode);",
-  ANALYSIS = "estimator = mlr; type = general; starts = 20;",
-  MODEL = " f8age; f9age; f10age;
-            lang perfiq wiscBwsp attnSel attnDiv attnOpp on f8age;
-            naraRate on f9age;
-            cntSpan on f10age;
-            naraRate;
-            lang by woldComp wiscVcb woldVcb;;
-            perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
-            workmem by wiscBwsp cntSpan; 
-            attn by attnSel attnDiv attnOpp sdqHyp;
-            naraRate with lang; naraRate with perfiq;
-            naraRate with workmem; naraRate with attn;
-            lang with perfiq; 
-            lang with workmem; lang with attn;
-            perfiq with workmem; perfiq with attn;
-            workmem with attn;",
-  DEFINE = " wiscVcb = wiscVcb/2; naraRate = naraRate/8;
-          wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
-          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20; 
-          attnOpp = attnOpp/4;",
-  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "naraComp", "naraAcc", "combAcc", "wiscCode")]),
-  rdata = cp_data)
-
-m_cfa1_fit <- mplusModeler(m_cfa1c,
-                           modelout = "./mplus_models/compprof/cfa/cp_cfa_4fRate.inp",
-                           check = TRUE, run = TRUE)
-
-
-# # EJ # Try with language factor, no accuracy, split execfun, separate rate and sdq - ERROR
-# m_cfa1d <- mplusObject(
-#   TITLE = "Confirmatory Factor Analysis - 4-factor + rate + separate sdq (split execfun, no wiscode);",
-#   ANALYSIS = "estimator = mlr; type = general; starts = 20;",
-#   MODEL = " f8age; f9age; f10age;
-#             lang perfiq attn wiscBwsp on f8age;
-#             naraRate on f9age;
-#             cntSpan on f10age;
-#             naraRate;
-#             lang by woldComp wiscVcb woldVcb;;
-#             perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
-#             workmem by wiscBwsp cntSpan; 
-#             attn by attnSel attnDiv attnOpp;
-#             sdqHyp;
-#             naraRate with lang; naraRate with perfiq;
-#             naraRate with workmem; naraRate with attn;
-#             naraRate with sdqHyp;
-#             lang with perfiq; 
-#             lang with workmem; lang with attn;
-#             lang with sdqHyp;
-#             perfiq with workmem; perfiq with attn;
-#             perfiq with sdqHyp;
-#             workmem with attn; workmem with sdqHyp;
-#             attn with sdqHyp;",
-#   DEFINE = " wiscVcb = wiscVcb/2; naraRate = naraRate/8;
-#           wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
-#           wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20; 
-#           attnOpp = attnOpp/4;",
-#   OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-#   PLOT = "TYPE = PLOT3;",
-#   usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "naraComp", "naraAcc", "combAcc", "wiscCode")]),
-#   rdata = cp_data)
-# 
-# m_cfa1_fit <- mplusModeler(m_cfa1d,
-#                            modelout = "./mplus_models/compprof/cfa/cp_cfa_4fRateSDQ.inp",
-#                            check = TRUE, run = TRUE)
-
-m_cfa1e <- mplusObject(
-  TITLE = "Confirmatory Factor Analysis - 4-factor + rate (split execfun, no wiscode, nosdq);",
-  ANALYSIS = "estimator = mlr; type = general; starts = 20;",
-  MODEL = " f8age; f9age; f10age;
-            lang perfiq attn wiscBwsp on f8age;
-            naraRate on f9age;
-            cntSpan on f10age;
-            naraRate;
-            lang by woldComp wiscVcb woldVcb;;
-            perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
-            workmem by wiscBwsp cntSpan; 
-            attn by attnSel attnDiv attnOpp;
-            naraRate with lang; naraRate with perfiq;
-            naraRate with workmem; naraRate with attn;
-            lang with perfiq; 
-            lang with workmem; lang with attn;
-            perfiq with workmem; perfiq with attn;
-            workmem with attn;",
-  DEFINE = " wiscVcb = wiscVcb/2; naraRate = naraRate/8;
-          wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
-          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20; 
-          attnOpp = attnOpp/4;",
-  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "naraComp", "naraAcc", "combAcc", "wiscCode", "sdqHyp")]),
-  rdata = cp_data)
-
-m_cfa1_fit <- mplusModeler(m_cfa1e,
-                           modelout = "./mplus_models/compprof/cfa/cp_cfa_4fRnoSDQ.inp",
-                           check = TRUE, run = TRUE)
-
-
-# Inspect initial model fit
-cfa1_out <- readModels(target = "./mplus_models/compprof/cfa", filefilter = "cp_cfa")
-SummaryTable(cfa1_out, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
-
-
-
-# Try with language factor, no accuracy, split execfun ,no sdqHyp
-m_cfa1c <- mplusObject(
-  TITLE = "Confirmatory Factor Analysis - 3-factor (split execfun, no wiscode,no sdqHyp, no acc);",
-  ANALYSIS = "estimator = mlr; type = general; starts = 20;",
-  MODEL = " f8age; f10age;
-            lang perfiq wiscBwsp on f8age;
-            cntSpan on f10age;
-            lang by woldComp wiscVcb woldVcb;
-            perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
-            workmem by wiscBwsp cntSpan; 
-            lang with perfiq; 
-            lang with workmem;
-            perfiq with workmem;",
-  DEFINE = " wiscVcb = wiscVcb/2;
-          wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
-          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5;",
-  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153","naraAcc", "combAcc","naraRate", "naraComp", "wiscCode", "sdqHyp", "attnDiv", "attnOpp", "attnSel")]),
-  rdata = cp_data)
-
-```
-
-Investigate attention covariances
-
-```{r}
-# Try with language factor, with accuracy, split execfun ,no sdqHyp - ERROR
-m_cfa1 <- mplusObject(
-  TITLE = "Confirmatory Factor Analysis - 5-factor (split execfun, no wiscode, no sdqHyp);",
-  ANALYSIS = "estimator = mlr; type = general; starts = 20; distribution = skewnormal;",
-  MODEL = " f8age; f9age; f10age;
-            lang perfiq wiscBwsp attn on f8age;
-            cntSpan on f10age;
-            acc on f9age;
-            acc by combAcc naraAcc;
-            lang by woldComp wiscVcb woldVcb;
-            perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
-            workmem by wiscBwsp cntSpan;
-            attn by attnSel attnDiv attnOpp;
-            acc with lang; 
-            acc with perfiq; acc with workmem;
-            lang with perfiq;
-            lang with workmem; 
-            perfiq with workmem;
-            attn with acc; attn with lang; attn with perfiq;
-            attn with workmem;",
-  DEFINE = " naraAcc = naraAcc/5; wiscVcb = wiscVcb/2;
-          wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
-          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20;
-          attnOpp = attnOpp/4;",
-  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "naraComp", "wiscCode", "sdqHyp", "naraRate")]),
-  rdata = cp_data)
-
-
-m_cfa1_fit <- mplusModeler(m_cfa1,
-                           modelout = "./mplus_models/compprof/cfa/cp_cfa_5fskew.inp",
-                           check = TRUE, run = TRUE)
-
-
-# Put execfun back into single factor (not SDQ)
-m_cfa1 <- mplusObject(
-  TITLE = "Confirmatory Factor Analysis - 4-factor (no wiscode, no sdqHyp);",
-  ANALYSIS = "estimator = mlr; type = general; starts = 20;",
-  MODEL = " f8age; f9age; f10age;
-            lang perfiq wiscBwsp attnSel attnDiv attnOpp on f8age;
-            cntSpan on f10age;
-            acc on f9age;
-            acc by combAcc naraAcc;
-            lang by woldComp wiscVcb woldVcb;
-            perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
-            execfun by wiscBwsp cntSpan attnSel attnDiv attnOpp;
-            acc with lang; 
-            acc with perfiq; acc with execfun;
-            lang with perfiq; lang with execfun; 
-            perfiq with execfun;
-            naraAcc@0;",
-  DEFINE = " naraAcc = naraAcc/5; wiscVcb = wiscVcb/2;
-          wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
-          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20;
-          attnOpp = attnOpp/4;",
-  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "naraComp", "wiscCode", "sdqHyp", "naraRate")]),
-  rdata = cp_data)
-
-
-m_cfa1_fit <- mplusModeler(m_cfa1,
-                           modelout = "./mplus_models/compprof/cfa/cp_cfa_4facc.inp",
-                           check = TRUE, run = TRUE)
-
-
-```
-
-figure out the executive function variable
-
-```{r}
-# EFA with exec fun variables
-m_efa <- mplusObject(
-  TITLE = "EFA;",
-  ANALYSIS = "estimator = mlr; type = EFA 1 2;",
-  usevariables = c("wiscBwsp", "cntspan", "attnSel1", "attnDiv1", "attnOpp"),
-  rdata = cp_data)
-
-m_efa_fit <- mplusModeler(m_efa,
-                           modelout = "./mplus_models/compprof/cfa/ef_efa.inp",
-                           check = TRUE, run = TRUE)
-
-## try reverse coding
-cp_data <- cp_data %>% 
-  mutate(attnSel1 = attnSel*-1, 
-         attnDiv1 = attnDiv*-1,
-         attnOpp1 = attnOpp)
-
-# CFA 1
-m_cfa1 <- mplusObject(
-  TITLE = "CFA - ExecFun one factor ",
-  ANALYSIS = "estimator = mlr; type = general; starts = 20; distribution = skewt;",
-  MODEL = " f8age; f10age;
-            wiscBwsp attnSel attnDiv attnOpp on f8age;
-            cntSpan on f10age;
-            execfun by wiscBwsp cntSpan attnSel attnDiv attnOpp",
-  DEFINE = "attnDiv = attnDiv/20;
-          attnOpp = attnOpp/4;",
-  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-  usevariables = c("f8age", "f10age", "wiscBwsp", "cntspan", "attnSel", "attnDiv", "attnOpp"),
-  rdata = cp_data)
-m_efa_fit <- mplusModeler(m_cfa1,
-                           modelout = "./mplus_models/compprof/cfa/ef_1cfa_negskew.inp",
-                           check = TRUE, run = TRUE)
-
-# CFA 2
-m_cfa2 <- mplusObject(
-  TITLE = "CFA - ExecFun two factor ",
-  ANALYSIS = "estimator = mlr; type = general; starts = 20;",
-  MODEL = " f8age; f10age;
-            wiscBwsp attn on f8age;
-            cntSpan on f10age;
-            workmem by wiscBwsp cntSpan;
-            attn by attnSel attnDiv attnOpp;
-            attn with workmem;",
-  DEFINE = "attnDiv = attnDiv/20;
-          attnOpp = attnOpp/4;",
-  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-  usevariables = c("f8age", "f10age", "wiscBwsp", "cntspan", "attnSel", "attnDiv", "attnOpp"),
-  rdata = cp_data)
-m_efa_fit <- mplusModeler(m_cfa2,
-                           modelout = "./mplus_models/compprof/cfa/ef_2cfa.inp",
-                           check = TRUE, run = TRUE)
-
-
-# Put execfun back into single factor (not SDQ) with accuracy
-m_cfa1 <- mplusObject(
-  TITLE = "Confirmatory Factor Analysis - 2-factor (acc and EF);",
-  ANALYSIS = "estimator = mlr; type = general; starts = 20; distribution = skewt;",
-  MODEL = " f8age; f9age; f10age;
-            wiscBwsp attnSel attnDiv attnOpp on f8age;
-            cntSpan on f10age;
-            acc on f9age;
-            acc by naraAcc combAcc;
-            execfun by wiscBwsp cntSpan attnSel attnDiv attnOpp;
-            acc with execfun;
-            f8age with execfun@0; 
-            f8age with acc@0;
-            f9age with execfun@0;
-            f10age with acc@0;
-            f10age with execfun@0;
-            f8age with f9age@0;
-            f8age with f10age@0;
-            f9age with f10age@0;
-",
-  DEFINE = " naraAcc = naraAcc/5; attnDiv = attnDiv/20;
-          attnOpp = attnOpp/4;",
-  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = c("f8age", "f10age", "wiscBwsp", "cntspan", "attnSel", "attnDiv", "attnOpp", "f9age", "combAcc", "naraAcc"),
-  rdata = cp_data)
-
-
-m_cfa1_fit <- mplusModeler(m_cfa1,
-                           modelout = "./mplus_models/compprof/cfa/cp_cfa_2faccEF.inp",
-                           check = TRUE, run = TRUE)
-
-```
-
-```{r}
-# 3-factor versus 4-factor; rate or not
-# (without accuracy measures)
-
-# Put execfun back into single factor (not SDQ)
-m_cfa1 <- mplusObject(
-  TITLE = "Confirmatory Factor Analysis - 3-factor (no rate);",
-  ANALYSIS = "estimator = mlr; type = general; starts = 20;",
-  MODEL = " f8age; f10age;
-            lang perfiq wiscBwsp attnSel attnDiv attnOpp on f8age;
-            cntSpan on f10age;
-            lang by woldComp wiscVcb woldVcb;
-            perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
-            execfun by wiscBwsp cntSpan attnSel attnDiv attnOpp;
-            lang with perfiq; lang with execfun; 
-            perfiq with execfun;",
-  DEFINE = "wiscVcb = wiscVcb/2;
-          wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
-          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20;
-          attnOpp = attnOpp/4;",
-  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "naraComp", "naraAcc", "f9age", "combAcc", "wiscCode", "sdqHyp", "naraRate")]),
-  rdata = cp_data)
-m_cfa1_fit <- mplusModeler(m_cfa1,
-                           modelout = "./mplus_models/compprof/cfa/cp_cfa_3f.inp",
-                           check = TRUE, run = TRUE)
-
-# Compare with split version
-m_cfa1 <- mplusObject(
-  TITLE = "Confirmatory Factor Analysis - 4-factor (no rate);",
-  ANALYSIS = "estimator = mlr; type = general; starts = 20;",
-  MODEL = " f8age; f10age;
-            lang perfiq wiscBwsp attn on f8age;
-            cntSpan on f10age;
-            lang by woldComp wiscVcb woldVcb;
-            perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
-            workmem by wiscBwsp cntSpan; 
-            attn by attnSel attnDiv attnOpp;
-            lang with perfiq; lang with attn; lang with workmem;
-            perfiq with workmem; perfiq with attn;
-            workmem with attn;",
-  DEFINE = "wiscVcb = wiscVcb/2;
-          wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
-          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20;
-          attnOpp = attnOpp/4;",
-  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "naraComp", "naraAcc", "f9age", "combAcc", "wiscCode", "sdqHyp", "naraRate")]),
-  rdata = cp_data)
-m_cfa1_fit <- mplusModeler(m_cfa1,
-                           modelout = "./mplus_models/compprof/cfa/cp_cfa_4f.inp",
-                           check = TRUE, run = TRUE)
-
-# Compare with split version + rate
-m_cfa1 <- mplusObject(
-  TITLE = "Confirmatory Factor Analysis - 4-factor (with rate);",
-  ANALYSIS = "estimator = mlr; type = general; starts = 20; distribution = skewnormal;",
-  MODEL = " f8age; f9age; f10age;
-            lang perfiq wiscBwsp attn on f8age;
-            naraRate on f9age;
-            cntSpan on f10age;
-            naraRate;
-            lang by woldComp wiscVcb woldVcb;
-            perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
-            workmem by wiscBwsp cntSpan; 
-            attn by attnSel attnDiv attnOpp;
-            naraRate with lang; naraRate with perfiq;
-            naraRate with workmem; naraRate with attn;
-            lang with perfiq; lang with attn; lang with workmem;
-            perfiq with workmem; perfiq with attn;
-            workmem with attn;",
-  DEFINE = "wiscVcb = wiscVcb/2; naraRate = naraRate/8;
-          wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
-          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20;
-          attnOpp = attnOpp/4;",
-  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "naraComp", "naraAcc", "combAcc", "wiscCode", "sdqHyp")]),
-  rdata = cp_data)
-m_cfa1_fit <- mplusModeler(m_cfa1,
-                           modelout = "./mplus_models/compprof/cfa/cp_cfa_4frskew.inp",
-                           check = TRUE, run = TRUE)
-
-# Compare with split version + rate + acc
-m_cfa1 <- mplusObject(
-  TITLE = "Confirmatory Factor Analysis - 5-factor (with rate and naraAcc factor);",
-  ANALYSIS = "estimator = mlr; type = general; starts = 20;",
-  MODEL = " f8age; f9age; f10age;
-            lang perfiq wiscBwsp attn on f8age;
-            decode on f9age;
-            cntSpan on f10age;
-            decode by naraAcc naraRate;
-            lang by woldComp wiscVcb woldVcb;
-            perfiq by wiscPcmp wiscParr wiscBloc wiscObja;
-            workmem by wiscBwsp cntSpan; 
-            attn by attnSel attnDiv attnOpp;
-            decode with lang; 
-            decode with perfiq; decode with workmem;
-            decode with attn;
-            lang with perfiq; lang with attn; lang with workmem;
-            perfiq with workmem; perfiq with attn;
-            workmem with attn;",
-  DEFINE = "wiscVcb = wiscVcb/2; naraRate = naraRate/8;
-          wiscPcmp = wiscPcmp/2; wiscParr = wiscParr/5;
-          wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20;
-          attnOpp = attnOpp/4; naraAcc = naraAcc/5;",
-  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
-  PLOT = "TYPE = PLOT3;",
-  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "naraComp", "combAcc", "wiscCode", "sdqHyp")]),
-  rdata = cp_data)
-m_cfa1_fit <- mplusModeler(m_cfa1,
-                           modelout = "./mplus_models/compprof/cfa/cp_cfa_5fdecode.inp",
-                           check = TRUE, run = TRUE)
-```
-
-
-### Improving fit 
-
-```{r cfa-inspection}
-# Inspect model (by = loadings, with = covariances)
-cfa1_out$warnings
-cfa1_out$parameters$unstandardized
-cfa1_out$parameters$stdyx.standardized
+# Inspect model output
+SummaryTable(m_cfa2c_fit, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR")) %>%
+  kable("pipe")
 
 # Inspect modification indices
-cfa1_out$mod_indices %>% 
-  #filter(operator == "WITH") %>% 
-  arrange(desc(MI))
+m_cfa2c_fit$results$mod_indices %>%
+  arrange(desc(MI)) %>%
+  head(10) %>%
+  kable("pipe")
+
+# Add cross-loading of WISC Coding subtest to EF (guided by MIs)
+m_cfa2d <- update(m_cfa2c, 
+                  TITLE = ~ "Confirmatory Factor Analysis - 4-factor + rate (Coding cross-loading);",
+                  MODEL = ~ . + "execfun by wiscCode;")
+m_cfa2d_fit <- mplusModeler(m_cfa2d,
+                           modelout = "./mplus_models/compprof/cfa/cp_cfa2d.inp",
+                           check = TRUE, run = TRUE)
+m_cfa2d_fit$results$warnings
+
+# Inspect model output
+SummaryTable(m_cfa2d_fit, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR")) %>%
+  kable("pipe")
+``` 
+
+The model is now a good fit. The cross-loading of the WISC Coding subtest (a performance IQ measure) from the executive function construct is theoretically sensible when considering the demands on processing during this task. Children must hold a coding scheme in mind when copying corresponding symbols under timed conditions, placing demands on short-term memory and attention. 
+
+Finally, double check that comprehension cross-loading is necessary (note that for model identification the correlated errors between the two accuracy measures must then be removed, and the residual constraint for naraAcc re-added). Although the naraComp cross-loading is sensible when considering the way in which comprehension was measured during this task, a simpler model would be preferred if possible. 
+
+```{r cross-check}
+m_cfa2e <- mplusObject(
+  TITLE = "Confirmatory Factor Analysis - 4-factor + rate (no comp cross-load);",
+  ANALYSIS = "estimator = mlr; type = general; starts = 20;",
+  MODEL = " f8age; f9age; f10age;
+            acc naraComp naraRate on f9age;
+            perfiq woldComp wiscBwsp attnSel attnDiv attnOpp on f8age;
+            wiscVcb woldVcb on f8age;
+            cntSpan on f10age;
+            acc by combAcc naraAcc; 
+            naraAcc@0;
+            lang by woldComp naraComp wiscVcb woldVcb;
+            naraRate;
+            perfiq by wiscPcmp wiscCode wiscParr wiscBloc wiscObja;
+            execfun by wiscBwsp cntSpan attnSel attnDiv attnOpp sdqHyp;
+            acc with lang; acc with naraRate; 
+            acc with perfiq; acc with execfun;
+            lang with naraRate; 
+            lang with perfiq; lang with execfun;
+            naraRate with perfiq; naraRate with execfun; 
+            perfiq with execfun; execfun by wiscCode;
+            ",
+  DEFINE = "naraAcc = naraAcc/5; naraRate = naraRate/8; wiscVcb = wiscVcb/2;
+            wiscPcmp = wiscPcmp/2; wiscCode = wiscCode/5; wiscParr = wiscParr/5;
+            wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20; 
+            attnOpp = attnOpp/4;",
+  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
+  PLOT = "TYPE = PLOT3;",
+  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "c", "g")]),
+  rdata = cp_data)
+
+m_cfa2e_fit <- mplusModeler(m_cfa2e,
+                           modelout = "./mplus_models/compprof/cfa/cp_cfa2e.inp",
+                           check = TRUE, run = TRUE)
+
+# Inspect model output
+SummaryTable(m_cfa2e_fit, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR")) %>%
+  kable("pipe")
+
+# Inspect modification indices
+m_cfa2e_fit$results$mod_indices %>%
+  arrange(desc(MI)) %>%
+  head(10) %>%
+  kable("pipe")
 ```
 
-* Check for very large standardised residuals.  
-* No accepted view on how large MIs should be. Change only one at a time, starting with largest, but must be theoretically meaningful.  
-* As well as the additional modifications from the SimpView analysis, we anticipate potential covariances between aspects of executive function that are more closely related to each other, such as the working memory measures or subtests from the TEACh battery. 
+The model without the cross-loading from naraComp to the accuracy latent variable is poorer in fit, and the MIs support that this modification is key to the difference in fit. Retain cross-loading in final model. 
 
-E.g...
+## Final model
 
-```{r cfa-modification1}
-# TWO-FACTOR MODEL with additional covariance between the two working memory measures
-# m_cfa2 <- update(m_cfa1,
-#                  TITLE = ~ "Confirmatory Factor Analysis - Two-Factor - modification1 wm;",
-#                  MODEL = ~. + "cntSpan with wiscBwsp;")
-# 
-# m_cfa2_fit <- mplusModeler(m_cfa2,
-#                            modelout = "./mplus_models/compprof/cfa/cp_cfa2.inp",
-#                            check = TRUE, run = TRUE)
-# 
-# # COMPARE MODELS
-# cfa_models <- readModels(target = "./mplus_models/compprof/cfa", filefilter = "cp_cfa")
-# SummaryTable(cfa_models, keepCols = c("Title", "Parameters", "LL", "CFI", "TLI", "AIC", "BIC", "RMSEA_Estimate", "RMSEA_pLT05", "SRMR"))
-# 
-# # Inspect model (by = loadings, with = covariances)
-# cfa_models$cp_cfa2.out$warnings
-# cfa_models$cp_cfa2.out$parameters$unstandardized
-# cfa_models$cp_cfa2.out$parameters$stdyx.standardized
-# 
-# # Inspect modification indices
-# cfa_models$cp_cfa2.out$mod_indices %>% 
-#   filter(operator == "WITH") %>% 
-#   arrange(desc(MI))
+```{r final-model}
+readModels("./mplus_models/compprof/cfa/cp_cfa2d.out", what="parameters")$parameters$r2 %>% kable("pipe")
+readModels("./mplus_models/compprof/cfa/cp_cfa2d.out", what="parameters")$parameters$stdyx.standardized %>% kable("pipe")
+```
+
+This model will be taken forward for cross-validation with subsample B (WP1_SimpView_ShapeValidation.Rmd).
+
+
+# Version info {#version}
+
+*Package versions were up-to-date as of 12/08/2021.* *LPA models were run using Mplus Version 8.5.*
+
+```{r version}
+sessionInfo()
 ```
 
 
-The following rules of thumb are often used to indicate a good-fitting model:
-* CFI & TLI > .95  
-* RMSEA <= .05  
-* SRMR < .05
 
 
-### CFA figure
 
-```{r cfa-diagram}
-#semPaths(semPlotModel(cfa_models$cp_cfa2.out, mplusStd = "stdyx"), what = "paths", whatLabels = "std", rotation = 2, intercepts = FALSE)
+
+
+
+
+```{r exploratory-bifactor-cfa}
+# Proposed factor structure: 5 factors + rate
+m_bcfa1a <- mplusObject(
+  TITLE = "Confirmatory Factor Analysis - Bifactor model;",
+  ANALYSIS = "estimator = mlr; type = general; starts = 20;",
+  MODEL = " f8age; f9age; f10age;
+            acc naraRate naraComp on f9age;
+            vocab perfiq woldComp wiscBwsp attnSel attnDiv attnOpp on f8age;
+            cntSpan on f10age;
+            G by combAcc naraAcc woldComp naraComp naraRate wiscVcb woldVcb
+            wiscPcmp wiscCode wiscParr wiscBloc wiscObja
+            wiscBwsp cntSpan attnSel attnDiv attnOpp sdqHyp; 
+            acc by combAcc naraAcc; 
+            comp by woldComp naraComp;
+            naraRate;
+            vocab by wiscVcb woldVcb;
+            perfiq by wiscPcmp wiscCode wiscParr wiscBloc wiscObja;
+            execfun by wiscBwsp cntSpan attnSel attnDiv attnOpp sdqHyp;
+            G@1; acc@1; comp@1; naraRate@1; vocab@1; perfiq@1; execfun@1;
+            G with acc-execfun@0;
+            G with naraRate@0;
+            acc-execfun with acc-execfun@0;
+            naraRate with acc-execfun@0;
+ ",
+  DEFINE = "naraAcc = naraAcc/5; naraRate = naraRate/8; wiscVcb = wiscVcb/2;
+            wiscPcmp = wiscPcmp/2; wiscCode = wiscCode/5; wiscParr = wiscParr/5;
+            wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20; 
+            attnOpp = attnOpp/4;",
+  OUTPUT = "TECH1; TECH4; stdyx; modindices;",
+  PLOT = "TYPE = PLOT3;",
+  usevariables = colnames(cp_data[,!names(cp_data) %in% c("yp_id", "cidB3153", "c", "g")]),
+  rdata = cp_data)
+
+m_bcfa1a_fit <- mplusModeler(m_bcfa1a,
+                           modelout = "./mplus_models/compprof/cfa/cp_bcfa1a.inp",
+                           check = TRUE, run = TRUE)
+
 ```
-

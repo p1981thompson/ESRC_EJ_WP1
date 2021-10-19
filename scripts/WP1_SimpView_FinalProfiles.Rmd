@@ -1,0 +1,247 @@
+---
+title: "WP1: Simple View - Final Profiles"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_dir = "../output/analysis/") })
+---
+
+This script is used to extract and plot descriptive statistics for the profiles identified in the Simple View Analysis.
+
+# Set-up
+
+## Libraries
+
+```{r libraries, message = FALSE, warning = FALSE}
+# Specify packages
+pkgs <- c("tidyverse", "MplusAutomation", "texreg", "kableExtra", "GGally")
+
+# Load packages
+invisible(lapply(pkgs, library, character.only = TRUE))
+```
+
+## Directories
+
+```{r create-dir}
+# Create subdirectories for storing output, if do not already exist
+if(dir.exists("../output/")==FALSE){dir.create("../output/")}
+if(dir.exists("../output/figures")==FALSE){dir.create("../output/figures")}
+if(dir.exists("../output/tables")==FALSE){dir.create("../output/tables")}
+```
+
+## Data and model output
+
+```{r read-data}
+# Read in final model
+final_mod <- readModels(target = "./mplus_models/simpview/final_model", filefilter = "lpa_full")  # final model file
+
+# Extract class data
+class_data <- as.data.frame(final_mod$savedata) %>% 
+  rename_all(tolower) %>% 
+  select(cidb3153, f8age, f9age, c, g) %>%   # keep age data for additional checking during merge
+  rename(cidB3153 = cidb3153)
+
+# Save class data for future use
+write.csv(class_data, "../data/processed/WP1_data_profiles.csv", row.names = FALSE)
+
+# Read in and extract relevant variables from data file
+ppt_data <- read.csv("../data/processed/WP1_data_all.csv") %>%
+  select(cidB3153, age_m_f8, age_m_f9, nara_comp_raw_f9, nara_acc_raw_f9, read_word_raw_f9, read_nonw_raw_f9, wold_comp_raw_f8,
+         nara_comp_std_f9, nara_acc_std_f9) %>% 
+  mutate(read_comb_raw_f9 = (read_word_raw_f9 + read_nonw_raw_f9))
+
+# Merge class information with 
+ppt_classes <- ppt_data %>% 
+  full_join(class_data, by = c("cidB3153",
+                             "age_m_f8" = "f8age",
+                             "age_m_f9" = "f9age"))
+```
+
+# Standardise
+
+The NARA comes with test-normed standardised scores, but the others have raw score only (bespoke tests and/or only subset of items). Compute sample-standardised scores, accounting for age variability.
+
+```{r standardise-function}
+sample_std <- function(test_scores = NA, age = NA, data = NA){
+  
+  # Create row references
+  data <- data %>% 
+    rownames_to_column("rowno_id")
+  
+  # For each variable in list
+  for (test in test_scores){
+    
+      # Create new variable name
+      var_name = str_replace(test, "raw", "bstd")   # for bespoke standard
+    
+      # Regress out age
+      lm_age <- lm(get(test) ~ get(age), data = data)
+      
+      # Use standardised residuals, and then convert to standardised score (M = 100, SD = 15)
+      ppt_resid <- rstandard(lm_age)
+      std_score <- round(ppt_resid*15 + 100)
+
+      # Convert new standardised score to data frame
+      append_score <- data.frame(std_score) %>%
+        set_names(var_name) %>%
+        rownames_to_column("rowno_id")
+
+      # Merge score by row reference
+      data <- data %>%
+        left_join(append_score, by = "rowno_id") 
+  }
+  
+  # Remove row reference from final output
+  data <- data %>% 
+    select(-rowno_id)
+}
+```
+
+```{r standardise-data}
+std_data <- sample_std(data = ppt_classes, test_scores = c("read_comb_raw_f9", "nara_acc_raw_f9", "nara_comp_raw_f9"), age = "age_m_f9")
+std_data <- sample_std(data = std_data, test_scores = c("wold_comp_raw_f8"), age = "age_m_f8")
+```
+
+Intend to report test-standardised scores for the NARA, but check how the two compare.
+
+```{r standardise-compare}
+# Edit so that not skewed by having greater distribution at tails than original
+std_data2 <- std_data %>%
+  mutate(nara_comp_bstd_f9 = ifelse(nara_comp_bstd_f9 < 70, 69, 
+                                    ifelse(nara_comp_bstd_f9 > 130, 131, nara_comp_bstd_f9)),
+         nara_acc_bstd_f9 = ifelse(nara_acc_bstd_f9 < 70, 69, 
+                                   ifelse(nara_acc_bstd_f9 > 130, 131, nara_acc_bstd_f9)))
+
+# Accuracy
+plot(std_data2$nara_acc_std_f9, std_data2$nara_acc_bstd_f9) +
+  abline(1, 1)
+
+# Comprehension
+plot(std_data2$nara_comp_std_f9, std_data2$nara_comp_bstd_f9) +
+  abline(1, 1)
+```
+
+# Descriptive statistics
+
+Re-format to long dataframe for ease of formatting
+
+```{r long-data}
+# Long version 
+long_data <- std_data %>% 
+  select(cidB3153, c, read_comb_bstd_f9, nara_acc_bstd_f9, nara_acc_std_f9, nara_comp_bstd_f9, nara_comp_std_f9, wold_comp_bstd_f8) %>% 
+  pivot_longer(cols = c(read_comb_bstd_f9, nara_acc_bstd_f9, nara_acc_std_f9, nara_comp_bstd_f9, nara_comp_std_f9, wold_comp_bstd_f8),
+               names_to = "task",
+               values_to = "score") %>% 
+  mutate(c = as.factor(c),
+         task = factor(task, levels = c("read_comb_bstd_f9", "nara_acc_bstd_f9", "nara_acc_std_f9", "nara_comp_bstd_f9", "nara_comp_std_f9", "wold_comp_bstd_f8")))
+```
+
+Extract descriptive statistics for each group.
+
+```{r group-descriptives}
+# N per group
+profile_n <- std_data %>%
+  group_by(c) %>%
+  count()
+
+# Describe groups on age at the two tests
+std_data %>%
+  group_by(c) %>%
+  summarise(mean_f8 = mean(age_m_f8, na.rm = TRUE), mean_f9 = mean(age_m_f9))
+
+# Describe groups on standarised assessment scores (NARA only)
+nara_std <- std_data %>% 
+  group_by(c) %>% 
+  summarise(across(contains("_std"), list(mean = mean, sd = sd, min = min, max = max))) %>% 
+  round(2)
+nara_std %>% 
+  kable("pipe")
+
+# Describe groups on bespoke standardised scores
+sample_std <- std_data %>% 
+  group_by(c) %>% 
+  summarise(across(contains("_bstd"), list(mean = mean, sd = sd), na.rm = TRUE)) %>% 
+  round(2)
+sample_std <- profile_n %>%
+  left_join(sample_std, by = "c")
+
+sample_std %>% 
+  kable("pipe")
+write.csv(sample_std, "../output/tables/profile_desc_bstd.csv", row.names = FALSE)
+
+# Reformat bespoke standardised scores 
+long_data %>% 
+  group_by(c, task) %>% 
+  filter(!is.na(score)) %>% 
+  filter(grepl("_bstd", task)) %>% 
+  summarise(mean = mean(score), sd = sd(score), min = min(score), max = max(score)) %>% 
+  mutate(across(where(is.numeric), round, 2)) %>% 
+  kable("pipe")
+```
+
+# Correlations
+
+```{r scatterplot-matrix}
+# Distributions/correlations by group
+std_data %>% 
+  mutate(c = as.factor(c)) %>%
+  select(c("c", contains("_bstd")))  %>%
+  ggpairs(mapping = aes(color = c))
+
+ggsave("../output/figures/profiles_ggally.png")
+```
+
+# Figures
+
+```{r}
+# Format data for plotting
+plot_data <- long_data  %>%
+  group_by(c, task) %>%
+  filter(grepl("_bstd", task)) %>% 
+  droplevels() %>%
+  summarise(class_mean = mean(score, na.rm = TRUE), sd = sd(score, na.rm = TRUE),
+            n = n(), proportion = n/6846*100)
+
+levels(plot_data$c) <- list("Poor comprehenders" = "1", "Poor word readers" = "2", "Average readers" = "4", "Consistent readers" = "6", "Inconsistent readers" = "3", "Good comprehenders" = "5")
+
+
+# Class descriptives (Means) 
+plot_data %>%
+  mutate(c = paste0(c, " (", round(proportion,2), "%)")) %>%
+  mutate(c = as.factor(c)) %>%
+  ggplot(aes(x = task, y = class_mean, group = c, colour = c)) +
+  theme_classic() +
+  geom_point(aes(shape = c), position = position_dodge(0.3), size = 4) + 
+  geom_line(position = position_dodge(0.3), size = 1.5, linetype = "solid", alpha = 0.3) + 
+  scale_x_discrete(name = "Task", labels = c("Item\naccuracy", "Passage\naccuracy", "Reading\ncomprehension", "Listening\ncomprehension"),  expand = c(0.1,0)) +
+  scale_y_continuous(name = "Mean score (sample-standardised)") +
+  geom_hline(yintercept = 100, linetype = "longdash") +
+  theme(axis.text = element_text(colour = "black", size = 8),
+        legend.background = element_rect(colour = "black"),
+        legend.position = "right",
+        legend.title = element_text(size = 8),
+        legend.text = element_text(size = 6)) +
+  labs(shape = "Profile", color = "Profile")
+ggsave("../output/figures/profiles.png", dpi = 600, height = 4, width = 6, units = "in")  
+
+
+plot_data %>%
+  mutate(c = paste0(c, " (", round(proportion,2), "%)")) %>%
+  mutate(c = as.factor(c)) %>%
+  ggplot(aes(x = task, y = class_mean, group = c, colour = c)) +
+  theme_classic() +
+  geom_point(aes(shape = c), position = position_dodge(0.3), size = 4) + 
+  geom_line(position = position_dodge(0.3), size = 1.5, linetype = "solid", alpha = 0.3) + 
+  scale_x_discrete(name = "Task", labels = c("Item\naccuracy", "Passage\naccuracy", "Reading\ncomprehension", "Listening\ncomprehension"),  expand = c(0.1, 0)) +
+  scale_y_continuous(name = "Mean score (sample-standardised)") +
+  geom_hline(yintercept = 100, linetype = "longdash") +
+  theme(axis.text = element_text(colour = "black", size = 6),
+        legend.position = "none",
+        plot.margin = margin(0, 6, 0, 0,"cm")) +
+  geom_dl(aes(label = c), method = "last.points", cex = 0.8, x = x+1) +
+  coord_cartesian(clip = "off")
+ggsave("../output/figures/profiles.png", dpi = 600, height = 4, width = 6, units = "in")  
+```
