@@ -1,0 +1,41 @@
+TITLE:
+Confirmatory Factor Analysis - 5-factor + rate;
+DATA:
+FILE = "./mplus_models/compprof/cfa/cp_cfa1a_ab04529702acd08c9e424a561d3863e8.dat";
+ 
+VARIABLE:
+NAMES = naraComp naraAcc woldComp f8age f9age f10age naraRate woldVcb wiscVcb
+     wiscPcmp wiscCode wiscParr wiscBloc wiscObja wiscBwsp cntspan attnSel attnDiv
+     attnOpp sdqHyp combAcc; 
+ MISSING=.;
+ 
+DEFINE:
+naraAcc = naraAcc/5; naraRate = naraRate/8; wiscVcb = wiscVcb/2;
+            wiscPcmp = wiscPcmp/2; wiscCode = wiscCode/5; wiscParr = wiscParr/5;
+            wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20; 
+            attnOpp = attnOpp/4;
+ANALYSIS:
+estimator = mlr; type = general; starts = 20;
+MODEL:
+ f8age; f9age; f10age;
+            acc naraRate naraComp on f9age;
+            vocab perfiq woldComp wiscBwsp attnSel attnDiv attnOpp on f8age;
+            cntSpan on f10age;
+            acc by combAcc naraAcc; 
+            comp by woldComp naraComp;
+            naraRate;
+            vocab by wiscVcb woldVcb;
+            perfiq by wiscPcmp wiscCode wiscParr wiscBloc wiscObja;
+            execfun by wiscBwsp cntSpan attnSel attnDiv attnOpp sdqHyp;
+            acc with comp; acc with naraRate; acc with vocab; 
+            acc with perfiq; acc with execfun;
+            comp with naraRate; comp with vocab; 
+            comp with perfiq; comp with execfun;
+            naraRate with vocab; naraRate with perfiq; 
+            naraRate with execfun; 
+            vocab with perfiq; vocab with execfun;
+            perfiq with execfun;
+OUTPUT:
+TECH1; TECH4; stdyx; modindices;
+PLOT:
+TYPE = PLOT3;

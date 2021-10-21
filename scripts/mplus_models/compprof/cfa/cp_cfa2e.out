@@ -1,0 +1,2208 @@
+Mplus VERSION 8.5
+MUTHEN & MUTHEN
+10/18/2021   1:05 PM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+  Confirmatory Factor Analysis - 4-factor + rate (no comp cross-load);
+  DATA:
+  FILE = "./mplus_models/compprof/cfa/cp_cfa1a_ab04529702acd08c9e424a561d3863e8.dat";
+
+  VARIABLE:
+  NAMES = naraComp naraAcc woldComp f8age f9age f10age naraRate woldVcb wiscVcb
+       wiscPcmp wiscCode wiscParr wiscBloc wiscObja wiscBwsp cntspan attnSel attnDiv
+       attnOpp sdqHyp combAcc;
+   MISSING=.;
+
+  DEFINE:
+  naraAcc = naraAcc/5; naraRate = naraRate/8; wiscVcb = wiscVcb/2;
+              wiscPcmp = wiscPcmp/2; wiscCode = wiscCode/5; wiscParr = wiscParr/5;
+              wiscBloc = wiscBloc/6; wiscObja = wiscObja/5; attnDiv = attnDiv/20;
+              attnOpp = attnOpp/4;
+  ANALYSIS:
+  estimator = mlr; type = general; starts = 20;
+  MODEL:
+   f8age; f9age; f10age;
+              acc naraComp naraRate on f9age;
+              perfiq woldComp wiscBwsp attnSel attnDiv attnOpp on f8age;
+              wiscVcb woldVcb on f8age;
+              cntSpan on f10age;
+              acc by combAcc naraAcc;
+              naraAcc@0;
+              lang by woldComp naraComp wiscVcb woldVcb;
+              naraRate;
+              perfiq by wiscPcmp wiscCode wiscParr wiscBloc wiscObja;
+              execfun by wiscBwsp cntSpan attnSel attnDiv attnOpp sdqHyp;
+              acc with lang; acc with naraRate;
+              acc with perfiq; acc with execfun;
+              lang with naraRate;
+              lang with perfiq; lang with execfun;
+              naraRate with perfiq; naraRate with execfun;
+              perfiq with execfun; execfun by wiscCode;
+
+  OUTPUT:
+  TECH1; TECH4; stdyx; modindices;
+  PLOT:
+  TYPE = PLOT3;
+
+
+
+INPUT READING TERMINATED NORMALLY
+
+
+
+
+Confirmatory Factor Analysis - 4-factor + rate (no comp cross-load);
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                         947
+
+Number of dependent variables                                   18
+Number of independent variables                                  3
+Number of continuous latent variables                            4
+
+Observed dependent variables
+
+  Continuous
+   NARACOMP    NARAACC     WOLDCOMP    NARARATE    WOLDVCB     WISCVCB
+   WISCPCMP    WISCCODE    WISCPARR    WISCBLOC    WISCOBJA    WISCBWSP
+   CNTSPAN     ATTNSEL     ATTNDIV     ATTNOPP     SDQHYP      COMBACC
+
+Observed independent variables
+   F8AGE       F9AGE       F10AGE
+
+Continuous latent variables
+   ACC         LANG        PERFIQ      EXECFUN
+
+
+Estimator                                                      MLR
+Information matrix                                        OBSERVED
+Maximum number of iterations                                  1000
+Convergence criterion                                    0.500D-04
+Maximum number of steepest descent iterations                   20
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+Random Starts Specifications
+  Number of random starts                                       20
+  Random starts scale                                    0.500D+01
+
+Input data file(s)
+  ./mplus_models/compprof/cfa/cp_cfa1a_ab04529702acd08c9e424a561d3863e8.dat
+
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns            75
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT
+
+
+           Covariance Coverage
+              NARACOMP      NARAACC       WOLDCOMP      NARARATE      WOLDVCB
+              ________      ________      ________      ________      ________
+ NARACOMP       1.000
+ NARAACC        1.000         1.000
+ WOLDCOMP       0.852         0.852         0.852
+ NARARATE       0.995         0.995         0.848         0.995
+ WOLDVCB        0.845         0.845         0.844         0.841         0.845
+ WISCVCB        0.846         0.846         0.839         0.843         0.833
+ WISCPCMP       0.850         0.850         0.844         0.846         0.837
+ WISCCODE       0.850         0.850         0.844         0.847         0.837
+ WISCPARR       0.837         0.837         0.831         0.834         0.825
+ WISCBLOC       0.834         0.834         0.828         0.830         0.822
+ WISCOBJA       0.792         0.792         0.787         0.789         0.781
+ WISCBWSP       0.828         0.828         0.822         0.825         0.816
+ CNTSPAN        0.865         0.865         0.762         0.861         0.758
+ ATTNSEL        0.834         0.834         0.828         0.830         0.823
+ ATTNDIV        0.812         0.812         0.806         0.811         0.800
+ ATTNOPP        0.831         0.831         0.825         0.829         0.818
+ SDQHYP         0.863         0.863         0.755         0.857         0.748
+ COMBACC        0.996         0.996         0.849         0.992         0.842
+ F8AGE          0.859         0.859         0.852         0.854         0.845
+ F9AGE          1.000         1.000         0.852         0.995         0.845
+ F10AGE         0.914         0.914         0.804         0.909         0.797
+
+
+           Covariance Coverage
+              WISCVCB       WISCPCMP      WISCCODE      WISCPARR      WISCBLOC
+              ________      ________      ________      ________      ________
+ WISCVCB        0.846
+ WISCPCMP       0.842         0.850
+ WISCCODE       0.844         0.846         0.850
+ WISCPARR       0.832         0.833         0.835         0.837
+ WISCBLOC       0.830         0.830         0.832         0.820         0.834
+ WISCOBJA       0.790         0.788         0.790         0.780         0.778
+ WISCBWSP       0.825         0.824         0.825         0.813         0.812
+ CNTSPAN        0.759         0.761         0.762         0.753         0.751
+ ATTNSEL        0.824         0.826         0.827         0.814         0.812
+ ATTNDIV        0.803         0.804         0.806         0.793         0.791
+ ATTNOPP        0.822         0.823         0.825         0.812         0.811
+ SDQHYP         0.747         0.751         0.751         0.739         0.739
+ COMBACC        0.843         0.847         0.847         0.834         0.831
+ F8AGE          0.846         0.850         0.850         0.837         0.834
+ F9AGE          0.846         0.850         0.850         0.837         0.834
+ F10AGE         0.797         0.803         0.801         0.791         0.788
+
+
+           Covariance Coverage
+              WISCOBJA      WISCBWSP      CNTSPAN       ATTNSEL       ATTNDIV
+              ________      ________      ________      ________      ________
+ WISCOBJA       0.792
+ WISCBWSP       0.776         0.828
+ CNTSPAN        0.718         0.747         0.865
+ ATTNSEL        0.772         0.806         0.752         0.834
+ ATTNDIV        0.752         0.787         0.738         0.807         0.812
+ ATTNOPP        0.769         0.803         0.749         0.822         0.804
+ SDQHYP         0.700         0.731         0.760         0.735         0.715
+ COMBACC        0.789         0.825         0.861         0.831         0.809
+ F8AGE          0.792         0.828         0.769         0.834         0.812
+ F9AGE          0.792         0.828         0.865         0.834         0.812
+ F10AGE         0.748         0.781         0.865         0.788         0.768
+
+
+           Covariance Coverage
+              ATTNOPP       SDQHYP        COMBACC       F8AGE         F9AGE
+              ________      ________      ________      ________      ________
+ ATTNOPP        0.831
+ SDQHYP         0.736         0.863
+ COMBACC        0.828         0.860         0.996
+ F8AGE          0.831         0.759         0.855         0.859
+ F9AGE          0.831         0.863         0.996         0.859         1.000
+ F10AGE         0.785         0.804         0.910         0.810         0.914
+
+
+           Covariance Coverage
+              F10AGE
+              ________
+ F10AGE         0.914
+
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     NARACOMP             21.048      -0.826       0.000    0.11%      16.000     20.000     22.000
+             947.000      42.113       0.435      34.000    0.42%      24.000     27.000
+     NARAACC              14.818      -1.306       1.400    0.21%      12.000     15.400     16.000
+             947.000      15.134       1.216      19.800    0.63%      16.800     17.800
+     WOLDCOMP              6.823      -0.171       2.000    1.36%       5.000      7.000      7.000
+             807.000       3.311       0.332      13.000    0.12%       7.000      8.000
+     NARARATE             10.367       0.849       2.375    0.11%       7.500      9.625     10.375
+             942.000      10.574       4.725      36.625    0.11%      11.000     13.000
+     WOLDVCB               6.986      -0.715       0.000    0.12%       5.000      7.000      7.000
+             800.000       3.831       0.323      10.000    7.38%       8.000      9.000
+     WISCVCB              10.562       0.298       0.000    1.00%       8.000     10.000     10.000
+             801.000      13.155       0.484      22.000    0.12%      11.000     13.000
+     WISCPCMP              7.229      -0.372       0.000    0.12%       5.000      7.000      8.000
+             805.000       6.194      -0.404      13.000    0.62%       8.000      9.000
+     WISCCODE              6.780      -0.316       0.200    0.12%       5.600      6.400      6.800
+             805.000       2.072       1.262      12.000    0.12%       7.000      8.000
+     WISCPARR              3.593       0.231       0.000    0.25%       1.600      2.800      3.600
+             793.000       4.195      -0.794       9.200    0.13%       4.200      5.400
+     WISCBLOC              4.860       0.079       0.000    0.38%       3.000      4.333      4.667
+             790.000       4.224      -0.287      11.333    0.13%       5.333      6.667
+     WISCOBJA              4.496       0.012       0.000    0.13%       2.800      3.600      4.200
+             750.000       2.834      -1.078       8.200    0.13%       5.000      6.200
+     WISCBWSP              3.501       0.116       0.000    0.13%       3.000      3.000      3.000
+             784.000       0.740       0.805       7.000    0.13%       4.000      4.000
+     CNTSPAN               3.395      -0.113       0.500    0.61%       2.500      3.500      3.500
+             819.000       0.605       0.180       5.000    4.64%       3.500      4.000
+     ATTNSEL               5.336       2.275      -3.250    0.13%       4.000      4.600      4.950
+             790.000       3.861      11.080      19.250    0.13%       5.317      6.350
+     ATTNDIV               0.318       6.481      -0.682    0.13%      -0.005      0.050      0.090
+             769.000       0.806      54.167      11.075    0.13%       0.130      0.329
+     ATTNOPP               1.146       1.314      -0.750    0.13%       0.625      0.875      1.000
+             787.000       0.513       4.280       5.750    0.13%       1.125      1.625
+     SDQHYP                2.840       0.875       0.000   13.22%       1.000      2.000      3.000
+             817.000       4.889       0.489      10.000    1.10%       3.000      5.000
+     COMBACC              12.622      -0.922       0.000    3.08%       9.000     13.000     14.000
+             943.000      23.342       0.183      20.000    0.53%      15.000     17.000
+     F8AGE               103.043       0.807      99.000    1.97%     102.000    102.000    103.000
+             813.000       3.751       1.206     110.000    0.49%     103.000    104.000
+     F9AGE               118.382       1.277     107.000    0.11%     116.000    117.000    118.000
+             947.000      11.890       2.765     139.000    0.11%     118.000    121.000
+     F10AGE              127.342       1.684     120.000    0.12%     125.000    126.000    127.000
+             866.000       8.137       4.065     142.000    0.12%     127.000    129.000
+
+
+RANDOM STARTS RESULTS RANKED FROM THE BEST TO THE WORST FIT FUNCTION VALUES
+
+Fit function values at local maxima and random start numbers:
+
+            727.7657         11
+            727.7657         1
+            727.7657         unperturbed
+            727.7657         2
+            727.7657         4
+            727.7657         3
+            727.7657         13
+            727.7657         12
+            727.7657         7
+            727.7657         16
+            727.7657         6
+            727.7657         19
+            727.7657         9
+            727.7657         8
+            727.7657         10
+
+6 starting value run(s) did not converge.
+
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                       90
+
+Loglikelihood
+
+          H0 Value                      -35637.386
+          H0 Scaling Correction Factor      1.7558
+            for MLR
+          H1 Value                      -35273.504
+          H1 Scaling Correction Factor      1.2873
+            for MLR
+
+Information Criteria
+
+          Akaike (AIC)                   71454.773
+          Bayesian (BIC)                 71891.570
+          Sample-Size Adjusted BIC       71605.735
+            (n* = (n + 2) / 24)
+
+Chi-Square Test of Model Fit
+
+          Value                            708.597*
+          Degrees of Freedom                   162
+          P-Value                           0.0000
+          Scaling Correction Factor         1.0271
+            for MLR
+
+*   The chi-square value for MLM, MLMV, MLR, ULSMV, WLSM and WLSMV cannot be used
+    for chi-square difference testing in the regular way.  MLM, MLR and WLSM
+    chi-square difference testing is described on the Mplus website.  MLMV, WLSMV,
+    and ULSMV difference testing is done using the DIFFTEST option.
+
+RMSEA (Root Mean Square Error Of Approximation)
+
+          Estimate                           0.060
+          90 Percent C.I.                    0.055  0.064
+          Probability RMSEA <= .05           0.000
+
+CFI/TLI
+
+          CFI                                0.888
+          TLI                                0.857
+
+Chi-Square Test of Model Fit for the Baseline Model
+
+          Value                           5090.285
+          Degrees of Freedom                   207
+          P-Value                           0.0000
+
+SRMR (Standardized Root Mean Square Residual)
+
+          Value                              0.048
+
+
+
+MODEL RESULTS
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ ACC      BY
+    COMBACC            1.000      0.000    999.000    999.000
+    NARAACC            0.957      0.017     56.716      0.000
+
+ LANG     BY
+    WOLDCOMP           1.000      0.000    999.000    999.000
+    NARACOMP           8.548      0.804     10.627      0.000
+    WISCVCB            2.733      0.242     11.309      0.000
+    WOLDVCB            1.489      0.135     11.052      0.000
+
+ PERFIQ   BY
+    WISCPCMP           1.000      0.000    999.000    999.000
+    WISCCODE          -0.262      0.115     -2.282      0.023
+    WISCPARR           0.651      0.077      8.467      0.000
+    WISCBLOC           1.202      0.107     11.215      0.000
+    WISCOBJA           0.891      0.077     11.640      0.000
+
+ EXECFUN  BY
+    WISCBWSP           1.000      0.000    999.000    999.000
+    CNTSPAN            0.914      0.084     10.836      0.000
+    ATTNSEL           -1.855      0.324     -5.726      0.000
+    ATTNDIV           -0.811      0.177     -4.574      0.000
+    ATTNOPP           -0.733      0.092     -7.934      0.000
+    SDQHYP            -1.704      0.248     -6.856      0.000
+    WISCCODE           2.401      0.422      5.687      0.000
+
+ ACC      ON
+    F9AGE              0.045      0.035      1.276      0.202
+
+ PERFIQ   ON
+    F8AGE              0.015      0.025      0.590      0.555
+
+ NARACOMP ON
+    F9AGE              0.408      0.103      3.956      0.000
+
+ NARARATE ON
+    F9AGE              0.035      0.029      1.182      0.237
+
+ WOLDCOMP ON
+    F8AGE              0.036      0.032      1.126      0.260
+
+ WISCBWSP ON
+    F8AGE             -0.022      0.016     -1.352      0.176
+
+ ATTNSEL  ON
+    F8AGE             -0.041      0.030     -1.379      0.168
+
+ ATTNDIV  ON
+    F8AGE             -0.022      0.014     -1.554      0.120
+
+ ATTNOPP  ON
+    F8AGE              0.000      0.014      0.001      0.999
+
+ WISCVCB  ON
+    F8AGE              0.133      0.057      2.346      0.019
+
+ WOLDVCB  ON
+    F8AGE              0.065      0.032      2.036      0.042
+
+ CNTSPAN  ON
+    F10AGE             0.006      0.010      0.663      0.507
+
+ ACC      WITH
+    LANG               2.725      0.281      9.691      0.000
+    NARARATE           7.907      0.699     11.309      0.000
+    PERFIQ             2.354      0.304      7.751      0.000
+    EXECFUN            1.150      0.167      6.873      0.000
+
+ LANG     WITH
+    NARARATE           1.383      0.169      8.200      0.000
+    PERFIQ             0.499      0.084      5.924      0.000
+    EXECFUN            0.230      0.037      6.166      0.000
+
+ NARARATE WITH
+    PERFIQ             1.055      0.198      5.327      0.000
+    EXECFUN            0.628      0.090      6.983      0.000
+
+ PERFIQ   WITH
+    EXECFUN            0.427      0.061      6.998      0.000
+
+ F8AGE    WITH
+    LANG               0.005      0.026      0.187      0.852
+    EXECFUN            0.070      0.036      1.925      0.054
+
+ F9AGE    WITH
+    LANG              -0.480      0.144     -3.330      0.001
+    EXECFUN           -0.100      0.055     -1.830      0.067
+
+ F10AGE   WITH
+    LANG              -0.134      0.059     -2.257      0.024
+    EXECFUN           -0.049      0.049     -1.001      0.317
+
+ F9AGE    WITH
+    F8AGE              0.427      0.283      1.509      0.131
+
+ F10AGE   WITH
+    F8AGE              0.297      0.262      1.132      0.257
+    F9AGE              4.155      0.552      7.527      0.000
+
+ Means
+    F8AGE            103.051      0.070   1472.323      0.000
+    F9AGE            118.382      0.112   1056.513      0.000
+    F10AGE           127.408      0.100   1276.849      0.000
+
+ Intercepts
+    NARACOMP         -27.212     12.194     -2.232      0.026
+    NARAACC            9.699      4.013      2.417      0.016
+    WOLDCOMP           3.079      3.284      0.938      0.348
+    NARARATE           6.253      3.463      1.806      0.071
+    WOLDVCB            0.248      3.279      0.076      0.940
+    WISCVCB           -3.249      5.827     -0.558      0.577
+    WISCPCMP           5.682      2.564      2.216      0.027
+    WISCCODE           7.143      0.684     10.450      0.000
+    WISCPARR           2.573      1.678      1.533      0.125
+    WISCBLOC           2.981      3.073      0.970      0.332
+    WISCOBJA           3.103      2.273      1.365      0.172
+    WISCBWSP           5.695      1.644      3.464      0.001
+    CNTSPAN            2.565      1.219      2.105      0.035
+    ATTNSEL            9.594      3.068      3.127      0.002
+    ATTNDIV            2.639      1.481      1.782      0.075
+    ATTNOPP            1.162      1.486      0.782      0.434
+    SDQHYP             2.881      0.078     36.910      0.000
+    COMBACC            7.269      4.187      1.736      0.083
+
+ Variances
+    F8AGE              3.752      0.236     15.928      0.000
+    F9AGE             11.890      0.843     14.097      0.000
+    F10AGE             8.210      0.688     11.940      0.000
+    LANG               0.542      0.098      5.533      0.000
+    EXECFUN            0.211      0.039      5.400      0.000
+
+ Residual Variances
+    NARACOMP           4.116      0.999      4.118      0.000
+    NARAACC            0.000      0.000    999.000    999.000
+    WOLDCOMP           2.793      0.154     18.100      0.000
+    NARARATE          10.650      0.887     12.001      0.000
+    WOLDVCB            2.699      0.150     17.945      0.000
+    WISCVCB            9.334      0.553     16.874      0.000
+    WISCPCMP           4.633      0.255     18.142      0.000
+    WISCCODE           1.301      0.124     10.479      0.000
+    WISCPARR           3.549      0.173     20.537      0.000
+    WISCBLOC           2.038      0.179     11.390      0.000
+    WISCOBJA           1.639      0.109     15.084      0.000
+    WISCBWSP           0.544      0.036     15.102      0.000
+    CNTSPAN            0.443      0.030     14.876      0.000
+    ATTNSEL            3.148      0.448      7.027      0.000
+    ATTNDIV            0.675      0.174      3.887      0.000
+    ATTNOPP            0.404      0.034     11.737      0.000
+    SDQHYP             4.298      0.246     17.460      0.000
+    COMBACC            6.839      0.329     20.811      0.000
+    ACC               16.527      1.147     14.404      0.000
+    PERFIQ             1.579      0.237      6.658      0.000
+
+
+STANDARDIZED MODEL RESULTS
+
+
+STDYX Standardization
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ ACC      BY
+    COMBACC            0.841      0.011     74.106      0.000
+    NARAACC            1.000      0.000    999.000    999.000
+
+ LANG     BY
+    WOLDCOMP           0.403      0.032     12.536      0.000
+    NARACOMP           0.967      0.017     56.533      0.000
+    WISCVCB            0.548      0.027     20.003      0.000
+    WOLDVCB            0.554      0.027     20.329      0.000
+
+ PERFIQ   BY
+    WISCPCMP           0.504      0.033     15.057      0.000
+    WISCCODE          -0.227      0.099     -2.309      0.021
+    WISCPARR           0.398      0.039     10.215      0.000
+    WISCBLOC           0.727      0.030     24.409      0.000
+    WISCOBJA           0.658      0.030     21.921      0.000
+
+ EXECFUN  BY
+    WISCBWSP           0.530      0.041     13.062      0.000
+    CNTSPAN            0.534      0.035     15.379      0.000
+    ATTNSEL           -0.432      0.055     -7.867      0.000
+    ATTNDIV           -0.412      0.052     -7.930      0.000
+    ATTNOPP           -0.468      0.040    -11.617      0.000
+    SDQHYP            -0.353      0.042     -8.491      0.000
+    WISCCODE           0.764      0.097      7.851      0.000
+
+ ACC      ON
+    F9AGE              0.038      0.030      1.269      0.204
+
+ PERFIQ   ON
+    F8AGE              0.023      0.038      0.593      0.553
+
+ NARACOMP ON
+    F9AGE              0.216      0.055      3.913      0.000
+
+ NARARATE ON
+    F9AGE              0.037      0.031      1.177      0.239
+
+ WOLDCOMP ON
+    F8AGE              0.038      0.034      1.123      0.261
+
+ WISCBWSP ON
+    F8AGE             -0.048      0.036     -1.350      0.177
+
+ ATTNSEL  ON
+    F8AGE             -0.040      0.029     -1.375      0.169
+
+ ATTNDIV  ON
+    F8AGE             -0.048      0.032     -1.507      0.132
+
+ ATTNOPP  ON
+    F8AGE              0.000      0.039      0.001      0.999
+
+ WISCVCB  ON
+    F8AGE              0.070      0.030      2.362      0.018
+
+ WOLDVCB  ON
+    F8AGE              0.063      0.031      2.049      0.040
+
+ CNTSPAN  ON
+    F10AGE             0.023      0.035      0.663      0.507
+
+ ACC      WITH
+    LANG               0.911      0.013     69.591      0.000
+    NARARATE           0.596      0.063      9.438      0.000
+    PERFIQ             0.461      0.037     12.321      0.000
+    EXECFUN            0.615      0.038     16.090      0.000
+
+ LANG     WITH
+    NARARATE           0.576      0.060      9.673      0.000
+    PERFIQ             0.540      0.040     13.425      0.000
+    EXECFUN            0.679      0.035     19.518      0.000
+
+ NARARATE WITH
+    PERFIQ             0.257      0.046      5.606      0.000
+    EXECFUN            0.418      0.049      8.514      0.000
+
+ PERFIQ   WITH
+    EXECFUN            0.740      0.040     18.467      0.000
+
+ F8AGE    WITH
+    LANG               0.003      0.018      0.187      0.852
+    EXECFUN            0.078      0.040      1.946      0.052
+
+ F9AGE    WITH
+    LANG              -0.189      0.056     -3.406      0.001
+    EXECFUN           -0.063      0.035     -1.793      0.073
+
+ F10AGE   WITH
+    LANG              -0.064      0.028     -2.270      0.023
+    EXECFUN           -0.037      0.037     -0.994      0.320
+
+ F9AGE    WITH
+    F8AGE              0.064      0.041      1.541      0.123
+
+ F10AGE   WITH
+    F8AGE              0.054      0.047      1.140      0.254
+    F9AGE              0.421      0.038     11.031      0.000
+
+ Means
+    F8AGE             53.201      1.654     32.162      0.000
+    F9AGE             34.332      1.199     28.635      0.000
+    F10AGE            44.467      1.838     24.197      0.000
+
+ Intercepts
+    NARACOMP          -4.183      1.878     -2.227      0.026
+    NARAACC            2.492      1.034      2.410      0.016
+    WOLDCOMP           1.685      1.800      0.936      0.349
+    NARARATE           1.915      1.058      1.810      0.070
+    WOLDVCB            0.125      1.658      0.076      0.940
+    WISCVCB           -0.886      1.585     -0.559      0.576
+    WISCPCMP           2.280      1.034      2.204      0.028
+    WISCCODE           4.942      0.507      9.750      0.000
+    WISCPARR           1.253      0.819      1.529      0.126
+    WISCBLOC           1.434      1.480      0.969      0.333
+    WISCOBJA           1.824      1.336      1.366      0.172
+    WISCBWSP           6.559      1.891      3.468      0.001
+    CNTSPAN            3.257      1.553      2.098      0.036
+    ATTNSEL            4.862      1.577      3.083      0.002
+    ATTNDIV            2.917      1.686      1.730      0.084
+    ATTNOPP            1.614      2.081      0.776      0.438
+    SDQHYP             1.300      0.033     39.389      0.000
+    COMBACC            1.503      0.866      1.736      0.082
+
+ Variances
+    F8AGE              1.000      0.000    999.000    999.000
+    F9AGE              1.000      0.000    999.000    999.000
+    F10AGE             1.000      0.000    999.000    999.000
+    LANG               1.000      0.000    999.000    999.000
+    EXECFUN            1.000      0.000    999.000    999.000
+
+ Residual Variances
+    NARACOMP           0.097      0.024      4.125      0.000
+    NARAACC            0.000    999.000    999.000    999.000
+    WOLDCOMP           0.836      0.026     32.129      0.000
+    NARARATE           0.999      0.002    440.618      0.000
+    WOLDVCB            0.689      0.031     22.484      0.000
+    WISCVCB            0.694      0.031     22.608      0.000
+    WISCPCMP           0.746      0.034     22.083      0.000
+    WISCCODE           0.623      0.056     11.177      0.000
+    WISCPARR           0.841      0.031     27.113      0.000
+    WISCBLOC           0.472      0.043     10.904      0.000
+    WISCOBJA           0.567      0.040     14.335      0.000
+    WISCBWSP           0.721      0.043     16.881      0.000
+    CNTSPAN            0.715      0.037     19.321      0.000
+    ATTNSEL            0.809      0.048     17.001      0.000
+    ATTNDIV            0.825      0.041     20.172      0.000
+    ATTNOPP            0.781      0.038     20.763      0.000
+    SDQHYP             0.875      0.029     29.736      0.000
+    COMBACC            0.292      0.019     15.311      0.000
+    ACC                0.999      0.002    431.723      0.000
+    PERFIQ             0.999      0.002    578.376      0.000
+
+
+R-SQUARE
+
+    Observed                                        Two-Tailed
+    Variable        Estimate       S.E.  Est./S.E.    P-Value
+
+    NARACOMP           0.903      0.024     38.282      0.000
+    NARAACC            1.000    999.000    999.000    999.000
+    WOLDCOMP           0.164      0.026      6.290      0.000
+    NARARATE           0.001      0.002      0.589      0.556
+    WOLDVCB            0.311      0.031     10.136      0.000
+    WISCVCB            0.306      0.031      9.963      0.000
+    WISCPCMP           0.254      0.034      7.529      0.000
+    WISCCODE           0.377      0.056      6.778      0.000
+    WISCPARR           0.159      0.031      5.108      0.000
+    WISCBLOC           0.528      0.043     12.205      0.000
+    WISCOBJA           0.433      0.040     10.961      0.000
+    WISCBWSP           0.279      0.043      6.523      0.000
+    CNTSPAN            0.285      0.037      7.688      0.000
+    ATTNSEL            0.191      0.048      4.021      0.000
+    ATTNDIV            0.175      0.041      4.284      0.000
+    ATTNOPP            0.219      0.038      5.835      0.000
+    SDQHYP             0.125      0.029      4.246      0.000
+    COMBACC            0.708      0.019     37.053      0.000
+
+     Latent                                         Two-Tailed
+    Variable        Estimate       S.E.  Est./S.E.    P-Value
+
+    ACC                0.001      0.002      0.635      0.526
+    PERFIQ             0.001      0.002      0.296      0.767
+
+
+QUALITY OF NUMERICAL RESULTS
+
+     Condition Number for the Information Matrix              0.269E-08
+       (ratio of smallest to largest eigenvalue)
+
+
+MODEL MODIFICATION INDICES
+
+NOTE:  Modification indices for direct effects of observed dependent variables
+regressed on covariates may not be included.  To include these, request
+MODINDICES (ALL).
+
+Minimum M.I. value for printing the modification index    10.000
+
+                                   M.I.     E.P.C.  Std E.P.C.  StdYX E.P.C.
+
+BY Statements
+
+ACC      BY WISCCODE              10.016    -0.063     -0.255       -0.176
+ACC      BY SDQHYP                22.359    -0.126     -0.512       -0.231
+LANG     BY NARAACC               85.597     2.854      2.100        0.540
+LANG     BY SDQHYP                17.202    -0.719     -0.529       -0.239
+LANG     BY COMBACC               87.909    -3.027     -2.227       -0.461
+EXECFUN  BY COMBACC               10.570    -1.000     -0.460       -0.095
+
+ON/BY Statements
+
+NARACOMP ON ACC      /
+ACC      BY NARACOMP             167.345     4.515     18.368        2.824
+NARACOMP ON PERFIQ   /
+PERFIQ   BY NARACOMP              70.278    -2.297     -2.887       -0.444
+NARACOMP ON EXECFUN  /
+EXECFUN  BY NARACOMP              32.880    -5.267     -2.422       -0.372
+WOLDCOMP ON ACC      /
+ACC      BY WOLDCOMP              11.009    -0.141     -0.575       -0.315
+WOLDCOMP ON PERFIQ   /
+PERFIQ   BY WOLDCOMP              10.076     0.225      0.283        0.155
+WOLDVCB  ON ACC      /
+ACC      BY WOLDVCB               22.938    -0.231     -0.938       -0.474
+WOLDVCB  ON PERFIQ   /
+PERFIQ   BY WOLDVCB               28.140     0.378      0.475        0.240
+WOLDVCB  ON EXECFUN  /
+EXECFUN  BY WOLDVCB               12.771     0.847      0.389        0.197
+WISCVCB  ON PERFIQ   /
+PERFIQ   BY WISCVCB               26.075     0.673      0.846        0.231
+WISCVCB  ON EXECFUN  /
+EXECFUN  BY WISCVCB               10.150     1.400      0.644        0.176
+WISCBWSP ON ACC      /
+ACC      BY WISCBWSP              17.390     0.043      0.174        0.200
+CNTSPAN  ON ACC      /
+ACC      BY CNTSPAN               14.820     0.036      0.146        0.185
+CNTSPAN  ON LANG     /
+LANG     BY CNTSPAN               12.633     0.216      0.159        0.202
+ATTNSEL  ON ACC      /
+ACC      BY ATTNSEL               11.221     0.078      0.318        0.161
+ATTNOPP  ON ACC      /
+ACC      BY ATTNOPP               13.277     0.031      0.126        0.175
+ATTNOPP  ON LANG     /
+LANG     BY ATTNOPP               17.467     0.232      0.171        0.237
+
+ON Statements
+
+ACC      ON NARACOMP              99.497     1.834      0.451        2.932
+ACC      ON WOLDCOMP              20.001    -0.190     -0.047       -0.085
+ACC      ON WOLDVCB               13.020    -0.176     -0.043       -0.085
+ACC      ON WISCVCB               14.690    -0.100     -0.025       -0.090
+ACC      ON WISCBWSP              14.321     0.368      0.090        0.078
+LANG     ON NARACOMP             126.689    -0.788     -1.071       -6.968
+PERFIQ   ON NARACOMP              43.987    -0.436     -0.347       -2.255
+PERFIQ   ON WOLDVCB               22.302     0.128      0.102        0.202
+PERFIQ   ON WISCVCB               18.111     0.062      0.049        0.181
+EXECFUN  ON CNTSPAN               11.610    -0.107     -0.233       -0.183
+EXECFUN  ON ATTNOPP               13.394    -0.112     -0.243       -0.175
+WOLDCOMP ON WOLDVCB               42.564     0.242      0.242        0.262
+WOLDCOMP ON WISCVCB               41.748     0.129      0.129        0.260
+WOLDVCB  ON NARACOMP              12.199    -0.134     -0.134       -0.441
+WOLDVCB  ON WOLDCOMP              42.565     0.234      0.234        0.216
+WOLDVCB  ON WISCVCB               42.350     0.130      0.130        0.240
+WISCVCB  ON WOLDCOMP              41.748     0.432      0.432        0.215
+WISCVCB  ON WOLDVCB               42.350     0.448      0.448        0.242
+CNTSPAN  ON NARARATE              11.181     0.031      0.031        0.128
+ATTNOPP  ON NARACOMP              12.861     0.020      0.020        0.182
+
+WITH Statements
+
+COMBACC  WITH NARAACC            168.877     2.185      2.185      999.000
+NARACOMP WITH ACC                117.581     8.453      2.079        1.025
+NARACOMP WITH LANG               126.686    -3.244     -4.409       -2.173
+NARACOMP WITH PERFIQ              45.749    -1.915     -1.524       -0.751
+WOLDCOMP WITH ACC                 19.552    -0.524     -0.129       -0.077
+WOLDVCB  WITH ACC                 12.331    -0.463     -0.114       -0.069
+WOLDVCB  WITH PERFIQ              21.531     0.342      0.273        0.166
+WOLDVCB  WITH WOLDCOMP            42.565     0.654      0.654        0.238
+WISCVCB  WITH ACC                 13.917    -0.908     -0.223       -0.073
+WISCVCB  WITH PERFIQ              17.403     0.570      0.453        0.148
+WISCVCB  WITH WOLDCOMP            41.748     1.207      1.207        0.236
+WISCVCB  WITH WOLDVCB             42.350     1.210      1.210        0.241
+WISCBWSP WITH ACC                 14.209     0.199      0.049        0.066
+CNTSPAN  WITH EXECFUN             11.610    -0.047     -0.103       -0.155
+ATTNOPP  WITH EXECFUN             13.394    -0.045     -0.098       -0.155
+
+Variances/Residual Variances
+
+NARAACC                          168.877    -2.091     -2.091       -0.138
+
+
+TECHNICAL 1 OUTPUT
+
+
+     PARAMETER SPECIFICATION
+
+
+           NU
+              NARACOMP      NARAACC       WOLDCOMP      NARARATE      WOLDVCB
+              ________      ________      ________      ________      ________
+                  0             1             0             0             0
+
+
+           NU
+              WISCVCB       WISCPCMP      WISCCODE      WISCPARR      WISCBLOC
+              ________      ________      ________      ________      ________
+                  0             2             3             4             5
+
+
+           NU
+              WISCOBJA      WISCBWSP      CNTSPAN       ATTNSEL       ATTNDIV
+              ________      ________      ________      ________      ________
+                  6             0             0             0             0
+
+
+           NU
+              ATTNOPP       SDQHYP        COMBACC       F8AGE         F9AGE
+              ________      ________      ________      ________      ________
+                  0             7             8             0             0
+
+
+           NU
+              F10AGE
+              ________
+                  0
+
+
+           LAMBDA
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+ NARACOMP           0             0             0             0             0
+ NARAACC            9             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ NARARATE           0             0             0             0             0
+ WOLDVCB            0             0             0             0             0
+ WISCVCB            0             0             0             0             0
+ WISCPCMP           0             0             0             0             0
+ WISCCODE           0             0            10            11             0
+ WISCPARR           0             0            12             0             0
+ WISCBLOC           0             0            13             0             0
+ WISCOBJA           0             0            14             0             0
+ WISCBWSP           0             0             0             0             0
+ CNTSPAN            0             0             0             0             0
+ ATTNSEL            0             0             0             0             0
+ ATTNDIV            0             0             0             0             0
+ ATTNOPP            0             0             0             0             0
+ SDQHYP             0             0             0            15             0
+ COMBACC            0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           LAMBDA
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+ NARACOMP           0             0             0             0             0
+ NARAACC            0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ NARARATE           0             0             0             0             0
+ WOLDVCB            0             0             0             0             0
+ WISCVCB            0             0             0             0             0
+ WISCPCMP           0             0             0             0             0
+ WISCCODE           0             0             0             0             0
+ WISCPARR           0             0             0             0             0
+ WISCBLOC           0             0             0             0             0
+ WISCOBJA           0             0             0             0             0
+ WISCBWSP           0             0             0             0             0
+ CNTSPAN            0             0             0             0             0
+ ATTNSEL            0             0             0             0             0
+ ATTNDIV            0             0             0             0             0
+ ATTNOPP            0             0             0             0             0
+ SDQHYP             0             0             0             0             0
+ COMBACC            0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           LAMBDA
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+ NARACOMP           0             0             0             0             0
+ NARAACC            0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ NARARATE           0             0             0             0             0
+ WOLDVCB            0             0             0             0             0
+ WISCVCB            0             0             0             0             0
+ WISCPCMP           0             0             0             0             0
+ WISCCODE           0             0             0             0             0
+ WISCPARR           0             0             0             0             0
+ WISCBLOC           0             0             0             0             0
+ WISCOBJA           0             0             0             0             0
+ WISCBWSP           0             0             0             0             0
+ CNTSPAN            0             0             0             0             0
+ ATTNSEL            0             0             0             0             0
+ ATTNDIV            0             0             0             0             0
+ ATTNOPP            0             0             0             0             0
+ SDQHYP             0             0             0             0             0
+ COMBACC            0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           LAMBDA
+              F9AGE         F10AGE
+              ________      ________
+ NARACOMP           0             0
+ NARAACC            0             0
+ WOLDCOMP           0             0
+ NARARATE           0             0
+ WOLDVCB            0             0
+ WISCVCB            0             0
+ WISCPCMP           0             0
+ WISCCODE           0             0
+ WISCPARR           0             0
+ WISCBLOC           0             0
+ WISCOBJA           0             0
+ WISCBWSP           0             0
+ CNTSPAN            0             0
+ ATTNSEL            0             0
+ ATTNDIV            0             0
+ ATTNOPP            0             0
+ SDQHYP             0             0
+ COMBACC            0             0
+ F8AGE              0             0
+ F9AGE              0             0
+ F10AGE             0             0
+
+
+           THETA
+              NARACOMP      NARAACC       WOLDCOMP      NARARATE      WOLDVCB
+              ________      ________      ________      ________      ________
+ NARACOMP           0
+ NARAACC            0             0
+ WOLDCOMP           0             0             0
+ NARARATE           0             0             0             0
+ WOLDVCB            0             0             0             0             0
+ WISCVCB            0             0             0             0             0
+ WISCPCMP           0             0             0             0             0
+ WISCCODE           0             0             0             0             0
+ WISCPARR           0             0             0             0             0
+ WISCBLOC           0             0             0             0             0
+ WISCOBJA           0             0             0             0             0
+ WISCBWSP           0             0             0             0             0
+ CNTSPAN            0             0             0             0             0
+ ATTNSEL            0             0             0             0             0
+ ATTNDIV            0             0             0             0             0
+ ATTNOPP            0             0             0             0             0
+ SDQHYP             0             0             0             0             0
+ COMBACC            0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           THETA
+              WISCVCB       WISCPCMP      WISCCODE      WISCPARR      WISCBLOC
+              ________      ________      ________      ________      ________
+ WISCVCB            0
+ WISCPCMP           0            16
+ WISCCODE           0             0            17
+ WISCPARR           0             0             0            18
+ WISCBLOC           0             0             0             0            19
+ WISCOBJA           0             0             0             0             0
+ WISCBWSP           0             0             0             0             0
+ CNTSPAN            0             0             0             0             0
+ ATTNSEL            0             0             0             0             0
+ ATTNDIV            0             0             0             0             0
+ ATTNOPP            0             0             0             0             0
+ SDQHYP             0             0             0             0             0
+ COMBACC            0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           THETA
+              WISCOBJA      WISCBWSP      CNTSPAN       ATTNSEL       ATTNDIV
+              ________      ________      ________      ________      ________
+ WISCOBJA          20
+ WISCBWSP           0             0
+ CNTSPAN            0             0             0
+ ATTNSEL            0             0             0             0
+ ATTNDIV            0             0             0             0             0
+ ATTNOPP            0             0             0             0             0
+ SDQHYP             0             0             0             0             0
+ COMBACC            0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           THETA
+              ATTNOPP       SDQHYP        COMBACC       F8AGE         F9AGE
+              ________      ________      ________      ________      ________
+ ATTNOPP            0
+ SDQHYP             0            21
+ COMBACC            0             0            22
+ F8AGE              0             0             0             0
+ F9AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           THETA
+              F10AGE
+              ________
+ F10AGE             0
+
+
+           ALPHA
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+                  0             0             0             0            23
+
+
+           ALPHA
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+                 24            25            26            27            28
+
+
+           ALPHA
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+                 29            30            31            32            33
+
+
+           ALPHA
+              F9AGE         F10AGE
+              ________      ________
+                 34            35
+
+
+           BETA
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+ ACC                0             0             0             0             0
+ LANG               0             0             0             0             0
+ PERFIQ             0             0             0             0             0
+ EXECFUN            0             0             0             0             0
+ NARACOMP           0            38             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ NARARATE           0             0             0             0             0
+ WOLDVCB            0            42             0             0             0
+ WISCVCB            0            44             0             0             0
+ WISCBWSP           0             0             0             0             0
+ CNTSPAN            0             0             0            47             0
+ ATTNSEL            0             0             0            49             0
+ ATTNDIV            0             0             0            51             0
+ ATTNOPP            0             0             0            53             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           BETA
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+ ACC                0             0             0             0             0
+ LANG               0             0             0             0             0
+ PERFIQ             0             0             0             0             0
+ EXECFUN            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0             0
+ NARARATE           0             0             0             0             0
+ WOLDVCB            0             0             0             0             0
+ WISCVCB            0             0             0             0             0
+ WISCBWSP           0             0             0             0             0
+ CNTSPAN            0             0             0             0             0
+ ATTNSEL            0             0             0             0             0
+ ATTNDIV            0             0             0             0             0
+ ATTNOPP            0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           BETA
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+ ACC                0             0             0             0             0
+ LANG               0             0             0             0             0
+ PERFIQ             0             0             0             0            37
+ EXECFUN            0             0             0             0             0
+ NARACOMP           0             0             0             0             0
+ WOLDCOMP           0             0             0             0            40
+ NARARATE           0             0             0             0             0
+ WOLDVCB            0             0             0             0            43
+ WISCVCB            0             0             0             0            45
+ WISCBWSP           0             0             0             0            46
+ CNTSPAN            0             0             0             0             0
+ ATTNSEL            0             0             0             0            50
+ ATTNDIV            0             0             0             0            52
+ ATTNOPP            0             0             0             0            54
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           BETA
+              F9AGE         F10AGE
+              ________      ________
+ ACC               36             0
+ LANG               0             0
+ PERFIQ             0             0
+ EXECFUN            0             0
+ NARACOMP          39             0
+ WOLDCOMP           0             0
+ NARARATE          41             0
+ WOLDVCB            0             0
+ WISCVCB            0             0
+ WISCBWSP           0             0
+ CNTSPAN            0            48
+ ATTNSEL            0             0
+ ATTNDIV            0             0
+ ATTNOPP            0             0
+ F8AGE              0             0
+ F9AGE              0             0
+ F10AGE             0             0
+
+
+           PSI
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+ ACC               55
+ LANG              56            57
+ PERFIQ            58            59            60
+ EXECFUN           61            62            63            64
+ NARACOMP           0             0             0             0            65
+ WOLDCOMP           0             0             0             0             0
+ NARARATE          67            68            69            70             0
+ WOLDVCB            0             0             0             0             0
+ WISCVCB            0             0             0             0             0
+ WISCBWSP           0             0             0             0             0
+ CNTSPAN            0             0             0             0             0
+ ATTNSEL            0             0             0             0             0
+ ATTNDIV            0             0             0             0             0
+ ATTNOPP            0             0             0             0             0
+ F8AGE              0            79             0            80             0
+ F9AGE              0            82             0            83             0
+ F10AGE             0            86             0            87             0
+
+
+           PSI
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+ WOLDCOMP          66
+ NARARATE           0            71
+ WOLDVCB            0             0            72
+ WISCVCB            0             0             0            73
+ WISCBWSP           0             0             0             0            74
+ CNTSPAN            0             0             0             0             0
+ ATTNSEL            0             0             0             0             0
+ ATTNDIV            0             0             0             0             0
+ ATTNOPP            0             0             0             0             0
+ F8AGE              0             0             0             0             0
+ F9AGE              0             0             0             0             0
+ F10AGE             0             0             0             0             0
+
+
+           PSI
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+ CNTSPAN           75
+ ATTNSEL            0            76
+ ATTNDIV            0             0            77
+ ATTNOPP            0             0             0            78
+ F8AGE              0             0             0             0            81
+ F9AGE              0             0             0             0            84
+ F10AGE             0             0             0             0            88
+
+
+           PSI
+              F9AGE         F10AGE
+              ________      ________
+ F9AGE             85
+ F10AGE            89            90
+
+
+     STARTING VALUES
+
+
+           NU
+              NARACOMP      NARAACC       WOLDCOMP      NARARATE      WOLDVCB
+              ________      ________      ________      ________      ________
+                0.000        14.818         0.000         0.000         0.000
+
+
+           NU
+              WISCVCB       WISCPCMP      WISCCODE      WISCPARR      WISCBLOC
+              ________      ________      ________      ________      ________
+                0.000         7.229         6.780         3.593         4.860
+
+
+           NU
+              WISCOBJA      WISCBWSP      CNTSPAN       ATTNSEL       ATTNDIV
+              ________      ________      ________      ________      ________
+                4.496         0.000         0.000         0.000         0.000
+
+
+           NU
+              ATTNOPP       SDQHYP        COMBACC       F8AGE         F9AGE
+              ________      ________      ________      ________      ________
+                0.000         2.840        12.622         0.000         0.000
+
+
+           NU
+              F10AGE
+              ________
+                0.000
+
+
+           LAMBDA
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+ NARACOMP       0.000         0.000         0.000         0.000         1.000
+ NARAACC        0.958         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ NARARATE       0.000         0.000         0.000         0.000         0.000
+ WOLDVCB        0.000         0.000         0.000         0.000         0.000
+ WISCVCB        0.000         0.000         0.000         0.000         0.000
+ WISCPCMP       0.000         0.000         1.000         0.000         0.000
+ WISCCODE       0.000         0.000         1.000         1.000         0.000
+ WISCPARR       0.000         0.000         0.640         0.000         0.000
+ WISCBLOC       0.000         0.000         1.210         0.000         0.000
+ WISCOBJA       0.000         0.000         0.915         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000         0.000         0.000
+ CNTSPAN        0.000         0.000         0.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000         0.000         0.000
+ ATTNDIV        0.000         0.000         0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000         0.000
+ SDQHYP         0.000         0.000         0.000        -1.466         0.000
+ COMBACC        1.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ NARAACC        0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       1.000         0.000         0.000         0.000         0.000
+ NARARATE       0.000         1.000         0.000         0.000         0.000
+ WOLDVCB        0.000         0.000         1.000         0.000         0.000
+ WISCVCB        0.000         0.000         0.000         1.000         0.000
+ WISCPCMP       0.000         0.000         0.000         0.000         0.000
+ WISCCODE       0.000         0.000         0.000         0.000         0.000
+ WISCPARR       0.000         0.000         0.000         0.000         0.000
+ WISCBLOC       0.000         0.000         0.000         0.000         0.000
+ WISCOBJA       0.000         0.000         0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000         0.000         1.000
+ CNTSPAN        0.000         0.000         0.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000         0.000         0.000
+ ATTNDIV        0.000         0.000         0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000         0.000
+ SDQHYP         0.000         0.000         0.000         0.000         0.000
+ COMBACC        0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ NARAACC        0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ NARARATE       0.000         0.000         0.000         0.000         0.000
+ WOLDVCB        0.000         0.000         0.000         0.000         0.000
+ WISCVCB        0.000         0.000         0.000         0.000         0.000
+ WISCPCMP       0.000         0.000         0.000         0.000         0.000
+ WISCCODE       0.000         0.000         0.000         0.000         0.000
+ WISCPARR       0.000         0.000         0.000         0.000         0.000
+ WISCBLOC       0.000         0.000         0.000         0.000         0.000
+ WISCOBJA       0.000         0.000         0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000         0.000         0.000
+ CNTSPAN        1.000         0.000         0.000         0.000         0.000
+ ATTNSEL        0.000         1.000         0.000         0.000         0.000
+ ATTNDIV        0.000         0.000         1.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         1.000         0.000
+ SDQHYP         0.000         0.000         0.000         0.000         0.000
+ COMBACC        0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         1.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              F9AGE         F10AGE
+              ________      ________
+ NARACOMP       0.000         0.000
+ NARAACC        0.000         0.000
+ WOLDCOMP       0.000         0.000
+ NARARATE       0.000         0.000
+ WOLDVCB        0.000         0.000
+ WISCVCB        0.000         0.000
+ WISCPCMP       0.000         0.000
+ WISCCODE       0.000         0.000
+ WISCPARR       0.000         0.000
+ WISCBLOC       0.000         0.000
+ WISCOBJA       0.000         0.000
+ WISCBWSP       0.000         0.000
+ CNTSPAN        0.000         0.000
+ ATTNSEL        0.000         0.000
+ ATTNDIV        0.000         0.000
+ ATTNOPP        0.000         0.000
+ SDQHYP         0.000         0.000
+ COMBACC        0.000         0.000
+ F8AGE          0.000         0.000
+ F9AGE          1.000         0.000
+ F10AGE         0.000         1.000
+
+
+           THETA
+              NARACOMP      NARAACC       WOLDCOMP      NARARATE      WOLDVCB
+              ________      ________      ________      ________      ________
+ NARACOMP       0.000
+ NARAACC        0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000
+ NARARATE       0.000         0.000         0.000         0.000
+ WOLDVCB        0.000         0.000         0.000         0.000         0.000
+ WISCVCB        0.000         0.000         0.000         0.000         0.000
+ WISCPCMP       0.000         0.000         0.000         0.000         0.000
+ WISCCODE       0.000         0.000         0.000         0.000         0.000
+ WISCPARR       0.000         0.000         0.000         0.000         0.000
+ WISCBLOC       0.000         0.000         0.000         0.000         0.000
+ WISCOBJA       0.000         0.000         0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000         0.000         0.000
+ CNTSPAN        0.000         0.000         0.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000         0.000         0.000
+ ATTNDIV        0.000         0.000         0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000         0.000
+ SDQHYP         0.000         0.000         0.000         0.000         0.000
+ COMBACC        0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              WISCVCB       WISCPCMP      WISCCODE      WISCPARR      WISCBLOC
+              ________      ________      ________      ________      ________
+ WISCVCB        0.000
+ WISCPCMP       0.000         3.097
+ WISCCODE       0.000         0.000         1.036
+ WISCPARR       0.000         0.000         0.000         2.098
+ WISCBLOC       0.000         0.000         0.000         0.000         2.112
+ WISCOBJA       0.000         0.000         0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000         0.000         0.000
+ CNTSPAN        0.000         0.000         0.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000         0.000         0.000
+ ATTNDIV        0.000         0.000         0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000         0.000
+ SDQHYP         0.000         0.000         0.000         0.000         0.000
+ COMBACC        0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              WISCOBJA      WISCBWSP      CNTSPAN       ATTNSEL       ATTNDIV
+              ________      ________      ________      ________      ________
+ WISCOBJA       1.417
+ WISCBWSP       0.000         0.000
+ CNTSPAN        0.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000         0.000
+ ATTNDIV        0.000         0.000         0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000         0.000
+ SDQHYP         0.000         0.000         0.000         0.000         0.000
+ COMBACC        0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              ATTNOPP       SDQHYP        COMBACC       F8AGE         F9AGE
+              ________      ________      ________      ________      ________
+ ATTNOPP        0.000
+ SDQHYP         0.000         2.444
+ COMBACC        0.000         0.000        11.671
+ F8AGE          0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              F10AGE
+              ________
+ F10AGE         0.000
+
+
+           ALPHA
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000        21.048
+
+
+           ALPHA
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+                6.823        10.367         6.986        10.562         3.501
+
+
+           ALPHA
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+                3.395         5.336         0.318         1.146       103.043
+
+
+           ALPHA
+              F9AGE         F10AGE
+              ________      ________
+              118.382       127.342
+
+
+           BETA
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+ ACC            0.000         0.000         0.000         0.000         0.000
+ LANG           0.000         0.000         0.000         0.000         0.000
+ PERFIQ         0.000         0.000         0.000         0.000         0.000
+ EXECFUN        0.000         0.000         0.000         0.000         0.000
+ NARACOMP       0.000         4.462         0.000         0.000         0.000
+ WOLDCOMP       0.000         1.000         0.000         0.000         0.000
+ NARARATE       0.000         0.000         0.000         0.000         0.000
+ WOLDVCB        0.000         1.312         0.000         0.000         0.000
+ WISCVCB        0.000         2.492         0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000         1.000         0.000
+ CNTSPAN        0.000         0.000         0.000         0.825         0.000
+ ATTNSEL        0.000         0.000         0.000        -2.130         0.000
+ ATTNDIV        0.000         0.000         0.000        -0.962         0.000
+ ATTNOPP        0.000         0.000         0.000        -0.856         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+ ACC            0.000         0.000         0.000         0.000         0.000
+ LANG           0.000         0.000         0.000         0.000         0.000
+ PERFIQ         0.000         0.000         0.000         0.000         0.000
+ EXECFUN        0.000         0.000         0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ NARARATE       0.000         0.000         0.000         0.000         0.000
+ WOLDVCB        0.000         0.000         0.000         0.000         0.000
+ WISCVCB        0.000         0.000         0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000         0.000         0.000
+ CNTSPAN        0.000         0.000         0.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000         0.000         0.000
+ ATTNDIV        0.000         0.000         0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+ ACC            0.000         0.000         0.000         0.000         0.000
+ LANG           0.000         0.000         0.000         0.000         0.000
+ PERFIQ         0.000         0.000         0.000         0.000         0.000
+ EXECFUN        0.000         0.000         0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ NARARATE       0.000         0.000         0.000         0.000         0.000
+ WOLDVCB        0.000         0.000         0.000         0.000         0.000
+ WISCVCB        0.000         0.000         0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000         0.000         0.000
+ CNTSPAN        0.000         0.000         0.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000         0.000         0.000
+ ATTNDIV        0.000         0.000         0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              F9AGE         F10AGE
+              ________      ________
+ ACC            0.000         0.000
+ LANG           0.000         0.000
+ PERFIQ         0.000         0.000
+ EXECFUN        0.000         0.000
+ NARACOMP       0.000         0.000
+ WOLDCOMP       0.000         0.000
+ NARARATE       0.000         0.000
+ WOLDVCB        0.000         0.000
+ WISCVCB        0.000         0.000
+ WISCBWSP       0.000         0.000
+ CNTSPAN        0.000         0.000
+ ATTNSEL        0.000         0.000
+ ATTNDIV        0.000         0.000
+ ATTNOPP        0.000         0.000
+ F8AGE          0.000         0.000
+ F9AGE          0.000         0.000
+ F10AGE         0.000         0.000
+
+
+           PSI
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+ ACC            0.050
+ LANG           0.000         0.050
+ PERFIQ         0.000         0.000         0.050
+ EXECFUN        0.000         0.000         0.000         0.050
+ NARACOMP       0.000         0.000         0.000         0.000        21.056
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ NARARATE       0.000         0.000         0.000         0.000         0.000
+ WOLDVCB        0.000         0.000         0.000         0.000         0.000
+ WISCVCB        0.000         0.000         0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000         0.000         0.000
+ CNTSPAN        0.000         0.000         0.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000         0.000         0.000
+ ATTNDIV        0.000         0.000         0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+ WOLDCOMP       1.655
+ NARARATE       0.000         5.287
+ WOLDVCB        0.000         0.000         1.916
+ WISCVCB        0.000         0.000         0.000         6.578
+ WISCBWSP       0.000         0.000         0.000         0.000         0.370
+ CNTSPAN        0.000         0.000         0.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000         0.000         0.000
+ ATTNDIV        0.000         0.000         0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.000         0.000         0.000         0.000         0.000
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+ CNTSPAN        0.302
+ ATTNSEL        0.000         1.930
+ ATTNDIV        0.000         0.000         0.403
+ ATTNOPP        0.000         0.000         0.000         0.256
+ F8AGE          0.000         0.000         0.000         0.000         1.875
+ F9AGE          0.000         0.000         0.000         0.000         0.000
+ F10AGE         0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              F9AGE         F10AGE
+              ________      ________
+ F9AGE          5.945
+ F10AGE         0.000         4.069
+
+
+TECHNICAL 4 OUTPUT
+
+
+     ESTIMATES DERIVED FROM THE MODEL
+
+
+           ESTIMATED MEANS FOR THE LATENT VARIABLES
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+                5.351         0.000         1.513         0.000        21.048
+
+
+           ESTIMATED MEANS FOR THE LATENT VARIABLES
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+                6.777        10.349         6.908        10.433         3.475
+
+
+           ESTIMATED MEANS FOR THE LATENT VARIABLES
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+                3.373         5.369         0.342         1.164       103.051
+
+
+           ESTIMATED MEANS FOR THE LATENT VARIABLES
+              F9AGE         F10AGE
+              ________      ________
+              118.382       127.408
+
+
+           S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+                4.193         0.000         2.565         0.000         0.211
+
+
+           S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+                0.064         0.107         0.070         0.126         0.031
+
+
+           S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+                0.027         0.072         0.036         0.026         0.070
+
+
+           S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              F9AGE         F10AGE
+              ________      ________
+                0.112         0.100
+
+
+           EST./S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+                1.276         0.000         0.590         0.000        99.809
+
+
+           EST./S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+              106.077        97.049        98.945        82.669       113.004
+
+
+           EST./S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+              124.447        75.000         9.429        44.233      1472.323
+
+
+           EST./S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              F9AGE         F10AGE
+              ________      ________
+             1056.513      1276.849
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+                0.202         1.000         0.555         1.000         0.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              F9AGE         F10AGE
+              ________      ________
+                0.000         0.000
+
+
+           ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+ ACC           16.551
+ LANG           2.703         0.542
+ PERFIQ         2.355         0.499         1.580
+ EXECFUN        1.146         0.230         0.428         0.211
+ NARACOMP      23.324         4.434         4.268         1.924        42.315
+ WOLDCOMP       2.704         0.542         0.501         0.232         4.441
+ NARARATE       7.925         1.367         1.055         0.624        11.851
+ WOLDVCB        4.025         0.807         0.746         0.347         6.614
+ WISCVCB        7.389         1.480         1.371         0.637        12.143
+ WISCBWSP       1.146         0.230         0.427         0.210         1.919
+ CNTSPAN        1.049         0.209         0.392         0.193         1.762
+ ATTNSEL       -2.127        -0.427        -0.797        -0.395        -3.579
+ ATTNDIV       -0.929        -0.186        -0.348        -0.173        -1.565
+ ATTNOPP       -0.840        -0.169        -0.314        -0.155        -1.411
+ F8AGE          0.019         0.005         0.055         0.070         0.215
+ F9AGE          0.537        -0.480         0.006        -0.100         0.745
+ F10AGE         0.188        -0.134         0.004        -0.049         0.546
+
+
+           ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+ WOLDCOMP       3.340
+ NARARATE       1.367        10.664
+ WOLDVCB        0.815         2.036         3.916
+ WISCVCB        1.499         3.737         2.237        13.447
+ WISCBWSP       0.229         0.624         0.341         0.626         0.754
+ CNTSPAN        0.212         0.572         0.316         0.581         0.192
+ ATTNSEL       -0.437        -1.159        -0.653        -1.203        -0.389
+ ATTNDIV       -0.191        -0.507        -0.287        -0.528        -0.170
+ ATTNOPP       -0.170        -0.458        -0.254        -0.467        -0.154
+ F8AGE          0.139         0.015         0.250         0.511        -0.011
+ F9AGE         -0.465         0.411        -0.687        -1.255        -0.109
+ F10AGE        -0.124         0.144        -0.181        -0.328        -0.056
+
+
+           ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+ CNTSPAN        0.620
+ ATTNSEL       -0.361         3.893
+ ATTNDIV       -0.158         0.327         0.818
+ ATTNOPP       -0.141         0.290         0.127         0.518
+ F8AGE          0.066        -0.283        -0.140        -0.051         3.752
+ F9AGE         -0.065         0.168         0.072         0.073         0.427
+ F10AGE         0.007         0.079         0.033         0.036         0.297
+
+
+           ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              F9AGE         F10AGE
+              ________      ________
+ F9AGE         11.890
+ F10AGE         4.155         8.210
+
+
+           S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+ ACC            1.145
+ LANG           0.282         0.098
+ PERFIQ         0.304         0.084         0.237
+ EXECFUN        0.167         0.037         0.061         0.039
+ NARACOMP       1.451         0.447         0.521         0.250         2.152
+ WOLDCOMP       0.282         0.098         0.085         0.038         0.448
+ NARARATE       0.700         0.168         0.198         0.090         1.015
+ WOLDVCB        0.332         0.103         0.112         0.049         0.500
+ WISCVCB        0.614         0.193         0.211         0.092         0.958
+ WISCBWSP       0.167         0.037         0.061         0.039         0.250
+ CNTSPAN        0.129         0.029         0.047         0.027         0.193
+ ATTNSEL        0.306         0.075         0.147         0.064         0.514
+ ATTNDIV        0.201         0.045         0.086         0.043         0.338
+ ATTNOPP        0.113         0.026         0.050         0.025         0.175
+ F8AGE          0.019         0.026         0.093         0.036         0.199
+ F9AGE          0.424         0.144         0.011         0.055         0.695
+ F10AGE         0.148         0.059         0.008         0.049         0.342
+
+
+           S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+ WOLDCOMP       0.181
+ NARARATE       0.168         0.886
+ WOLDVCB        0.104         0.213         0.213
+ WISCVCB        0.195         0.387         0.229         0.761
+ WISCBWSP       0.037         0.090         0.049         0.091         0.046
+ CNTSPAN        0.030         0.081         0.038         0.073         0.027
+ ATTNSEL        0.076         0.191         0.101         0.188         0.064
+ ATTNDIV        0.045         0.119         0.063         0.119         0.043
+ ATTNOPP        0.026         0.066         0.034         0.065         0.025
+ F8AGE          0.119         0.015         0.123         0.224         0.055
+ F9AGE          0.145         0.348         0.224         0.390         0.055
+ F10AGE         0.060         0.121         0.091         0.165         0.049
+
+
+           S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+ CNTSPAN        0.032
+ ATTNSEL        0.057         0.500
+ ATTNDIV        0.038         0.097         0.222
+ ATTNOPP        0.019         0.060         0.033         0.046
+ F8AGE          0.033         0.114         0.051         0.054         0.236
+ F9AGE          0.058         0.106         0.045         0.041         0.283
+ F10AGE         0.069         0.093         0.040         0.036         0.262
+
+
+           S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              F9AGE         F10AGE
+              ________      ________
+ F9AGE          0.843
+ F10AGE         0.552         0.688
+
+
+           EST./S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+ ACC           14.456
+ LANG           9.595         5.533
+ PERFIQ         7.750         5.923         6.653
+ EXECFUN        6.846         6.166         7.001         5.400
+ NARACOMP      16.075         9.914         8.199         7.698        19.663
+ WOLDCOMP       9.598         5.530         5.911         6.175         9.919
+ NARARATE      11.330         8.118         5.327         6.945        11.676
+ WOLDVCB       12.114         7.794         6.656         7.050        13.223
+ WISCVCB       12.041         7.681         6.492         6.926        12.673
+ WISCBWSP       6.844         6.171         6.997         5.379         7.688
+ CNTSPAN        8.129         7.143         8.258         7.145         9.121
+ ATTNSEL       -6.941        -5.716        -5.429        -6.154        -6.959
+ ATTNDIV       -4.628        -4.132        -4.042        -4.034        -4.634
+ ATTNOPP       -7.462        -6.404        -6.284        -6.249        -8.058
+ F8AGE          0.999         0.187         0.590         1.925         1.082
+ F9AGE          1.267        -3.330         0.546        -1.830         1.073
+ F10AGE         1.272        -2.257         0.517        -1.001         1.598
+
+
+           EST./S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+ WOLDCOMP      18.496
+ NARARATE       8.121        12.040
+ WOLDVCB        7.818         9.565        18.398
+ WISCVCB        7.677         9.666         9.752        17.663
+ WISCBWSP       6.130         6.942         6.999         6.851        16.492
+ CNTSPAN        7.164         7.072         8.235         7.973         7.109
+ ATTNSEL       -5.750        -6.056        -6.489        -6.403        -6.075
+ ATTNDIV       -4.233        -4.270        -4.534        -4.423        -3.956
+ ATTNOPP       -6.460        -6.896        -7.414        -7.146        -6.191
+ F8AGE          1.175         0.969         2.033         2.287        -0.203
+ F9AGE         -3.196         1.180        -3.063        -3.214        -1.981
+ F10AGE        -2.054         1.187        -1.982        -1.984        -1.127
+
+
+           EST./S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+ CNTSPAN       19.220
+ ATTNSEL       -6.334         7.785
+ ATTNDIV       -4.160         3.367         3.690
+ ATTNOPP       -7.481         4.868         3.826        11.157
+ F8AGE          1.992        -2.484        -2.737        -0.943        15.928
+ F9AGE         -1.123         1.588         1.596         1.801         1.509
+ F10AGE         0.104         0.846         0.825         0.994         1.132
+
+
+           EST./S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              F9AGE         F10AGE
+              ________      ________
+ F9AGE         14.097
+ F10AGE         7.527        11.940
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+ ACC            0.000
+ LANG           0.000         0.000
+ PERFIQ         0.000         0.000         0.000
+ EXECFUN        0.000         0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ NARARATE       0.000         0.000         0.000         0.000         0.000
+ WOLDVCB        0.000         0.000         0.000         0.000         0.000
+ WISCVCB        0.000         0.000         0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000         0.000         0.000
+ CNTSPAN        0.000         0.000         0.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000         0.000         0.000
+ ATTNDIV        0.000         0.000         0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.318         0.852         0.555         0.054         0.279
+ F9AGE          0.205         0.001         0.585         0.067         0.283
+ F10AGE         0.203         0.024         0.605         0.317         0.110
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+ WOLDCOMP       0.000
+ NARARATE       0.000         0.000
+ WOLDVCB        0.000         0.000         0.000
+ WISCVCB        0.000         0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000         0.000         0.000
+ CNTSPAN        0.000         0.000         0.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000         0.000         0.000
+ ATTNDIV        0.000         0.000         0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.240         0.333         0.042         0.022         0.839
+ F9AGE          0.001         0.238         0.002         0.001         0.048
+ F10AGE         0.040         0.235         0.047         0.047         0.260
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+ CNTSPAN        0.000
+ ATTNSEL        0.000         0.000
+ ATTNDIV        0.000         0.001         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000
+ F8AGE          0.046         0.013         0.006         0.345         0.000
+ F9AGE          0.261         0.112         0.110         0.072         0.131
+ F10AGE         0.917         0.398         0.410         0.320         0.257
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              F9AGE         F10AGE
+              ________      ________
+ F9AGE          0.000
+ F10AGE         0.000         0.000
+
+
+           ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+ ACC            1.000
+ LANG           0.903         1.000
+ PERFIQ         0.460         0.540         1.000
+ EXECFUN        0.613         0.679         0.741         1.000
+ NARACOMP       0.881         0.926         0.522         0.643         1.000
+ WOLDCOMP       0.364         0.403         0.218         0.277         0.374
+ NARARATE       0.597         0.569         0.257         0.416         0.558
+ WOLDVCB        0.500         0.554         0.300         0.381         0.514
+ WISCVCB        0.495         0.549         0.297         0.378         0.509
+ WISCBWSP       0.324         0.360         0.391         0.526         0.340
+ CNTSPAN        0.327         0.361         0.396         0.533         0.344
+ ATTNSEL       -0.265        -0.294        -0.321        -0.436        -0.279
+ ATTNDIV       -0.253        -0.280        -0.306        -0.416        -0.266
+ ATTNOPP       -0.287        -0.318        -0.347        -0.468        -0.301
+ F8AGE          0.002         0.003         0.023         0.078         0.017
+ F9AGE          0.038        -0.189         0.001        -0.063         0.033
+ F10AGE         0.016        -0.064         0.001        -0.037         0.029
+
+
+           ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+ WOLDCOMP       1.000
+ NARARATE       0.229         1.000
+ WOLDVCB        0.226         0.315         1.000
+ WISCVCB        0.224         0.312         0.308         1.000
+ WISCBWSP       0.145         0.220         0.199         0.197         1.000
+ CNTSPAN        0.147         0.222         0.203         0.201         0.280
+ ATTNSEL       -0.121        -0.180        -0.167        -0.166        -0.227
+ ATTNDIV       -0.116        -0.171        -0.160        -0.159        -0.216
+ ATTNOPP       -0.130        -0.195        -0.178        -0.177        -0.246
+ F8AGE          0.039         0.002         0.065         0.072        -0.007
+ F9AGE         -0.074         0.037        -0.101        -0.099        -0.036
+ F10AGE        -0.024         0.015        -0.032        -0.031        -0.022
+
+
+           ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+ CNTSPAN        1.000
+ ATTNSEL       -0.232         1.000
+ ATTNDIV       -0.222         0.183         1.000
+ ATTNOPP       -0.250         0.204         0.195         1.000
+ F8AGE          0.043        -0.074        -0.080        -0.037         1.000
+ F9AGE         -0.024         0.025         0.023         0.030         0.064
+ F10AGE         0.003         0.014         0.013         0.017         0.054
+
+
+           ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              F9AGE         F10AGE
+              ________      ________
+ F9AGE          1.000
+ F10AGE         0.421         1.000
+
+
+           S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+ ACC            0.000
+ LANG           0.015         0.000
+ PERFIQ         0.037         0.040         0.000
+ EXECFUN        0.038         0.035         0.040         0.000
+ NARACOMP       0.012         0.016         0.036         0.033         0.000
+ WOLDCOMP       0.031         0.032         0.027         0.028         0.031
+ NARARATE       0.063         0.059         0.046         0.049         0.057
+ WOLDVCB        0.026         0.027         0.030         0.028         0.026
+ WISCVCB        0.027         0.027         0.031         0.029         0.028
+ WISCBWSP       0.039         0.037         0.036         0.041         0.036
+ CNTSPAN        0.034         0.033         0.033         0.035         0.032
+ ATTNSEL        0.031         0.035         0.045         0.055         0.033
+ ATTNDIV        0.033         0.035         0.041         0.051         0.033
+ ATTNOPP        0.028         0.029         0.035         0.040         0.027
+ F8AGE          0.002         0.018         0.038         0.040         0.016
+ F9AGE          0.030         0.056         0.003         0.035         0.031
+ F10AGE         0.013         0.028         0.002         0.037         0.018
+
+
+           S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+ WOLDCOMP       0.000
+ NARARATE       0.030         0.000
+ WOLDVCB        0.024         0.036         0.000
+ WISCVCB        0.024         0.036         0.024         0.000
+ WISCBWSP       0.021         0.031         0.024         0.024         0.000
+ CNTSPAN        0.019         0.033         0.022         0.022         0.033
+ ATTNSEL        0.018         0.029         0.022         0.022         0.031
+ ATTNDIV        0.018         0.029         0.021         0.022         0.036
+ ATTNOPP        0.017         0.028         0.019         0.019         0.031
+ F8AGE          0.033         0.002         0.032         0.031         0.033
+ F9AGE          0.023         0.031         0.032         0.031         0.018
+ F10AGE         0.011         0.013         0.016         0.016         0.020
+
+
+           S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+ CNTSPAN        0.000
+ ATTNSEL        0.032         0.000
+ ATTNDIV        0.033         0.036         0.000
+ ATTNOPP        0.027         0.035         0.033         0.000
+ F8AGE          0.022         0.030         0.029         0.039         0.000
+ F9AGE          0.021         0.016         0.014         0.016         0.041
+ F10AGE         0.031         0.017         0.015         0.018         0.047
+
+
+           S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              F9AGE         F10AGE
+              ________      ________
+ F9AGE          0.000
+ F10AGE         0.038         0.000
+
+
+           EST./S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+ ACC          999.000
+ LANG          61.679       999.000
+ PERFIQ        12.334        13.427       999.000
+ EXECFUN       15.962        19.518        18.530       999.000
+ NARACOMP      72.991        59.421        14.325        19.474       999.000
+ WOLDCOMP      11.874        12.520         8.118         9.892        12.127
+ NARARATE       9.451         9.637         5.611         8.497         9.720
+ WOLDVCB       19.127        20.298         9.842        13.610        19.601
+ WISCVCB       18.024        19.976         9.640        13.064        18.365
+ WISCBWSP       8.386         9.631        10.840        12.913         9.479
+ CNTSPAN        9.685        11.004        12.036        15.361        10.876
+ ATTNSEL       -8.529        -8.333        -7.107        -7.960        -8.327
+ ATTNDIV       -7.635        -8.028        -7.397        -8.215        -7.983
+ ATTNOPP      -10.103       -11.070        -9.929       -11.671       -11.000
+ F8AGE          1.000         0.187         0.593         1.946         1.081
+ F9AGE          1.269        -3.406         0.550        -1.793         1.075
+ F10AGE         1.272        -2.270         0.520        -0.994         1.603
+
+
+           EST./S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+ WOLDCOMP     999.000
+ NARARATE       7.591       999.000
+ WOLDVCB        9.357         8.632       999.000
+ WISCVCB        9.235         8.711        12.629       999.000
+ WISCBWSP       7.030         6.992         8.256         8.084       999.000
+ CNTSPAN        7.860         6.837         9.419         9.110         8.502
+ ATTNSEL       -6.579        -6.161        -7.672        -7.507        -7.268
+ ATTNDIV       -6.486        -5.901        -7.512        -7.274        -6.055
+ ATTNOPP       -7.838        -7.078        -9.495        -9.145        -7.928
+ F8AGE          1.180         0.969         2.055         2.322        -0.203
+ F9AGE         -3.257         1.177        -3.170        -3.234        -1.978
+ F10AGE        -2.076         1.183        -2.013        -1.996        -1.125
+
+
+           EST./S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+ CNTSPAN      999.000
+ ATTNSEL       -7.329       999.000
+ ATTNDIV       -6.655         5.031       999.000
+ ATTNOPP       -9.366         5.757         5.915       999.000
+ F8AGE          1.994        -2.506        -2.714        -0.935       999.000
+ F9AGE         -1.119         1.579         1.609         1.820         1.541
+ F10AGE         0.104         0.844         0.827         0.996         1.140
+
+
+           EST./S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              F9AGE         F10AGE
+              ________      ________
+ F9AGE        999.000
+ F10AGE        11.031       999.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              ACC           LANG          PERFIQ        EXECFUN       NARACOMP
+              ________      ________      ________      ________      ________
+ ACC            0.000
+ LANG           0.000         0.000
+ PERFIQ         0.000         0.000         0.000
+ EXECFUN        0.000         0.000         0.000         0.000
+ NARACOMP       0.000         0.000         0.000         0.000         0.000
+ WOLDCOMP       0.000         0.000         0.000         0.000         0.000
+ NARARATE       0.000         0.000         0.000         0.000         0.000
+ WOLDVCB        0.000         0.000         0.000         0.000         0.000
+ WISCVCB        0.000         0.000         0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000         0.000         0.000
+ CNTSPAN        0.000         0.000         0.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000         0.000         0.000
+ ATTNDIV        0.000         0.000         0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.317         0.852         0.553         0.052         0.280
+ F9AGE          0.204         0.001         0.583         0.073         0.282
+ F10AGE         0.203         0.023         0.603         0.320         0.109
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              WOLDCOMP      NARARATE      WOLDVCB       WISCVCB       WISCBWSP
+              ________      ________      ________      ________      ________
+ WOLDCOMP       0.000
+ NARARATE       0.000         0.000
+ WOLDVCB        0.000         0.000         0.000
+ WISCVCB        0.000         0.000         0.000         0.000
+ WISCBWSP       0.000         0.000         0.000         0.000         0.000
+ CNTSPAN        0.000         0.000         0.000         0.000         0.000
+ ATTNSEL        0.000         0.000         0.000         0.000         0.000
+ ATTNDIV        0.000         0.000         0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000         0.000
+ F8AGE          0.238         0.332         0.040         0.020         0.839
+ F9AGE          0.001         0.239         0.002         0.001         0.048
+ F10AGE         0.038         0.237         0.044         0.046         0.260
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              CNTSPAN       ATTNSEL       ATTNDIV       ATTNOPP       F8AGE
+              ________      ________      ________      ________      ________
+ CNTSPAN        0.000
+ ATTNSEL        0.000         0.000
+ ATTNDIV        0.000         0.000         0.000
+ ATTNOPP        0.000         0.000         0.000         0.000
+ F8AGE          0.046         0.012         0.007         0.350         0.000
+ F9AGE          0.263         0.114         0.108         0.069         0.123
+ F10AGE         0.917         0.399         0.408         0.319         0.254
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              F9AGE         F10AGE
+              ________      ________
+ F9AGE          0.000
+ F10AGE         0.000         0.000
+
+
+SAMPLE STATISTICS FOR ESTIMATED FACTOR SCORES
+
+
+     SAMPLE STATISTICS
+
+
+           Means
+              ACC           ACC_SE        LANG          LANG_SE       PERFIQ
+              ________      ________      ________      ________      ________
+                5.351         0.000         0.000         0.169         1.513
+
+
+           Means
+              PERFIQ_S      EXECFUN       EXECFUN_
+              ________      ________      ________
+                0.687         0.000         0.228
+
+
+           Covariances
+              ACC           ACC_SE        LANG          LANG_SE       PERFIQ
+              ________      ________      ________      ________      ________
+ ACC           16.537
+ ACC_SE         0.000         0.000
+ LANG           2.701         0.000         0.513
+ LANG_SE       -0.001         0.000         0.000         0.000
+ PERFIQ         2.342         0.000         0.483         0.000         1.084
+ PERFIQ_S      -0.060         0.000        -0.018         0.000        -0.015
+ EXECFUN        1.138         0.000         0.224         0.000         0.355
+ EXECFUN_      -0.017         0.000        -0.005         0.000        -0.004
+
+
+           Covariances
+              PERFIQ_S      EXECFUN       EXECFUN_
+              ________      ________      ________
+ PERFIQ_S       0.021
+ EXECFUN       -0.008         0.157
+ EXECFUN_       0.005        -0.002         0.001
+
+
+           Correlations
+              ACC           ACC_SE        LANG          LANG_SE       PERFIQ
+              ________      ________      ________      ________      ________
+ ACC            1.000
+ ACC_SE       999.000         1.000
+ LANG           0.927       999.000         1.000
+ LANG_SE       -0.104       999.000        -0.172         1.000
+ PERFIQ         0.553       999.000         0.647        -0.095         1.000
+ PERFIQ_S      -0.102       999.000        -0.168         0.986        -0.101
+ EXECFUN        0.705       999.000         0.787        -0.127         0.860
+ EXECFUN_      -0.115       999.000        -0.186         0.985        -0.107
+
+
+           Correlations
+              PERFIQ_S      EXECFUN       EXECFUN_
+              ________      ________      ________
+ PERFIQ_S       1.000
+ EXECFUN       -0.133         1.000
+ EXECFUN_       0.978        -0.145         1.000
+
+
+PLOT INFORMATION
+
+The following plots are available:
+
+  Histograms (sample values, estimated factor scores, estimated values, residuals)
+  Scatterplots (sample values, estimated factor scores, estimated values, residuals)
+  Latent variable distribution plots
+
+     Beginning Time:  13:05:46
+        Ending Time:  13:07:12
+       Elapsed Time:  00:01:26
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2020 Muthen & Muthen
